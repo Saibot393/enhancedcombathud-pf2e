@@ -419,7 +419,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 		get label() {
 			//return "PF2E.ActionTypeFree";
-			game.i18n.localize("PF2E.ActionTypeFree").split(" ")[0];
+			return game.i18n.localize("PF2E.ActionTypeFree")//.split(" ")[0];
 		}
 		
 		get actionType() {
@@ -428,6 +428,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get colorScheme() {
 			return 1;
+		}
+		
+		_onNewRound(combat) {
+			this._currentActions = this.maxActions;
+			this.updateActionUse();
 		}
 		
 		async _getButtons() {
@@ -1006,7 +1011,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					return spell.isCantrip;
 				}
 				else {
-					return !spell.isCantrip && spell.system.level.value == level;
+					if (level == undefined) {
+						return !spell.isCantrip
+					}
+					else {
+						return !spell.isCantrip && spell.system.level.value == level;
+					}
 				}
 			}
 			
@@ -1033,9 +1043,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let buttons = [];
 				
 				for (let group of focus) {
-					buttons = buttons.concat(group.spells.filter(spell => !spell.isCantrip).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, spell.system.level?.value)})));
+					buttons = buttons.concat(group.spells.filter(spell => isvalidspell(spell)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, spell.system.level?.value)})));
 					
-					addcantrips = addcantrips.concat(group.spells.filter(spell => spell.isCantrip).map((spell) => {return {spell, group}}));
+					addcantrips = addcantrips.concat(group.spells.filter(spell => isvalidspell(spell, 0)).map((spell) => {return {spell, group}}));
 				}
 				
 				spellCategories.push({
