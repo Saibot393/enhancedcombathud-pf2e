@@ -1,0 +1,63 @@
+{
+  "id": "enhancedcombathud-pf2e",
+  "title": "Argon - Combat HUD (PF2E)",
+  "description": "An Argon version for the Pathfinder second edition System",
+  "authors": [
+    {
+    "name": "saibot"
+    }
+  ],
+  "version": "0.0.0",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "11"
+  },
+  "socket": "true",
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json",
+      "flags": {}
+    },
+    {
+      "lang": "de",
+      "name": "Deutsch",
+      "path": "lang/de.json",
+      "flags": {}
+    }
+  ],
+  "esmodules": [
+	"scripts/settings.js",
+	"scripts/pf2eui.js"
+  ],
+  "styles": [
+    "styles/StarfinderCustom.css"
+  ],
+  "relationships": {
+	"requires": [
+		{
+			"id": "enhancedcombathud",
+			"type": "module",
+			"compatibility": {}
+		}
+	],
+	"systems": [
+		{
+			"id": "pf2e",
+			"type": "system",
+			"compatibility": {}
+		}
+	]
+  },
+  "compatibility": {
+	"minimum": "11",
+	"verified": "11"
+  },
+  "url": "https://github.com/Saibot393/enhancedcombathud-pf2e-lite",
+  "download": "https://github.com/Saibot393/enhancedcombathud-pf2e-lite/archive/refs/tags/v1.2.4.zip",
+  "manifest": "https://github.com/Saibot393/enhancedcombathud-pf2e-lite/releases/latest/download/module.json",
+  "readme": "https://github.com/Saibot393/enhancedcombathud-pf2e-lite/blob/main/README.md",
+  "changelog": "https://github.com/Saibot393/enhancedcombathud-pf2e-lite/blob/main/CHANGELOG.md",
+  "allowBugReporter": true
+}

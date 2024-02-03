@@ -1,0 +1,81 @@
+{
+	"enhancedcombathud-pf2e-lite" : {
+		"Titles" : {
+			"StandardAction"			: "Standard Aktionen",
+			"MoveAction"				: "Bewegungsaktionen",
+			"SwiftAction"				: "Schnelle Aktionen",
+			"ReAction"					: "Reaktionen",
+			"FullAction"				: "Volle Aktionen",
+			"Action"					: "Aktion",
+			
+			"CombatManeuver"			: "Kampfmaneuver",
+			"BullRush"					: "Ansturm",
+			"DirtyTrick"				: "Schmutziger Trick",
+			"Disarm"					: "Entwaffnen",
+			"Grapple"					: "Ringkampf",
+			"Reposition"				: "Versetzen",
+			"Sunder"					: "Gegenstand zerschmettern",
+			"Trip"						: "Zu Fall bringen",
+			"CoveringFire"				: "Deckungsfeuer",
+			"Feint"						: "Finte",
+			"Fight Defensively"			: "Defensiv kämpfen",
+			"HarryingFire"				: "Unterstützungsfeuer",
+			"TotalDefense"				: "Volle Verteidigung",
+			
+			"DrawSheathe"				: "Ziehen/Verstauen",
+			"GuardedStep"				: "Vorsichtiger Schritt",
+			"Reload"					: "Nachladen",
+			"StandUp"					: "Aufstehen",
+			
+			"Charge"					: "Rennen",
+			"CoupdeGrace"				: "Coup de Grace",
+			"Withdraw"					: "Rückzug",
+			
+			"Attack"					: "Angriff",
+			"Move"						: "Bewegung",
+			"MeleeAttack"				: "Nahkampf",
+			"RangedAttack"				: "Fernkampf",
+			"Against"					: "Gegen"
+		},
+		
+		"Settings" : {
+			"CheckWeaponSets" : {
+				"name"					: "Waffensets überprüfen",
+				"descrp"				: "Ob Waffensets überprüft werden sollen um invalide Kombinationen zu verhindern"
+			},
+			"ShowSwiftActions" : {
+				"name"					: "Zeige schnelle Aktionen",
+				"descrp"				: "Ob eine Leiste für schnelle Aktionen angezeigt werden soll (wenn verfügbar)"
+			},
+			"ShowFullActions" : {
+				"name"					: "Zeige volle Aktionen",
+				"descrp"				: "Ob eine Leiste für volle Aktionen angezeigt werden soll "
+			},
+			"Showintegratedweapons" : {
+				"name"					: "Zeige integrierte Waffen",
+				"descrp"				: "Ob Waffen welche in getragene Rüstungen integriert sind in den Aktionsleisten angezeigt werden sollen"
+			},
+			"allowallItemsinItemslots" : {
+				"name"					: "Erlaube alle Gegenstände in Waffensets",
+				"descrp"				: "Ob alle Gegenstände in den Slots der Waffensets erlaubt sein sollen"
+			},
+			"HealthBarWidthScale" : {
+				"name"					: "Statusleisten Breite",
+				"descrp"				: "Die Breiten Skalierung der Statusleiste im Portrait"
+			},
+			"HealthBarHeightScale" : {
+				"name"					: "Statusleisten Höhe",
+				"descrp"				: "Die Höhen Skalierung der Statusleiste im Portrait"
+			},
+			"OwnSpellSlotConsume" : {
+				"name"					: "Angepasster Zauberplatz Verbrauch",
+				"descrp"				: "Ob Argon - Starfinder den Zauberplatz Verbrauch verwalten soll (wenn via Argon verursacht) um den Zauberplatz Verbrauch Bug zu umgehen"
+			}
+		}
+	},
+	
+    "enhancedcombathud.themeOptions.mainAction" : "Standard Aktion Farben",
+    "enhancedcombathud.themeOptions.bonusAction" : "Bewegungs-/Schnelle- Aktion Farben",
+    "enhancedcombathud.themeOptions.freeAction" : "Reaktion Farben",
+    "enhancedcombathud.themeOptions.reaction" : "Volle Aktion Farben"
+}

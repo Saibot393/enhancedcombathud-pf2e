@@ -1,0 +1,176 @@
+/*Based on Argon core portraitHUD.css, changes to the weapon sets to make them single buttons*/
+.weapon-set-buttoncorrection:before {
+    left: 50px !important;
+	bottom : 25px !important;
+	border : 0px !important;
+}
+.weapon-set-buttoncorrection.active:after {
+    left: 50px !important;
+	bottom : 25px !important;
+}
+
+.weapon-set-nobutton {
+    align-items: center;
+    backdrop-filter: blur(6px);
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-right: 0.75rem; 
+
+    pointer-events: all;
+}
+.weapon-set-nobutton:before {
+    border-radius: 0%;
+    border: 0px solid transparent !important;
+    content: '';
+    height: 0px !important;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, 100%) translateY(2.5px) !important;
+    transition: all 0.1s ease-in-out;
+    width: 0px !important;
+    pointer-events: none;
+}
+.weapon-set-nobutton:hover:before,
+.weapon-set-nobutton.active:before {
+    border-radius: 50%;
+    height: 0px !important;
+    width: 0px !important;
+	transform: translate(-50%, 50%) !important;
+}
+.weapon-set-nobutton.active:after {
+    border-radius: 50%;
+    content: '';
+    height: 0px !important;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, 100%) translateY(2.5px) !important;
+    width: 0px !important;
+    pointer-events: none;
+}
+.weapon-set-nobutton > .set {
+    background: no-repeat center;
+    background-origin: border-box;
+    background-size: cover;
+    height: 50px;
+    min-width: 50px;
+}
+
+.weapon-set-nobutton > .set.set-primary:before,
+.weapon-set-nobutton > .set.set-primary:after {
+    border-left: 0px solid transparent;
+    content: '';
+    height: 500px !important;
+    left: 50px;
+    position: absolute;
+    top: 0px;
+    transform: translateX(-50%);
+    width: 0px;
+}
+.weapon-set-nobutton > .set.set-primary:after {
+    transform: translate(-50%, 25px);
+}
+.weapon-set-nobutton:hover > .set.set-primary:before,
+.weapon-set-nobutton:hover > .set.set-primary:after,
+.weapon-set-nobutton.active > .set.set-primary:before,
+.weapon-set-nobutton.active > .set.set-primary:after {
+    height: 25px !important;
+}
+.weapon-set-nobutton:hover > .set.set-primary:after,
+.weapon-set-nobutton.active > .set.set-primary:after {
+    transform: translate(-50%, 25px) !important;
+}
+
+
+
+.weapon-set-nobutton-single > .set.set-primary:before,
+.weapon-set-nobutton-single > .set.set-primary:after {
+    border-left: 0px solid transparent !important;
+    content: '';
+    height: 25px;
+    left: 50%;
+    position: absolute;
+    top: 0px;
+    transform: translateX(-50%);
+    width: 0px;
+}
+
+
+/*Based on Argon core portraitHUD.css, changes to the weapon sets to make them single buttons*/
+.weapon-set-singleslotselect {
+    align-items: center;
+    backdrop-filter: blur(6px);
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-right: 0.75rem; 
+
+    pointer-events: all;
+}
+.weapon-set-singleslotselect:before {
+    border-radius: 0%;
+    border: 0px solid transparent !important;
+    content: '';
+    height: 0px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, 100%) translateY(2.5px) !important;
+    transition: all 0.1s ease-in-out;
+    width: 0px;
+    pointer-events: none;
+}
+.weapon-set-singleslotselect:hover:before,
+.weapon-set-singleslotselect.active:before {
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+	transform: translate(-50%, 50%) !important;
+}
+.weapon-set-singleslotselect.active:after {
+    border-radius: 50%;
+    content: '';
+    height: 15px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, 100%) translateY(2.5px) !important;
+    width: 15px;
+    pointer-events: none;
+}
+.weapon-set-singleslotselect > .set {
+    background: no-repeat center;
+    background-origin: border-box;
+    background-size: cover;
+    height: 50px;
+    min-width: 50px;
+}
+
+.weapon-set-singleslotselect > .set.set-primary:before,
+.weapon-set-singleslotselect > .set.set-primary:after {
+    border-left: 2px solid transparent !important;
+    content: '';
+    height: 25px;
+    left: 50%;
+    position: absolute;
+    top: 0px;
+    transform: translateX(-50%);
+    width: 0px;
+}
+.weapon-set-singleslotselect > .set.set-primary:after {
+    transform: translate(-50%, 25px);
+}
+.weapon-set-singleslotselect:hover > .set.set-primary:before,
+.weapon-set-singleslotselect:hover > .set.set-primary:after,
+.weapon-set-singleslotselect.active > .set.set-primary:before,
+.weapon-set-singleslotselect.active > .set.set-primary:after {
+    height: 12.5px;
+}
+.weapon-set-singleslotselect:hover > .set.set-primary:after,
+.weapon-set-singleslotselect.active > .set.set-primary:after {
+    transform: translate(-50%, 37.5px);
+}

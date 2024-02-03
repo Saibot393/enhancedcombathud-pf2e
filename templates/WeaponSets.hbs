@@ -1,0 +1,22 @@
+	<div>
+		{{#each sets}}
+
+		<div style="display:flex;flex-direction:column;transform:translate(0px, -104px)">
+			<div class="weapon-set" data-type="switchWeapons" data-set="{{@key}}">
+				<div class="set set-primary" draggable="true" data-set="{{@key}}" data-slot="primary" style="background-image: url({{primary.img}})"></div>
+				<div class="set set-secondary" draggable="true" data-set="{{@key}}" data-slot="secondary" style="background-image: url({{secondary.img}})"></div>
+			</div>
+			
+			<div class="weapon-set" data-type="switchWeapons" data-set="{{@key}}">
+				<div class="set set-secondary" draggable="true" data-set="{{@key}}" data-slot="secondary" style="background-image: url({{primary.img}})"></div>
+				<div class="set set-secondary" draggable="true" data-set="{{@key}}" data-slot="secondary" style="background-image: url({{secondary.img}})"></div>
+			</div>
+			
+			<div class="weapon-set" data-type="switchWeapons" data-set="{{@key}}">
+				<div class="set set-secondary" draggable="true" data-set="{{@key}}" data-slot="secondary" style="background-image: url({{primary.img}})"></div>
+				<div class="set set-secondary" draggable="true" data-set="{{@key}}" data-slot="secondary" style="background-image: url({{secondary.img}})"></div>
+			</div>
+		</div>
+
+		{{/each}}
+	</div>
