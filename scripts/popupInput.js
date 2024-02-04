@@ -44,12 +44,12 @@ async function openNewInput(type, title, question, options = {}, argonstyle = fa
 		content: content,
 		buttons: {
 			accept: {
-			  label: game.i18n.localize(ModuleName + "Titles.accept"),
+			  label: game.i18n.localize(ModuleName + ".Titles.accept"),
 			  callback: internalcallback,
 			  icon: `<i class="fas fa-check"></i>`
 			},
 			abbort: {
-			  label: game.i18n.localize(ModuleName + "Titles.accept"),
+			  label: game.i18n.localize(ModuleName + ".Titles.abbort"),
 			  callback: () => {},
 			  icon: `<i class="fas fa-times"></i>`
 			}

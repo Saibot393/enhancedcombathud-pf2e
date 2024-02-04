@@ -1,7 +1,9 @@
 {
 	"enhancedcombathud-pf2e" : {
 		"Titles" : {
-			"refocus"			: "refocus"
+			"refocus"			: "refocus",
+			"accept"			: "Accept",
+			"abbort"			: "Aboort"
 		},
 		
 		"Settings" : {

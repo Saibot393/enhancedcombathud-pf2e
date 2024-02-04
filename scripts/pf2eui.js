@@ -1315,18 +1315,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		constructor (...args) {
 			super(...args);
 			
-			this._prevUsedMovement = 0;
+			this._prevUsepoint = 0;
 			this._speedtype = "land";
+			this._tempmaxspeed = {};
+			this._movementsegment = 0; //increases by one after one full movement segment was used
+			this._freeAction = 0;
 		}
 
 		get visible() {
 			return game.combat?.started;
-		}
-
-		get movementMax() {
-			return 0;
-					
-			return this.actor.system.attributes.speed[this.movementtype].value / canvas.scene.dimensions.distance;
 		}
 		
 		get movementtype() {
@@ -1345,29 +1342,79 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		set movementUsed(value) {
-			super._movementUsed = value;
+			const prevUsed = this._movementUsed;
 			
-			if (Math.ceil(value/this.movementMax) - Math.ceil(this._prevUsedMovement/this.movementMax) > 0) {
-				useAction("move");
-			};
+			this._movementUsed = value;
 			
-			this._prevUsedMovement = value;
+			if (this.movementMax > 0) {
+				let savepoint = false;
+				
+				let usedactions = Math.ceil((this._movementUsed-this._prevUsepoint)/this.movementMax) - Math.ceil((prevUsed-this._prevUsepoint)/this.movementMax);
+				
+				usedactions = usedactions - this._freeAction;
+				this._freeAction = 0;
+				
+				if (usedactions > 0) {
+					savepoint = true;
+
+					console.log("an action should be used here");
+				}
+				
+				if (this._movementUsed-this._prevUsepoint >= this.movementMax) {
+					savepoint = true;
+					
+					this._movementsegment = this._movementsegment + Math.max(1, usedactions);
+					
+					this.resettempspeed();
+				}
+				
+				if (savepoint) {
+					this._prevUsepoint = this._movementUsed - (this._movementUsed%this.movementMax);
+				}
+				
+				this.updateMovement();
+			}
 		}
 		
 		_onNewRound(combat) {
 			super._onNewRound(combat);
 			
-			this._prevUsedMovement = 0;
+			this._prevUsepoint = 0;
+			this._tempmaxspeed = {};
+			this._movementsegment = 0;
+			this._freeAction = 0;
+			
+			this.updateMovement();
 	    }
+		
+		async resettempspeed() {
+			if (Object.keys(this._tempmaxspeed).length) {
+				this._tempmaxspeed = {};
+				this.render();
+			}
+		}
 		
 		get speedtype() {
 			return this._speedtype;
+		}
+		
+		set speedtype(value) {
+			this._speedtype = value;
+			
+			this._prevUsepoint = this._movementUsed;
+			this._tempmaxspeed = {};
+			this._freeAction = 0;
+			
+			this.render();
 		}
 		
 		get typemaxspeed() {
 			let typeinfo = this.actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == this.speedtype);
 			
 			if (this.speedtype == "land") {
+				if (this.actor.hasCondition("prone")) {
+					return 5;
+				}
 				typeinfo = this.actor.system.attributes.speed;
 			}
 			
@@ -1379,21 +1426,105 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 		
+		get tempmaxspeed() {
+			return this._tempmaxspeed[this.speedtype];
+		}
+		
+		get maxspeed() {
+			if (this.typemaxspeed) {
+				return this.typemaxspeed;
+			}
+			
+			if (this.tempmaxspeed) {
+				return this.tempmaxspeed; 
+			}
+			
+			return 0;
+		}
+		
+		get movementMax() {
+			return this.maxspeed/canvas.scene.dimensions.distance;
+		}
+		
 		get requiredroll() {
-			if (this.typemaxspeed == 0) {
+			if (this.maxspeed == 0) {
 				switch(this.speedtype) {
 					case "swim":
 						return async () => {
-							game.pf2e.actions.swim({actors : canvas.tokens.controlled[0].actor, 
-													difficultyClass: await openNewInput("number", `game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) ${game.i18n.localize("PF2E.Check.DC.Unspecific")}`, `game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) ${game.i18n.localize("PF2E.Check.DC.Unspecific")}:`)}),
-													callback: (roll) => {console.log(roll)}
+							let title = game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) + " " + game.i18n.localize("PF2E.Check.DC.Unspecific");
+							
+							let dc = Number(await openNewInput("number", title, `${title}:`));
+							
+							await game.pf2e.actions.swim({
+								actors : canvas.tokens.controlled[0].actor, 
+								difficultyClass: dc,
+								callback: (result) => {
+									console.log("an action should be used here");
+									this._freeAction = 1;
+									
+									const landspeed = this.actor.system.attributes.speed.value;
+								
+									const outcome = result.outcome;
+									
+									let newspeed = 0;
+									
+									switch(outcome) {
+										case "criticalFailure":
+											break;
+										case "failure":
+											break;
+										case "success":
+											newspeed = 5 + 5 * Math.floor(landspeed/20);
+											break;
+										case "criticalSuccess":
+											newspeed = 10 + 5 * Math.floor(landspeed/20);
+											break;
+									}
+									
+									this._tempmaxspeed[this.speedtype] = newspeed;
+									
+									this.render();
+								}
+							});
 						}
 						break;
 					case "climb":
 						return async () => {
-							game.pf2e.actions.climb({actors : canvas.tokens.controlled[0].actor, 
-													difficultyClass: await openNewInput("number", `game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) ${game.i18n.localize("PF2E.Check.DC.Unspecific")}`, `game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) ${game.i18n.localize("PF2E.Check.DC.Unspecific")}:`)}),
-													callback: (roll) => {console.log(roll)}
+							let title = game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) + " " + game.i18n.localize("PF2E.Check.DC.Unspecific");
+							
+							let dc = Number(await openNewInput("number", title, `${title}:`));
+							
+							await game.pf2e.actions.climb({
+								actors : canvas.tokens.controlled[0].actor, 
+								difficultyClass: dc,
+								callback: (result) => {
+									console.log("an action should be used here");
+									this._freeAction = 1;
+									
+									const landspeed = this.actor.system.attributes.speed.value;
+									
+									const ourcome = result.outcome;
+									
+									let newspeed = 0;
+									
+									switch(ourcome) {
+										case "criticalFailure":
+											break;
+										case "failure":
+											break;
+										case "success":
+											newspeed = Math.max(5, 5 * Math.floor(landspeed/20));
+											break;
+										case "criticalSuccess":
+											newspeed = 5 + 5 * Math.floor(landspeed/20);
+											break;
+									}
+									
+									this._tempmaxspeed[this.speedtype] = newspeed;
+									
+									this.render();
+								}
+							});
 						}
 						break;
 				}
@@ -1402,18 +1533,27 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			return null;
 		}
 		
-		get currentmaxspeed() {
-			let maxspeed = this.typemaxspeed();
+		get movementColor() {
+			const movementColors = ["base-movement", "dash-movement", "danger-movement"];
 			
-			if (maxspeed) {
-				return maxspeed;
-			}
-			
-			
+			return movementColors[Math.min(Math.max(this._movementsegment, 0), 3)]
 		}
 		
 		async _renderInner() {
 			await super._renderInner();
+			
+			let roll = this.requiredroll;
+			if (roll) {
+				let rollicon = document.createElement("i");
+				rollicon.classList.add("fa-solid", "fa-dice-d20", "movement-space");
+				rollicon.style.fontSize = "2.7rem";
+				rollicon.style.top = "120px";
+				rollicon.style.position = "absolute";
+				
+				rollicon.onclick = roll;
+				
+				this.element.prepend(rollicon);
+			}
 			
 			const movementselect = document.createElement("select");
 			movementselect.id = "movementselect";
@@ -1421,6 +1561,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			movementselect.style.color = "white";
 			movementselect.style.backdropFilter = "var(--ech-blur-amount)";
 			movementselect.style.backgroundColor = "rgba(0,0,0,.3)";
+			movementselect.onchange = (value) => {
+				this.speedtype = value.srcElement.value;
+			}
 			
 			let movementtypes = [this.actor.system.attributes.speed.type];
 			
@@ -1439,7 +1582,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const typeoption = document.createElement("option");
 				typeoption.value = movementtype;
 				typeoption.innerHTML = game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(movementtype)}`);
-				typeoption.checked = (movementtype == this.speedtype);
+				typeoption.selected = (movementtype == this.speedtype);
 				typeoption.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
 				typeoption.style.width = "200px";
 				typeoption.style.height = "20px";
@@ -1447,32 +1590,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				typeoption.style.fontSize = "15px";
 				typeoption.style.backdropFilter = "var(--ech-blur-amount)";
 				typeoption.style.backgroundColor = "rgba(0,0,0,.3)";
-				
-				const icon = document.createElement("i");
-				icon.classList.add("fa-solid");
-				if (rollmovements.includes(movementtype)) {
-					icon.classList.add("fa-dice-d20");
-				}
-				else{
-					switch (movementtype) {
-						case "land":
-							icon.classList.add("fa-person-running");
-							break;
-						case "swim":
-							icon.classList.add("fa-person-swimming");
-							break;
-						case "climb":
-							icon.classList.add("fa-mountain");
-							break;
-						case "fly":
-							icon.classList.add("fa-feather-pointed");
-							break;
-						case "burrow":
-							icon.classList.add("fa-water-ladder");
-							break;
-					}
-				}
-				typeoption.setAttribute("data-content", icon.innerHTML);
 				
 				movementselect.appendChild(typeoption);
 			}
