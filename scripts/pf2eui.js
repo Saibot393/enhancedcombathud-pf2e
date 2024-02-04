@@ -1,5 +1,6 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
 import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction} from "./utils.js";
+import {openNewInput} from "./popupInput.js";
 
 const systemicons = {
 	lifeSupport : "fa-heart-pulse",
@@ -824,6 +825,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						option.style.width = "200px";
 						option.style.height = "20px";
 						option.style.backgroundColor = "grey";
+						option.style.fontSize = "12px";
 						option.selected = this.item.system.selectedAmmoId == ammo.id;
 						
 						ammoSelect.appendChild(option);
@@ -1313,7 +1315,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		constructor (...args) {
 			super(...args);
 			
-			this.prevUsedMovement = 0;
+			this._prevUsedMovement = 0;
+			this._speedtype = "land";
 		}
 
 		get visible() {
@@ -1322,14 +1325,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 		get movementMax() {
 			return 0;
-			switch (this.actor.type) {
-				case "starship":
-					return this.actor.system.attributes.speed.value;
-					break;
-				default:
-					return this.actor.system.attributes.speed[this.movementtype].value / canvas.scene.dimensions.distance;
-					break;
-			}
+					
+			return this.actor.system.attributes.speed[this.movementtype].value / canvas.scene.dimensions.distance;
 		}
 		
 		get movementtype() {
@@ -1350,18 +1347,70 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		set movementUsed(value) {
 			super._movementUsed = value;
 			
-			if (Math.ceil(value/this.movementMax) - Math.ceil(this.prevUsedMovement/this.movementMax) > 0) {
+			if (Math.ceil(value/this.movementMax) - Math.ceil(this._prevUsedMovement/this.movementMax) > 0) {
 				useAction("move");
 			};
 			
-			this.prevUsedMovement = value;
+			this._prevUsedMovement = value;
 		}
 		
 		_onNewRound(combat) {
 			super._onNewRound(combat);
 			
-			this.prevUsedMovement = 0;
+			this._prevUsedMovement = 0;
 	    }
+		
+		get speedtype() {
+			return this._speedtype;
+		}
+		
+		get typemaxspeed() {
+			let typeinfo = this.actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == this.speedtype);
+			
+			if (this.speedtype == "land") {
+				typeinfo = this.actor.system.attributes.speed;
+			}
+			
+			if (!typeinfo) {//fallback to default land
+				return 0;
+			}
+			else {
+				return typeinfo.value;
+			}
+		}
+		
+		get requiredroll() {
+			if (this.typemaxspeed == 0) {
+				switch(this.speedtype) {
+					case "swim":
+						return async () => {
+							game.pf2e.actions.swim({actors : canvas.tokens.controlled[0].actor, 
+													difficultyClass: await openNewInput("number", `game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) ${game.i18n.localize("PF2E.Check.DC.Unspecific")}`, `game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) ${game.i18n.localize("PF2E.Check.DC.Unspecific")}:`)}),
+													callback: (roll) => {console.log(roll)}
+						}
+						break;
+					case "climb":
+						return async () => {
+							game.pf2e.actions.climb({actors : canvas.tokens.controlled[0].actor, 
+													difficultyClass: await openNewInput("number", `game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) ${game.i18n.localize("PF2E.Check.DC.Unspecific")}`, `game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(this.speedtype)}`) ${game.i18n.localize("PF2E.Check.DC.Unspecific")}:`)}),
+													callback: (roll) => {console.log(roll)}
+						}
+						break;
+				}
+			}
+			
+			return null;
+		}
+		
+		get currentmaxspeed() {
+			let maxspeed = this.typemaxspeed();
+			
+			if (maxspeed) {
+				return maxspeed;
+			}
+			
+			
+		}
 		
 		async _renderInner() {
 			await super._renderInner();
@@ -1370,16 +1419,60 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			movementselect.id = "movementselect";
 			movementselect.style.width = "100%";
 			movementselect.style.color = "white";
+			movementselect.style.backdropFilter = "var(--ech-blur-amount)";
+			movementselect.style.backgroundColor = "rgba(0,0,0,.3)";
 			
-			for (const movementtype of Object.keys(this.actor.system.attributes.speed).filter(key => this.actor.system.attributes.speed[key]?.value)) {
+			let movementtypes = [this.actor.system.attributes.speed.type];
+			
+			movementtypes = movementtypes.concat(this.actor.system.attributes.speed.otherSpeeds.map(speed => speed.type));
+			
+			let rollmovements = [];
+			
+			for (let check of ["swim", "climb"]) {
+				if (!movementtypes.includes(check)) {
+					movementtypes.push(check);
+					rollmovements.push(check);
+				}
+			}
+			
+			for (const movementtype of movementtypes) {
 				const typeoption = document.createElement("option");
 				typeoption.value = movementtype;
-				typeoption.innerHTML = CONFIG.SFRPG.speeds[movementtype];
-				typeoption.checked = (movementtype == "land");
+				typeoption.innerHTML = game.i18n.localize(`PF2E.Actor.Speed.Type.${firstUpper(movementtype)}`);
+				typeoption.checked = (movementtype == this.speedtype);
 				typeoption.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
 				typeoption.style.width = "200px";
 				typeoption.style.height = "20px";
 				typeoption.style.backgroundColor = "grey";
+				typeoption.style.fontSize = "15px";
+				typeoption.style.backdropFilter = "var(--ech-blur-amount)";
+				typeoption.style.backgroundColor = "rgba(0,0,0,.3)";
+				
+				const icon = document.createElement("i");
+				icon.classList.add("fa-solid");
+				if (rollmovements.includes(movementtype)) {
+					icon.classList.add("fa-dice-d20");
+				}
+				else{
+					switch (movementtype) {
+						case "land":
+							icon.classList.add("fa-person-running");
+							break;
+						case "swim":
+							icon.classList.add("fa-person-swimming");
+							break;
+						case "climb":
+							icon.classList.add("fa-mountain");
+							break;
+						case "fly":
+							icon.classList.add("fa-feather-pointed");
+							break;
+						case "burrow":
+							icon.classList.add("fa-water-ladder");
+							break;
+					}
+				}
+				typeoption.setAttribute("data-content", icon.innerHTML);
 				
 				movementselect.appendChild(typeoption);
 			}
@@ -1398,13 +1491,31 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		async _getButtons() {
-			return [
+			let buttons = [
 				{
 					label: "PF2E.Action.RestForTheNight.Label",
 					onClick: (event) => game.pf2e.actions.restForTheNight({actors : this.actor}),
-					icon: "fas fa-bed",
+					icon: "fas fa-bed"
 				}
-			]
+			];
+			
+			if (this.actor.system.resources?.focus?.max) {
+				buttons.push({
+					label: ModuleName + ".Titles.refocus",
+					onClick: (event) => this.actor.update({system : {resources : {focus : {value : Math.min(this.actor.system.resources.focus.value + 1, this.actor.system.resources.focus.max)}}}}),
+					icon: "fa-solid fa-book-open-reader"
+				});
+			}
+			
+			if (this.actor.skills.medicine.rank) {
+				buttons.push({
+					label: (await fromUuid("Compendium.pf2e.actionspf2e.Item.1kGNdIIhuglAjIp9")).name,
+					onClick: (event) => game.pf2e.actions.treatWounds({actors : this.actor}),
+					icon: "fa-solid fa-kit-medical"
+				});
+			}
+			
+			return buttons;
 		}
 	}
 	

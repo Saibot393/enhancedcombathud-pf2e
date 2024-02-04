@@ -1,96 +1,11 @@
 {
-	"enhancedcombathud-pf2e-lite" : {
+	"enhancedcombathud-pf2e" : {
 		"Titles" : {
-			"StandardAction"			: "Standard Actions",
-			"MoveAction"				: "Move Actions",
-			"SwiftAction"				: "Swift Actions",
-			"ReAction"					: "Reactions",
-			"FullAction"				: "Full Actions",
-			"Action"					: "Action",
-			
-			"CombatManeuver"			: "Combat Maneuver",
-			"BullRush"					: "Bull Rush",
-			"DirtyTrick"				: "Dirty Trick",
-			"Disarm"					: "Disarm",
-			"Grapple"					: "Grapple",
-			"Reposition"				: "Reposition",
-			"Sunder"					: "Sunder",
-			"Trip"						: "Trip",
-			"CoveringFire"				: "Covering Fire",
-			"Feint"						: "Feint",
-			"FightDefensively"			: "Fight Defensively",
-			"HarryingFire"				: "Harrying Fire",
-			"TotalDefense"				: "Total Defense",
-			
-			"DrawSheathe"				: "Draw/Sheathe",
-			"GuardedStep"				: "Guarded Step",
-			"Reload"					: "Reload",
-			"StandUp"					: "Stand Up",
-			
-			"Charge"					: "Charge",
-			"CoupdeGrace"				: "Coup de Grace",
-			"Withdraw"					: "Withdraw",
-			
-			"Attack"					: "Attack",
-			"Move"						: "Move",
-			"MeleeAttack"				: "Melee Attack",
-			"RangedAttack"				: "Ranged Attack",
-			"Against"					: "Against"
+			"refocus"			: "refocus"
 		},
 		
 		"Settings" : {
-			"CheckWeaponSets" : {
-				"name"					: "Check weapon sets",
-				"descrp"				: "If weapon sets should be checked to prevent impossible or invalid combination"
-			},
-			"ShowSwiftActions" : {
-				"name"					: "Show swift actions",
-				"descrp"				: "If a panel for swift actions should be shown (if available)"
-			},
-			"ShowFullActions" : {
-				"name"					: "Show full actions",
-				"descrp"				: "If a panel for full actions should be shown"
-			},
-			"Showintegratedweapons" : {
-				"name"					: "Show integrated weapons",
-				"descrp"				: "If weapons integrated into the worn armor should be shown in the action bars"
-			},
-			"allowallItemsinItemslots" : {
-				"name"					: "Allow all items in item sets",
-				"descrp"				: "If all items should be placeable in the item set slots"
-			},
-			"HealthBarWidthScale" : {
-				"name"					: "Status bar width",
-				"descrp"				: "The width scale of the status bar in the portrait"
-			},
-			"HealthBarHeightScale" : {
-				"name"					: "Status bar height",
-				"descrp"				: "The height scale of the status bar in the portrait"
-			},
-			"ShowSystemStatus" : {
-				"name"					: "Show ship system status",
-				"descrp"				: "For which roles the ship system status should be displayed in the portrait",
-				"options" : {
-					"never"				: "never",
-					"engineer"			: "Engineer",
-					"engineercaptain"	: "Engineer, Captain",
-					"always"			: "always"
-				}
-			},
-			"ShowWeaponStatus" : {
-				"name"					: "Show ship weapon status",
-				"descrp"				: "For which roles the ship weapon status should be displayed in the portrait",
-				"options" : {
-					"never"				: "never",
-					"engineergunner"	: "Engineer, Gunner",
-					"engineergunnercaptain": "Engineer, Gunner, Captain",
-					"always"			: "always"
-				}
-			},
-			"OwnSpellSlotConsume" : {
-				"name"					: "Custom spell slot consume",
-				"descrp"				: "If Argon - Starfinder should take care of spell slot consumption (if triggered via Argon) to circumvent the spellslot consumption bug"
-			}
+			
 		}
 	},
 	
