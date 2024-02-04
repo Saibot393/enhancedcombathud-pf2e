@@ -31,9 +31,6 @@
 	"scripts/settings.js",
 	"scripts/pf2eui.js"
   ],
-  "styles": [
-    "styles/StarfinderCustom.css"
-  ],
   "relationships": {
 	"requires": [
 		{

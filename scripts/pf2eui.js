@@ -28,6 +28,25 @@ const systemconditioncolor = {
 	wrecked : "red"
 }
 
+/* EXPERIMENTLA code to add custom colors
+Hooks.once("argonDefaultColor", (defaultColors) => {
+	defaultColors.colors.movement.test123 = { background: "#c85f5aFF", boxShadow: "#dc736eCC" };
+	//ui.ARGON.setColorSettings();
+	
+	//document.styleSheets
+	//document.styleSheets[1].addRule(".extended-combat-hud .movement-hud .movement-spaces .movement-space.test-movement", "background-color: var(--ech-movement-dangerMovement-background); box-shadow: 0px 0px 10px 0px var(--ech-movement-dangerMovement-boxShadow);")
+	//ui.ARGON.setColorSettings()
+	//game.settings.get("enhancedcombathud", "echThemeData")
+	
+	//problem 635:  const json = await this.getThemeJson(theme.theme);
+});	
+
+//for config
+Hooks.once("init", () => {
+	Hooks.call("argonDefaultColor", defaultTheme);
+});
+*/
+
 Hooks.on("argonInit", async (CoreHUD) => {
     const ARGON = CoreHUD.ARGON;
   
@@ -1577,7 +1596,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get movementColor() {
-			const movementColors = ["base-movement", "dash-movement", "danger-movement"];
+			const movementColors = [/*"test-movement",*/ "base-movement", "dash-movement", "danger-movement"];
 			
 			return movementColors[Math.min(Math.max(this._movementsegment, 0), 3)]
 		}
