@@ -390,4 +390,4 @@ function spelluseAction(spell, spellGroup, level) {
 	}
 }
 
-export { getTooltipDetails, ModuleName, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction}
+export { replacewords, getTooltipDetails, ModuleName, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction}

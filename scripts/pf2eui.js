@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {ModuleName, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction} from "./utils.js";
 
 const systemicons = {
 	lifeSupport : "fa-heart-pulse",
@@ -97,46 +97,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				break;
 		}
 	}
-	
-	function armsof(actor) {
-		let attributes = actor?.system.attributes;
-		
-		switch(actor?.type) {
-			case "character":
-			case "npc":
-			case "npc2":
-				return attributes?.arms
-				break;
-			case "drone":
-				let arms = 0;
-				
-				if (attributes?.arms) {
-					arms = arms + attributes.arms;
-				}
-				
-				if (attributes?.weaponMounts?.melee) {
-					arms = arms + attributes.weaponMounts.melee.max;
-				}
-				
-				if (attributes?.weaponMounts?.ranged) {
-					arms = arms + attributes.weaponMounts.ranged.max;
-				}
-				
-				return arms;
-				break;
-			case "starship":
-				return 1;
-		}
-	}
-	
-	//for ammunition updates
-	function onUpdateItemadditional(item) {
-		if (item.parent !== ui.ARGON._actor) return;
-		for (const itemButton of ui.ARGON.itemButtons) {
-			if (itemButton.item?.system?.container?.contents[0]?.id == item.id) itemButton.render();
-		}
-	}
-	Hooks.on("updateItem", onUpdateItemadditional.bind(CoreHUD));
   
     class PF2EPortraitPanel extends ARGON.PORTRAIT.PortraitPanel {
 		constructor(...args) {
@@ -223,6 +183,53 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				],
 			];
 		}
+		
+		async _renderInner() {
+			await super._renderInner();
+			
+			if (this.actor.system.resources.heroPoints?.max) {
+				let max = this.actor.system.resources.heroPoints.max;
+				let value = this.actor.system.resources.heroPoints.value;
+				
+				let heroPoints = document.createElement("div");
+				heroPoints.classList.add("dots");
+				heroPoints.style.zIndex = "1";
+				heroPoints.style.position = "absolute";
+				heroPoints.style.top = "0";
+				heroPoints.style.right = "0";
+				heroPoints.onclick = () => {this.actor.update({system : {resources : {heroPoints : {value : Math.min(value + 1, max)}}}})};
+				heroPoints.oncontextmenu = () => {this.actor.update({system : {resources : {heroPoints : {value : Math.max(value - 1, 0)}}}})};
+				
+				let heroSpan = document.createElement("span");
+				heroSpan.classList.add("adjust-hero-points");
+				if (value == 1) {
+					heroSpan.setAttribute("data-tooltip", replacewords(game.i18n.localize("PF2E.HeroPointRatio.One"), {value : value, max : max}));
+				}
+				else {
+					heroSpan.setAttribute("data-tooltip", replacewords(game.i18n.localize("PF2E.HeroPointRatio.Many"), {value : value, max : max}));
+				}
+				heroSpan.style.fontSize = "15px";
+				
+				for (let i = 1; i <= max; i++) {
+					let icon = document.createElement("i");
+					
+					if (i <= value) {
+						icon.classList.add("fa-solid", "fa-hospital-symbol");
+					}
+					else {
+						icon.classList.add("fa-regular", "fa-circle");
+					}
+					icon.style.margin = "5px";
+					icon.style.marginLeft = "0px";
+					
+					heroSpan.appendChild(icon);
+				}
+				
+				heroPoints.appendChild(heroSpan);
+				
+				this.element.appendChild(heroPoints);
+			}
+		}
 	}
 	
 	class PF2EDrawerPanel extends ARGON.DRAWER.DrawerPanel {
@@ -234,7 +241,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			let returncategories = [];
 			
 			const saves = this.actor.saves;
-			const skills = this.actor.skills;
+			const skills = {perception : this.actor.perception, ...this.actor.skills};
 			
 			const savesButtons = Object.keys(saves).map(saveKey => {
 				const save = saves[saveKey];
@@ -538,6 +545,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			return  this.item || this._isWeaponSet;
 		}
 		
+		async _onSetChange({sets, active}) {
+			const activeSet = sets[active];
+
+			const item = this.isPrimary ? activeSet.primary : (activeSet.primary != activeSet.secondary ? activeSet.secondary : null);
+			this.setItem(item);    
+		}
+		
 		get visible() {
 			if (this._isWeaponSet && this.actionType != "action") {
 				if (this.item) {
@@ -586,7 +600,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let uses = 0;
 					let hasuses = false;
 					
-					if (this.parent.usecounts?.hasOwnProperty(this.item?.id)) {
+					if (this.parent?.usecounts?.hasOwnProperty(this.item?.id)) {
 						uses = uses + this.parent.usecounts[this.item.id]();
 						hasuses = true;
 					}
@@ -605,7 +619,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					break;
 					
 				default :
-					return this.item?.system?.quantity;
+					if (this.item?.system?.uses?.max) {
+						return this.item.system.uses.value;
+					}
+					else{
+						return this.item?.system?.quantity;
+					}
 					break;
 			}
 		}
@@ -749,7 +768,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			await super._renderInner();
 			
-			if (this.isWeaponSet) {
+			if (this.isWeaponSet && this.isPrimary) {
 				this.panel = await this._getPanel();
 				if (this.panel) {
 					this.panel._parent = this;
@@ -767,151 +786,151 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			const MAPActions = [{MAP : 1}, {MAP : 2}];
-			if (this.item.type == "weapon") {
-				this.element.querySelector("span").id = "maintitle";
-				
-				for (let i = 0; i < MAPActions.length; i++) {
-					let Action = MAPActions[i];
-					let ActionTitle = document.createElement("span");
-					ActionTitle.id = "specialAction";
-					ActionTitle.classList.add("action-element-title");
-					ActionTitle.innerHTML = MAPtext(this.item, Action.MAP);
-					ActionTitle.onclick = (event) => {event.stopPropagation(); event.preventDefault(); this._onLeftClick(event, {MAP : Action.MAP, specialAction : true})};
-					ActionTitle.style.visibility = "hidden";
+			if (this.isWeaponSet) {
+				const MAPActions = [{MAP : 1}, {MAP : 2}];
+				if (this.item.type == "weapon") {
+					this.element.querySelector("span").id = "maintitle";
 					
-					ActionTitle.style.width = `${100/MAPActions.length}%`;
-					ActionTitle.style.left = `${i * 100/MAPActions.length}%`;
-					
-					ActionTitle.onmouseenter = () => {ActionTitle.style.filter = "brightness(66%)"}
-					ActionTitle.onmouseleave = () => {ActionTitle.style.filter = ""}
-					
-					this.element.appendChild(ActionTitle);
-				}
-			}
-			
-			if (this.item?.requiresAmmo) {
-				let ammoSelect = document.createElement("select");
-				//ammoSelect.classList.add("action-element-title");
-				ammoSelect.id = "specialAction";
-				
-				for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => item.isAmmo)]) {
-					let option = document.createElement("option");
-					option.text = ammo.name;
-					option.value = ammo.id;
-
-					option.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
-					option.style.width = "200px";
-					option.style.height = "20px";
-					option.style.backgroundColor = "grey";
-					option.selected = this.item.system.selectedAmmoId == ammo.id;
-					
-					ammoSelect.appendChild(option);
-				}
-				
-				ammoSelect.style.position = "absolute";
-				ammoSelect.style.top = "0";
-				ammoSelect.style.left = "0";
-				ammoSelect.style.width = `${100/2}%`;
-				ammoSelect.style.height = `${100/8}%`;
-				ammoSelect.style.color = "#c8c8c8";
-				ammoSelect.style.backdropFilter = "var(--ech-blur-amount)";
-				ammoSelect.style.backgroundColor = "rgba(0,0,0,.3)";
-				ammoSelect.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
-				ammoSelect.style.borderColor = "inherit";
-				
-				ammoSelect.onchange = () => {this.item.update({system : {selectedAmmoId : ammoSelect.value}})};
-				
-				this.element.appendChild(ammoSelect);
-			}
-			
-			if (this.item) {
-				let toggles = [];
-				
-				let toggleoptions = ["versatile", "modular"];
-				
-				for (let togglekey of toggleoptions) {
-					if (this.item.system.traits.toggles) {
-						let toggle = this.item.system.traits.toggles[togglekey];
+					for (let i = 0; i < MAPActions.length; i++) {
+						let Action = MAPActions[i];
+						let ActionTitle = document.createElement("span");
+						ActionTitle.id = "specialAction";
+						ActionTitle.classList.add("action-element-title");
+						ActionTitle.innerHTML = MAPtext(this.item, Action.MAP);
+						ActionTitle.onclick = (event) => {event.stopPropagation(); event.preventDefault(); this._onLeftClick(event, {MAP : Action.MAP, specialAction : true})};
+						ActionTitle.style.visibility = "hidden";
 						
-						if (toggle.options.length) {
-							let options = [null, ...toggle.options];
+						ActionTitle.style.width = `${100/MAPActions.length}%`;
+						ActionTitle.style.left = `${i * 100/MAPActions.length}%`;
+						
+						ActionTitle.onmouseenter = () => {ActionTitle.style.filter = "brightness(66%)"}
+						ActionTitle.onmouseleave = () => {ActionTitle.style.filter = ""}
+						
+						this.element.appendChild(ActionTitle);
+					}
+				}
+				
+				if (this.item?.requiresAmmo) {
+					let ammoSelect = document.createElement("select");
+					//ammoSelect.classList.add("action-element-title");
+					ammoSelect.id = "specialAction";
+					
+					for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => item.isAmmo)]) {
+						let option = document.createElement("option");
+						option.text = ammo.name;
+						option.value = ammo.id;
+
+						option.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
+						option.style.width = "200px";
+						option.style.height = "20px";
+						option.style.backgroundColor = "grey";
+						option.selected = this.item.system.selectedAmmoId == ammo.id;
+						
+						ammoSelect.appendChild(option);
+					}
+					
+					ammoSelect.style.position = "absolute";
+					ammoSelect.style.top = "0";
+					ammoSelect.style.left = "0";
+					ammoSelect.style.width = `${100/2}%`;
+					ammoSelect.style.height = `${100/8}%`;
+					ammoSelect.style.color = "#c8c8c8";
+					ammoSelect.style.backdropFilter = "var(--ech-blur-amount)";
+					ammoSelect.style.backgroundColor = "rgba(0,0,0,.3)";
+					ammoSelect.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
+					ammoSelect.style.borderColor = "inherit";
+					
+					ammoSelect.onchange = () => {this.item.update({system : {selectedAmmoId : ammoSelect.value}})};
+					
+					this.element.appendChild(ammoSelect);
+				}
+				
+				if (this.item) {
+					let toggles = [];
+					
+					let toggleoptions = ["versatile", "modular"];
+					
+					for (let togglekey of toggleoptions) {
+						if (this.item.system.traits.toggles) {
+							let toggle = this.item.system.traits.toggles[togglekey];
 							
-							let current = toggle.selection;
-							let currentid = options.indexOf(current);
-							let next = options[(currentid + 1)%options.length];
-							
-							console.log(next);
-							
-							if (current == null) {
-								current = this.item.system.damage.damageType;
+							if (toggle.options.length) {
+								let options = [null, ...toggle.options];
+								
+								let current = toggle.selection;
+								let currentid = options.indexOf(current);
+								let next = options[(currentid + 1)%options.length];
+								
+								if (current == null) {
+									current = this.item.system.damage.damageType;
+								}
+								
+								let toggleData = {
+									iconclass : damageIcon(current),
+									onclick : () => {this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})}
+								};
+								
+								toggles.push(toggleData);
 							}
-							
-							let toggleData = {
-								iconclass : damageIcon(current),
-								onclick : () => {this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})}
-							};
-							
-							toggles.push(toggleData);
-						}
-					}
-				}
-				
-				if (this.item.isThrowable) {
-					let isthrown = this.item.getFlag(ModuleName, "thrown");
-					
-					let toggleData = {
-						iconsource : "systems/pf2e/icons/mdi/thrown.svg",
-						greyed : !isthrown,
-						onclick : () => {this.item.setFlag(ModuleName, "thrown", !isthrown)}
-					};	
-
-					toggles.push(toggleData);
-				}
-				
-				if (this.panel) {
-					let isthrown = this.item.getFlag(ModuleName, "thrown");
-					
-					let toggleData = {
-						iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
-						onclick : () => {this.panel.toggle()}
-					};	
-
-					toggles.push(toggleData);
-				}
-				
-				const iconsize = 30;
-				let topoffset = 1;
-				
-				for (let toggle of toggles) {
-					let icon;
-					if (toggle.iconclass) {
-						icon = document.createElement("i");
-						icon.classList.add("icon", ...toggle.iconclass);
-						icon.style.fontSize = `${iconsize*0.75}px`;
-					}
-					if (toggle.iconsource) {
-						icon = document.createElement("div");
-						icon.style.backgroundImage = `url(${toggle.iconsource})`;
-						icon.style.backgroundSize = "cover";
-						icon.style.filter = "invert(1)"; //for white icon
-						if (toggle.greyed) {
-							icon.style.filter = "invert(0.4)"; //for white icon
 						}
 					}
 					
-					icon.id = "specialAction";
-					icon.onclick = toggle.onclick;
-					icon.style.position = "absolute";
-					icon.style.top = `${topoffset}px`;
-					icon.style.right = `${1}px`;
-					icon.style.height = `${iconsize}px`;
-					icon.style.width = `${iconsize}px`;
-					icon.style.visibility = "hidden";
+					if (this.item.isThrowable) {
+						let isthrown = this.item.getFlag(ModuleName, "thrown");
+						
+						let toggleData = {
+							iconsource : "systems/pf2e/icons/mdi/thrown.svg",
+							greyed : !isthrown,
+							onclick : () => {this.item.setFlag(ModuleName, "thrown", !isthrown)}
+						};	
+
+						toggles.push(toggleData);
+					}
 					
-					this.element.appendChild(icon);
+					if (this.panel) {
+						let isthrown = this.item.getFlag(ModuleName, "thrown");
+						
+						let toggleData = {
+							iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
+							onclick : () => {this.panel.toggle()}
+						};	
+
+						toggles.push(toggleData);
+					}
 					
-					topoffset = topoffset + iconsize;
+					const iconsize = 30;
+					let topoffset = 1;
+					
+					for (let toggle of toggles) {
+						let icon;
+						if (toggle.iconclass) {
+							icon = document.createElement("i");
+							icon.classList.add("icon", ...toggle.iconclass);
+							icon.style.fontSize = `${iconsize*0.75}px`;
+						}
+						if (toggle.iconsource) {
+							icon = document.createElement("div");
+							icon.style.backgroundImage = `url(${toggle.iconsource})`;
+							icon.style.backgroundSize = "cover";
+							icon.style.filter = "invert(1)"; //for white icon
+							if (toggle.greyed) {
+								icon.style.filter = "invert(0.4)"; //for white icon
+							}
+						}
+						
+						icon.id = "specialAction";
+						icon.onclick = toggle.onclick;
+						icon.style.position = "absolute";
+						icon.style.top = `${topoffset}px`;
+						icon.style.right = `${1}px`;
+						icon.style.height = `${iconsize}px`;
+						icon.style.width = `${iconsize}px`;
+						icon.style.visibility = "hidden";
+						
+						this.element.appendChild(icon);
+						
+						topoffset = topoffset + iconsize;
+					}
 				}
 			}
 		}
@@ -1381,14 +1400,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _getButtons() {
 			return [
 				{
-					label: "SFRPG.Rest.Long.Title",
-					onClick: (event) => this.actor.longRest(),
+					label: "PF2E.Action.RestForTheNight.Label",
+					onClick: (event) => game.pf2e.actions.restForTheNight({actors : this.actor}),
 					icon: "fas fa-bed",
-				},
-				{
-					label: "SFRPG.Rest.Short.Title",
-					onClick: (event) => this.actor.shortRest(),
-					icon: "fas fa-coffee",
 				}
 			]
 		}
@@ -1433,23 +1447,22 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const activeItems = Object.values(activeSet).filter((item) => item);
 			const inactiveSets = Object.values(sets).filter((set) => set !== activeSet);
 			const inactiveItems = inactiveSets.flatMap((set) => Object.values(set)).filter((item) => item).filter((item) => !activeItems.includes(item));
+			
 			inactiveItems.forEach((item) => {
-				if (item.system?.equipped) updates.push({ _id: item.id, "system.equipped": false });
+				updates.push({ _id: item.id, system : {equipped : {carryType : "worn"}} });
 			});
+			
+			let handsHeld = 1;
+			if (activeItems[0] == activeItems[1]) {
+				handsHeld = 2;
+			}
 			activeItems.forEach((item) => {
-				if (!item.system?.equipped) updates.push({ _id: item.id, "system.equipped": true });
+				updates.push({ _id: item.id, system : {equipped : {carryType : "held", handsHeld : handsHeld}} });
 			});
+			
 			return await this.actor.updateEmbeddedDocuments("Item", updates);
 		}
     }
-  
-    /*
-    class PF2EEquipmentButton extends ARGON.MAIN.BUTTONS.EquipmentButton {
-		constructor(...args) {
-			super(...args);
-		}
-    }
-	*/
   
     CoreHUD.definePortraitPanel(PF2EPortraitPanel);
     CoreHUD.defineDrawerPanel(PF2EDrawerPanel);
