@@ -209,7 +209,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				else {
 					heroSpan.setAttribute("data-tooltip", replacewords(game.i18n.localize("PF2E.HeroPointRatio.Many"), {value : value, max : max}));
 				}
-				heroSpan.style.fontSize = "15px";
+				heroSpan.style.fontSize = "20px";
 				
 				for (let i = 1; i <= max; i++) {
 					let icon = document.createElement("i");
@@ -576,7 +576,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		get quantity() {
 			switch (this.item?.type) {
 				case "weapon":
-				case "equipment":
+				case "shield":
 					if (this.item.system?.container?.contents[0]?.id) {
 						const ammunition = this.actor.items.get(this.item.system.container.contents[0].id);
 						
@@ -718,9 +718,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							used = true;
 						}
 					}
-					else {//give up and let PF2E handle it
-						this.item.toChat();
-						used = true;
+					else {
+						if (this.item.consume) {
+							this.item.consume();
+						}
+						else {//give up and let PF2E handle it
+							this.item.toChat();
+							used = true;
+						}
 					}
 				}
 			}
@@ -744,7 +749,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _onTooltipMouseEnter(event) {
 			await super._onTooltipMouseEnter(event);
 			if (this.element.querySelector("#specialAction")) {
-				this.element.querySelector("#maintitle").style.visibility = "hidden";
+				this.element.querySelector("span.action-element-title").style.visibility = "hidden";
 				for (const specialelement of this.element.querySelectorAll("#specialAction")) {
 					specialelement.style.visibility = "";
 				}
@@ -755,7 +760,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			await super._onTooltipMouseLeave(event);
 			
 			if (this.element.querySelector("#specialAction")) {
-				this.element.querySelector("#maintitle").style.visibility = "";
+				this.element.querySelector("span.action-element-title").style.visibility = "";
 				for (const specialelement of this.element.querySelectorAll("#specialAction")) {
 					specialelement.style.visibility = "hidden";
 				}
@@ -789,7 +794,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (this.isWeaponSet) {
 				const MAPActions = [{MAP : 1}, {MAP : 2}];
-				if (this.item.type == "weapon") {
+				if (this.item.type == "weapon" || this.item.type == "shield") {
 					this.element.querySelector("span").id = "maintitle";
 					
 					for (let i = 0; i < MAPActions.length; i++) {
@@ -850,6 +855,19 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (this.item) {
 					let toggles = [];
 					
+					if (this.item?.type == "shield") {
+						let toggleData = {
+							iconclass : ["fa-solid", "fa-shield"],
+							greyed : !this.item.isRaised,
+							onclick : () => {
+								console.log("action here");
+								game.pf2e.actions.raiseAShield({actors : this.actor})
+							}
+						};	
+
+						toggles.push(toggleData);
+					}
+					
 					let toggleoptions = ["versatile", "modular"];
 					
 					for (let togglekey of toggleoptions) {
@@ -909,6 +927,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							icon = document.createElement("i");
 							icon.classList.add("icon", ...toggle.iconclass);
 							icon.style.fontSize = `${iconsize*0.75}px`;
+							if (toggle.greyed) {
+								icon.style.filter = "invert(0.6)"; //for white icon
+							}
 						}
 						if (toggle.iconsource) {
 							icon = document.createElement("div");
