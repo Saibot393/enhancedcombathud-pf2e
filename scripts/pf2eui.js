@@ -236,6 +236,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (this.actor.system.attributes.shield.raised) {
 				let shieldIcon = document.createElement("i");
 				shieldIcon.classList.add("fa-solid", "fa-shield");
+				shieldIcon.setAttribute("data-tooltip", game.i18n.localize("TYPES.Item.shield"));
 				
 				this.element.querySelector("#ACvalue").appendChild(shieldIcon);
 			}
@@ -871,7 +872,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							onclick : () => {
 								console.log("action here");
 								game.pf2e.actions.raiseAShield({actors : this.actor})
-							}
+							},
+							tooltip : (await fromUuid("Compendium.pf2e.actionspf2e.Item.xjGwis0uaC2305pm")).name
 						};	
 
 						toggles.push(toggleData);
@@ -896,7 +898,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								
 								let toggleData = {
 									iconclass : damageIcon(current),
-									onclick : () => {this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})}
+									onclick : () => {this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})},
+									tooltip : game.i18n.localize("PF2E.Trait" + firstUpper(togglekey))
 								};
 								
 								toggles.push(toggleData);
@@ -910,18 +913,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						let toggleData = {
 							iconsource : "systems/pf2e/icons/mdi/thrown.svg",
 							greyed : !isthrown,
-							onclick : () => {this.item.setFlag(ModuleName, "thrown", !isthrown)}
+							onclick : () => {this.item.setFlag(ModuleName, "thrown", !isthrown)},
+							tooltip : game.i18n.localize("PF2E.TraitThrown")
 						};	
 
 						toggles.push(toggleData);
 					}
 					
 					if (this.panel) {
-						let isthrown = this.item.getFlag(ModuleName, "thrown");
-						
 						let toggleData = {
 							iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
-							onclick : () => {this.panel.toggle()}
+							onclick : () => {this.panel.toggle()},
+							tooltip : game.i18n.localize("PF2E.Item.Spell.Plural")
 						};	
 
 						toggles.push(toggleData);
@@ -949,6 +952,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								icon.style.filter = "invert(0.4)"; //for white icon
 							}
 						}
+						
+						if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
 						
 						icon.id = "specialAction";
 						icon.onclick = toggle.onclick;
@@ -1461,6 +1466,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get maxspeed() {
+			if (this.isimmobilized) {
+				return 0;
+			}
+			
 			if (this.typemaxspeed) {
 				return this.typemaxspeed;
 			}
@@ -1474,6 +1483,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get movementMax() {
 			return this.maxspeed/canvas.scene.dimensions.distance;
+		}
+		
+		get isimmobilized() {
+			return this.actor.hasCondition("immobilized");
 		}
 		
 		get requiredroll() {
@@ -1572,22 +1585,36 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _renderInner() {
 			await super._renderInner();
 			
-			let roll = this.requiredroll;
-			if (roll) {
-				let rollicon = document.createElement("i");
-				rollicon.classList.add("fa-solid", "fa-dice-d20", "movement-space");
-				rollicon.style.fontSize = "2.7rem";
-				rollicon.style.top = "120px";
-				rollicon.style.position = "absolute";
-				
-				rollicon.onclick = roll;
-				
-				this.element.prepend(rollicon);
+			if (this.isimmobilized) {
+					let chainicon = document.createElement("i");
+					chainicon.setAttribute("data-tooltip", `${game.i18n.localize("PF2E.ConditionTypeImmobilized")}`);
+					chainicon.classList.add("fa-solid", "fa-link", "movement-space");
+					chainicon.style.fontSize = "2.7rem";
+					chainicon.style.top = "125px";
+					chainicon.style.position = "absolute";
+					
+					this.element.prepend(chainicon);
 			}
-			
+			else {
+				let roll = this.requiredroll;
+				if (roll) {
+					let rollicon = document.createElement("i");
+					rollicon.setAttribute("data-tooltip", `${game.i18n.localize("PF2E.Roll.Roll")} ${game.i18n.localize("PF2E.Check.Label")}`);
+					rollicon.classList.add("fa-solid", "fa-dice-d20", "movement-space");
+					rollicon.style.fontSize = "2.7rem";
+					rollicon.style.top = "125px";
+					rollicon.style.position = "absolute";
+					
+					rollicon.onclick = roll;
+					
+					this.element.prepend(rollicon);
+				}
+			}
+				
 			const movementselect = document.createElement("select");
 			movementselect.id = "movementselect";
 			movementselect.style.width = "100%";
+			movementselect.style.height = "40px";
 			movementselect.style.color = "white";
 			movementselect.style.backdropFilter = "var(--ech-blur-amount)";
 			movementselect.style.backgroundColor = "rgba(0,0,0,.3)";
