@@ -1,7 +1,7 @@
 const ModuleName = "enhancedcombathud-pf2e";
 
 const AoOid = "NMWXHGWUcZGoLDKb"; //id of Attack of Opportunity id
-const SBid = "jM72TjJ965jocBV8"; //id of SHield Block
+const SBid = "jM72TjJ965jocBV8"; //id of Shield Block
 
 function replacewords(text, words = {}){
 	let localtext = text;

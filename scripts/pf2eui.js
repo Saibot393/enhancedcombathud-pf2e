@@ -143,7 +143,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			const ClassDC = game.i18n.localize("PF2E.Check.DC.Unspecific");
 
-			const hpColor = this.actor.system.attributes.hp.temp ? "#6698f3" : "rgb(0 255 170)";
+			const hppercent = this.actor.system.attributes.hp.value/this.actor.system.attributes.hp.max;
+			const hpColor = this.actor.system.attributes.hp.temp ? "#6698f3" : (hppercent <= 0.5 ? (hppercent <= 0.1 ?  "rgb(255 10 10)" : "rgb(255 127 0)") : "rgb(0 255 170)");
 			const tempMax = this.actor.system.attributes.hp.tempmax;
 			const hpMaxColor = tempMax ? (tempMax > 0 ? "rgb(222 91 255)" : "#ffb000") : "rgb(255 255 255)";
 
@@ -171,6 +172,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					{
 						text: this.actor.system.attributes.ac.value,
 						color: "var(--ech-movement-baseMovement-background)",
+						id: "ACvalue"
 					},
 				],
 				[
@@ -229,6 +231,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				heroPoints.appendChild(heroSpan);
 				
 				this.element.appendChild(heroPoints);
+			}
+			
+			if (this.actor.system.attributes.shield.raised) {
+				let shieldIcon = document.createElement("i");
+				shieldIcon.classList.add("fa-solid", "fa-shield");
+				
+				this.element.querySelector("#ACvalue").appendChild(shieldIcon);
 			}
 		}
 	}
@@ -557,7 +566,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (this._isWeaponSet && this.actionType != "action") {
 				if (this.item) {
 					if (this.item.type == "shield") {
-						return hasSB(this.actor);
+						return /*hasSB(this.actor) ||*/ hasAoO(this.actor);
 					}
 					
 					if (this.item.type == "weapon") {
@@ -855,7 +864,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (this.item) {
 					let toggles = [];
 					
-					if (this.item?.type == "shield") {
+					if (this.item?.type == "shield" && this.isPrimary) {
 						let toggleData = {
 							iconclass : ["fa-solid", "fa-shield"],
 							greyed : !this.item.isRaised,
