@@ -377,4 +377,17 @@ function MAPtext(item, MAP = 0) {
 	return replacewords(game.i18n.localize("PF2E.MAPAbbreviationLabel"), {penalty : penalty});
 }
 
-export { getTooltipDetails, ModuleName, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext}
+function spelluseAction(spell, spellGroup, level) {
+	return () => {
+		console.log(spell, spellGroup);
+		if (spell && spellGroup) {
+			spellGroup.cast(spell, {consume : true, rank : level});
+			
+			return true;
+		}
+		
+		return false;
+	}
+}
+
+export { getTooltipDetails, ModuleName, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction}

@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {ModuleName, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext} from "./utils.js";
+import {ModuleName, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction} from "./utils.js";
 
 const systemicons = {
 	lifeSupport : "fa-heart-pulse",
@@ -614,6 +614,62 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const tooltipData = {};//await getTooltipDetails(this.item);
 			return tooltipData;
 		}
+		
+		//staves pannel, requires PF2E dailies
+		updateItem(item) {
+			if (!this.panel) return;
+			this.panel.updateItem(item);
+		}
+		
+		get buttonPanelContainer() {
+			return ui.ARGON.buttonPanelContainer;
+		}
+		
+		async staffSpells() {
+			const PF2EDailies = "pf2e-dailies";
+			
+			if (this.item?.system.traits?.value.includes("staff")) {
+				if (game.modules.get(PF2EDailies)?.active) {
+					let spellgroup = this.actor.items.filter(item => item.type == "spellcastingEntry").find(item => item.getFlag(PF2EDailies, "staff")?.staveID == this.item.id);
+					
+					if (spellgroup) {
+						let spellCategorie = {};
+						
+						spellCategorie.label = this.item.name;
+						spellCategorie.uses = () => {
+							let value = spellgroup?.getFlag(PF2EDailies, "staff")?.charges;
+							let max = spellgroup?.getFlag(PF2EDailies, "staff")?.max;
+							
+							if (!max || max < value) {
+								max = value;
+							}
+							
+							return {
+							max : max,
+							value : value
+						}}
+						spellCategorie.buttons = spellgroup.spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, spellgroup, spell.system.level?.value)}));
+						
+						return [spellCategorie];
+					}
+				}
+			}
+			
+			return null;
+		}
+		
+		async _getPanel() {
+			if (this.item?.system.traits?.value.includes("staff")) {
+				let staffSpells = await this.staffSpells();
+				
+				if (staffSpells?.length) {
+					return new PF2EAccordionPanel({accordionPanelCategories: staffSpells.map(data => new PF2EAccordionPanelCategory(data)) });
+				}
+			}
+			return null;
+		}
+		
+		//
 
 		async _onLeftClick(event, options = {MAP : 0}) {
 			if (!(event.target.id != "specialAction" || options.specialAction)) return;
@@ -625,13 +681,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			if (this.item) {
-				if (this.item.flags.hasOwnProperty(ModuleName) && this.item.flags[ModuleName].onclick) {
+				if (this.item.flags.hasOwnProperty(ModuleName) && this.item.flags[ModuleName].onclick) {//custom on clicks
 					this.item.flags[ModuleName].onclick();
 				}
 				else {
 					let action = this.actor.system.actions.find(action => action.slug == this.item.system.slug);
 					
-					if (action) {
+					if (action) {//default actions
 						let variant = action.variants[options.MAP];
 						
 						if (!variant) {
@@ -642,7 +698,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							used = true;
 						}
 					}
-					else {
+					else {//give up and let PF2E handle it
 						this.item.toChat();
 						used = true;
 					}
@@ -655,7 +711,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _onRightClick(event) {
-			this.item?.sheet?.render(true);
+			if (this.item?.sheet) {
+				this.item?.sheet?.render(true);
+			}
+			else {
+				if (this.item?.system?.item?.sheet) {
+					this.item.system.item.sheet.render(true);
+				}
+			}
 		}
 		
 		async _onTooltipMouseEnter(event) {
@@ -685,6 +748,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				return;
 			}
 			await super._renderInner();
+			
+			if (this.isWeaponSet) {
+				this.panel = await this._getPanel();
+				if (this.panel) {
+					this.panel._parent = this;
+					this.buttonPanelContainer.appendChild(this.panel.element);
+					await this.panel.render();
+				}
+			}
 			
 			if (this.item?.flags && this.item.flags[ModuleName]) {
 				if (this.item.flags[ModuleName].toggleable && this.item.flags[ModuleName].active && !this.item.flags[ModuleName].active()) {
@@ -792,6 +864,17 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						iconsource : "systems/pf2e/icons/mdi/thrown.svg",
 						greyed : !isthrown,
 						onclick : () => {this.item.setFlag(ModuleName, "thrown", !isthrown)}
+					};	
+
+					toggles.push(toggleData);
+				}
+				
+				if (this.panel) {
+					let isthrown = this.item.getFlag(ModuleName, "thrown");
+					
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
+						onclick : () => {this.panel.toggle()}
 					};	
 
 					toggles.push(toggleData);
@@ -988,7 +1071,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			return this.validitems.length;
 		}
 		
-		sortedSpells() {
+		sortedSpells() {//this is a mess, look away
 			let entries = this.actor.items.filter(entry => entry.type == "spellcastingEntry");
 			
 			let prepared = entries.filter(entry => entry.system.prepared.value == "prepared");
@@ -1020,22 +1103,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			function addusecounts(usecountbuffer) {
+			let addusecounts = (usecountbuffer) => {
 				for (let key of Object.keys(usecountbuffer)) {
 					
 					usecounts[key] = () => {return (usecounts[key] ? usecounts[key]() : 0) + usecountbuffer[key]()};
-				}
-			}
-			
-			function spelluseAction(spell, spellGroup, level) {
-				return () => {
-					if (spell && spellGroup) {
-						spellGroup.cast(spell, {consume : true, rank : level});
-						
-						return true;
-					}
-					
-					return false;
 				}
 			}
 			
