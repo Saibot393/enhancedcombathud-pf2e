@@ -753,11 +753,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					break;
 					
 				default :
-					if (this.item?.system?.uses?.max) {
+					if (this.item?.system.uses?.max) {
 						return this.item.system.uses.value;
 					}
 					else{
-						return this.item?.system?.quantity;
+						if (this.item?.system.frequency?.max) {
+							return this.item?.system.frequency.value;
+						}
+						else {
+							return this.item?.system?.quantity;
+						}
 					}
 					break;
 			}
@@ -852,12 +857,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						}
 					}
 					else {
-						if (this.item.consume) {
+						if (this.item.consume) {//consume actions
 							this.item.consume();
 						}
-						else {//give up and let PF2E handle it
-							this.item.toChat();
-							used = true;
+						else {
+							if (this.item.system.selfEffect?.uuid) {//effect actions
+								this.actor.createEmbeddedDocuments("Item", [await fromUuid(this.item.system.selfEffect.uuid)]);
+								used = true;
+							}
+							else {//give up and let PF2E handle it
+								this.item.toChat();
+								used = true;
+							}
+							
+							if (used) {//consume frequency charges by hand
+								if (this.item?.system.frequency?.max) {
+									return this.item.update({system : {frequency : {value : Math.max(this.item.system.frequency.value - 1, 0)}}});
+								}
+							}
 						}
 					}
 				}
@@ -882,7 +899,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _onTooltipMouseEnter(event) {
 			await super._onTooltipMouseEnter(event);
 			if (this.element.querySelector("#specialAction")) {
-				this.element.querySelector("span.action-element-title").style.visibility = "hidden";
+				if (this.element.querySelector("span.action-element-title")) {
+					this.element.querySelector("span.action-element-title").style.visibility = "hidden";
+				}
 				for (const specialelement of this.element.querySelectorAll("#specialAction")) {
 					specialelement.style.visibility = "";
 				}
@@ -893,7 +912,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			await super._onTooltipMouseLeave(event);
 			
 			if (this.element.querySelector("#specialAction")) {
-				this.element.querySelector("span.action-element-title").style.visibility = "";
+				if (this.element.querySelector("span.action-element-title")) {
+					this.element.querySelector("span.action-element-title").style.visibility = "";
+				}
 				for (const specialelement of this.element.querySelectorAll("#specialAction")) {
 					specialelement.style.visibility = "hidden";
 				}
@@ -901,6 +922,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _renderInner() {
+			const iconsize = 30;
+					
 			if (!this.visible) {//fix for potential bug
 				this.element.style.display = "none";
 				return;
@@ -924,6 +947,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					this.element.style.filter = "";
 				}
 			}
+			
+			let toggles = [];
 			
 			if (this.isWeaponSet) {
 				const MAPActions = [{MAP : 1}, {MAP : 2}];
@@ -985,113 +1010,118 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					this.element.appendChild(ammoSelect);
 				}
 				
-				if (this.item) {
-					let toggles = [];
-					
-					if (this.item?.type == "shield" && this.isPrimary) {
-						let toggleData = {
-							iconclass : ["fa-solid", "fa-shield"],
-							greyed : !this.item.isRaised,
-							onclick : () => {
-								console.log("action here");
-								game.pf2e.actions.raiseAShield({actors : this.actor})
-							},
-							tooltip : (await fromUuid("Compendium.pf2e.actionspf2e.Item.xjGwis0uaC2305pm")).name
-						};	
+				if (this.item?.type == "shield" && this.isPrimary) {
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-shield"],
+						greyed : !this.item.isRaised,
+						onclick : () => {
+							console.log("action here");
+							game.pf2e.actions.raiseAShield({actors : this.actor})
+						},
+						tooltip : (await fromUuid("Compendium.pf2e.actionspf2e.Item.xjGwis0uaC2305pm")).name
+					};	
 
-						toggles.push(toggleData);
-					}
-					
-					let toggleoptions = ["versatile", "modular"];
-					
-					for (let togglekey of toggleoptions) {
-						if (this.item.system.traits.toggles) {
-							let toggle = this.item.system.traits.toggles[togglekey];
+					toggles.push(toggleData);
+				}
+				
+				let toggleoptions = ["versatile", "modular"];
+				
+				for (let togglekey of toggleoptions) {
+					if (this.item.system.traits.toggles) {
+						let toggle = this.item.system.traits.toggles[togglekey];
+						
+						if (toggle.options.length) {
+							let options = [null, ...toggle.options];
 							
-							if (toggle.options.length) {
-								let options = [null, ...toggle.options];
-								
-								let current = toggle.selection;
-								let currentid = options.indexOf(current);
-								let next = options[(currentid + 1)%options.length];
-								
-								if (current == null) {
-									current = this.item.system.damage.damageType;
-								}
-								
-								let toggleData = {
-									iconclass : damageIcon(current),
-									onclick : () => {this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})},
-									tooltip : game.i18n.localize("PF2E.Trait" + firstUpper(togglekey))
-								};
-								
-								toggles.push(toggleData);
+							let current = toggle.selection;
+							let currentid = options.indexOf(current);
+							let next = options[(currentid + 1)%options.length];
+							
+							if (current == null) {
+								current = this.item.system.damage.damageType;
 							}
+							
+							let toggleData = {
+								iconclass : damageIcon(current),
+								onclick : () => {this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})},
+								tooltip : game.i18n.localize("PF2E.Trait" + firstUpper(togglekey))
+							};
+							
+							toggles.push(toggleData);
 						}
-					}
-					
-					if (this.item.isThrowable) {
-						let isthrown = this.item.getFlag(ModuleName, "thrown");
-						
-						let toggleData = {
-							iconsource : "systems/pf2e/icons/mdi/thrown.svg",
-							greyed : !isthrown,
-							onclick : () => {this.item.setFlag(ModuleName, "thrown", !isthrown)},
-							tooltip : game.i18n.localize("PF2E.TraitThrown")
-						};	
-
-						toggles.push(toggleData);
-					}
-					
-					if (this.panel) {
-						let toggleData = {
-							iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
-							onclick : () => {this.panel.toggle()},
-							tooltip : game.i18n.localize("PF2E.Item.Spell.Plural")
-						};	
-
-						toggles.push(toggleData);
-					}
-					
-					const iconsize = 30;
-					let topoffset = 1;
-					
-					for (let toggle of toggles) {
-						let icon;
-						if (toggle.iconclass) {
-							icon = document.createElement("i");
-							icon.classList.add("icon", ...toggle.iconclass);
-							icon.style.fontSize = `${iconsize*0.75}px`;
-							if (toggle.greyed) {
-								icon.style.filter = "invert(0.6)"; //for white icon
-							}
-						}
-						if (toggle.iconsource) {
-							icon = document.createElement("div");
-							icon.style.backgroundImage = `url(${toggle.iconsource})`;
-							icon.style.backgroundSize = "cover";
-							icon.style.filter = "invert(1)"; //for white icon
-							if (toggle.greyed) {
-								icon.style.filter = "invert(0.4)"; //for white icon
-							}
-						}
-						
-						if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
-						
-						icon.id = "specialAction";
-						icon.onclick = toggle.onclick;
-						icon.style.position = "absolute";
-						icon.style.top = `${topoffset}px`;
-						icon.style.right = `${1}px`;
-						icon.style.height = `${iconsize}px`;
-						icon.style.width = `${iconsize}px`;
-						icon.style.visibility = "hidden";
-						
-						this.element.appendChild(icon);
-						
-						topoffset = topoffset + iconsize;
 					}
 				}
+				
+				if (this.item.isThrowable) {
+					let isthrown = this.item.getFlag(ModuleName, "thrown");
+					
+					let toggleData = {
+						iconsource : "systems/pf2e/icons/mdi/thrown.svg",
+						greyed : !isthrown,
+						onclick : () => {this.item.setFlag(ModuleName, "thrown", !isthrown)},
+						tooltip : game.i18n.localize("PF2E.TraitThrown")
+					};	
+
+					toggles.push(toggleData);
+				}
+				
+				if (this.panel) {
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
+						onclick : () => {this.panel.toggle()},
+						tooltip : game.i18n.localize("PF2E.Item.Spell.Plural")
+					};	
+
+					toggles.push(toggleData);
+				}
+			}
+			
+			if (this.item?.system.frequency?.max > this.item?.system.frequency?.value) {
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-rotate-right"],
+						onclick : () => {this.item.update({system : {frequency : {value : this.item.system.frequency.max}}});},
+						tooltip : game.i18n.localize(`${game.i18n.localize("PF2E.Frequency.per")} ${game.i18n.localize("PF2E.Duration." + this.item.system.frequency.per)}`)
+					};	
+
+					toggles.push(toggleData);
+			}
+			
+			let topoffset = 1;
+			for (let toggle of toggles) {
+				let icon;
+				if (toggle.iconclass) {
+					icon = document.createElement("i");
+					icon.classList.add("icon", ...toggle.iconclass);
+					icon.style.fontSize = `${iconsize*0.75}px`;
+					if (toggle.greyed) {
+						icon.style.filter = "invert(0.6)"; //for white icon
+					}
+					icon.style.right = `${1}px`;
+				}
+				if (toggle.iconsource) {
+					icon = document.createElement("div");
+					icon.style.backgroundImage = `url(${toggle.iconsource})`;
+					icon.style.backgroundSize = "cover";
+					icon.style.filter = "invert(1)"; //for white icon
+					if (toggle.greyed) {
+						icon.style.filter = "invert(0.4)"; //for white icon
+					}
+					icon.style.right = `${5}px`;
+				}
+				
+				if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
+				
+				icon.id = "specialAction";
+				icon.onclick = toggle.onclick;
+				icon.style.position = "absolute";
+				icon.style.top = `${topoffset}px`;
+				icon.style.height = `${iconsize}px`;
+				icon.style.width = `${iconsize}px`;
+				icon.style.visibility = "hidden";
+				
+				this.element.appendChild(icon);
+				
+				topoffset = topoffset + iconsize;
 			}
 		}
 	}
@@ -1642,7 +1672,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 											break;
 									}
 									
-									this._tempmaxspeed[this.speedtype] = newspeed;
+									this._tempmaxspeed = {[this.speedtype] : newspeed};
+									
+									this._prevUsepoint = this._movementUsed;
 									
 									this.render();
 								}
@@ -1681,7 +1713,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 											break;
 									}
 									
-									this._tempmaxspeed[this.speedtype] = newspeed;
+									this._tempmaxspeed = {[this.speedtype] : newspeed};
+									
+									this._prevUsepoint = this._movementUsed;
 									
 									this.render();
 								}
