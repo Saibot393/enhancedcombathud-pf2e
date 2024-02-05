@@ -1,5 +1,11 @@
 const ModuleName = "enhancedcombathud-pf2e";
 
+const settingActionSpace = {
+	PF2EECHActionItems : 6,
+	PF2EECHFreeActionItems : 0,
+	PF2EECHReActionItems : 0
+};
+
 const AoOid = "NMWXHGWUcZGoLDKb"; //id of Attack of Opportunity id
 const SBid = "jM72TjJ965jocBV8"; //id of Shield Block
 
@@ -345,7 +351,7 @@ function actionGlyphs(actionType) {
 		case "action":
 			return ["1", "2", "3"];
 			break;
-		case "freeaction":
+		case "free":
 			return ["F"];
 			break;
 		case "reaction":
@@ -390,4 +396,22 @@ function spelluseAction(spell, spellGroup, level) {
 	}
 }
 
-export { replacewords, getTooltipDetails, ModuleName, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction}
+function isClassFeature(item) {
+	let checkitem = item;
+	
+	if (item.type == "action") {
+		checkitem = connectedItem(item);
+	}
+	
+	return checkitem?.system.category == "classfeature";
+}
+
+function connectedItem(action) {
+	if (action.getFlag("pf2e", "grantedBy")) {
+		return action.actor.items.get(action.getFlag("pf2e", "grantedBy").id);
+	}
+	
+	return null;
+}
+
+export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem}

@@ -1,6 +1,8 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem} from "./utils.js";
 import {openNewInput} from "./popupInput.js";
+
+const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2e/icons/actions/OneAction.webp", "systems/pf2e/icons/actions/OneThreeActions.webp", "systems/pf2e/icons/actions/OneTwoActions.webp", "systems/pf2e/icons/actions/Passive.webp", "systems/pf2e/icons/actions/Reaction.webp", "systems/pf2e/icons/actions/ThreeActions.webp", "systems/pf2e/icons/actions/TwoActions.webp", "systems/pf2e/icons/actions/TwoThreeActions.webp", "icons/sundries/books/book-red-exclamation.webp"]
 
 const systemicons = {
 	lifeSupport : "fa-heart-pulse",
@@ -149,11 +151,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get isDead() {
-			return this.isDying && this.actor.type !== "character";
+			return this.actor.isDead;
 		}
 
 		get isDying() {
-			return this.actor.system.attributes?.dying?.value >= 1;
+			return this.actor.hasCondition("dying");
 		}
 		
 		async _onDeathSave(event) {
@@ -484,6 +486,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _getButtons() {
+			//a = canvas.tokens.controlled[0].actor
+			//i = a.items.filter(i => i.name == "Rage" && i.type == "action")[0]
+			//id = i.getFlag("pf2e", "grantedBy").id
+			//g = a.items.get(id)
+			//g.category == classfeature
+			//e = await fromUuid(i.system.selfEffect.uuid)
+			//a.createEmbeddedDocuments("Item", [e])
+			
 			let buttons = [];
 			let specialActions = Object.values(PF2EECHActionItems);
 			
@@ -493,49 +503,28 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2ESplitButton(new PF2EButtonPanelButton({parent : this, type: "toggle"}), new PF2ESpecialActionButton(specialActions[1])));
 			
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "spell"}));
-			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feature"}));
-			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
+			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
 			
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[2]), new PF2ESpecialActionButton(specialActions[3])));
+			
+			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
+			
+			for (let i = 6; i < specialActions.length; i = i + 2) {
+				let splitcontent = [null, null];
+				
+				if (specialActions[i]) {
+					splitcontent[0] = new PF2ESpecialActionButton(specialActions[i]);
+				}
+				if (specialActions[i+1]) {
+					splitcontent[1] = new PF2ESpecialActionButton(specialActions[i+1]);
+				}
+				buttons.push(new PF2ESplitButton(splitcontent[0], splitcontent[1]));
+			}
+			
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[4]), new PF2ESpecialActionButton(specialActions[5])));
 			
-			return buttons.filter(button => button.isvalid);
-		}
-    }
-	
-    class PF2EFreeActionPanel extends ARGON.MAIN.ActionPanel {
-		constructor(...args) {
-			super(...args);
-		}
-
-		get label() {
-			//return "PF2E.ActionTypeFree";
-			return game.i18n.localize("PF2E.ActionTypeFree")//.split(" ")[0];
-		}
-		
-		get actionType() {
-			return "freeaction";
-		}
-		
-		get colorScheme() {
-			return 1;
-		}
-		
-		_onNewRound(combat) {
-			this._currentActions = this.maxActions;
-			this.updateActionUse();
-		}
-		
-		async _getButtons() {
-			let buttons = [];
-			let specialActions = Object.values(PF2EFreeActionPanel);
+			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			
-			//buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[0]), new PF2ESpecialActionButton(specialActions[1])));
-			
-			buttons.push(new PF2EButtonPanelButton({parent : this, type: "spell"}));
-			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feature"}));
-			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
-			 
 			return buttons.filter(button => button.isvalid);
 		}
     }
@@ -573,7 +562,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get colorScheme() {
-			return 2;
+			return 1;
 		}
 		
 		async _getButtons() {
@@ -586,9 +575,51 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[0]), new PF2ESpecialActionButton(specialActions[1])));
 			
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "spell"}));
-			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feature"}));
+			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
+			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			
+			return buttons.filter(button => button.isvalid);
+		}
+    }
+	
+	
+    class PF2EFreeActionPanel extends ARGON.MAIN.ActionPanel {
+		constructor(...args) {
+			super(...args);
+		}
+
+		get label() {
+			//return "PF2E.ActionTypeFree";
+			return game.i18n.localize("PF2E.ActionTypeFree")//.split(" ")[0];
+		}
+		
+		get actionType() {
+			return "free";
+		}
+		
+		get colorScheme() {
+			return 2;
+		}
+		
+		_onNewRound(combat) {
+			this._currentActions = this.maxActions;
+			this.updateActionUse();
+		}
+		
+		async _getButtons() {
+			let buttons = [];
+			let specialActions = Object.values(PF2EFreeActionPanel);
+			
+			//buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[0]), new PF2ESpecialActionButton(specialActions[1])));
+			
+			buttons.push(new PF2EButtonPanelButton({parent : this, type: "spell"}));
+			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
+			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
+			
+			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			 
 			return buttons.filter(button => button.isvalid);
 		}
     }
@@ -613,6 +644,25 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 		get targets() {
 			return null;
+		}
+		
+		get icon() {
+			if (defaultIcons.includes(this.item.img)) {
+				
+				if (this.item?.type == "action" || this.item?.type == "feat") {
+					let replaceItem = connectedItem(this.item);
+					
+					if (replaceItem) {
+						return replaceItem.img;
+					}
+				}
+				
+				if (this.item?.system.selfEffect?.img) {
+					return this.item.system.selfEffect.img;
+				}
+			}
+			
+			return super.icon;
 		}
 		
 		get actionType() {
@@ -1186,6 +1236,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				case "toggle":
 					return this.actor.rules.filter(rule => rule.toggleable).map(rule => itemfromRule(rule));
 					break;
+				case "feat":
+					return this.actor.items.filter(item => (item.type == this.type || item.type == "action") && item.system.actionType?.value == this.actionType).filter(item => !isClassFeature(item));
+					break;
 				default:
 					let items = this.actor.items.filter(item => item.type == this.type);
 					
@@ -1355,14 +1408,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			switch (this.type) {
 				case "spell":
 					return new PF2EAccordionPanel({accordionPanelCategories: this.sortedSpells().map(data => new PF2EAccordionPanelCategory(data)) });
-					break;
-				/*
-				case "maneuver":
-					return new ARGON.MAIN.BUTTON_PANELS.ButtonPanel({buttons: this.validitems.map(item => new PF2ESpecialActionButton(item))});
-					break;
-				*/
-				case "toggle":
-					return new PF2EButtonPanel({buttons: this.validitems.map(item => new PF2EItemButton({item}))});
 					break;
 				default:
 					return new PF2EButtonPanel({buttons: this.validitems.map(item => new PF2EItemButton({item}))});
@@ -1826,8 +1871,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
     CoreHUD.defineDrawerPanel(PF2EDrawerPanel);
     CoreHUD.defineMainPanels([
 		PF2EActionPanel,
-		PF2EFreeActionPanel,
 		PF2EReActionPanel,
+		PF2EFreeActionPanel,
 		ARGON.PREFAB.PassTurnPanel
     ]);  
 	CoreHUD.defineMovementHud(PF2EMovementHud);

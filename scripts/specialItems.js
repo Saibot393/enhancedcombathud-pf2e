@@ -1,34 +1,67 @@
-import { ModuleName } from "./utils.js";
+import { ModuleName, settingActionSpace } from "./utils.js";
 
 const ItemReplacementID = "_argonUI_";
 
-const defaultActionsIDs = {
-	"administerFirstAid"	: "MHLuKy4nQO2Z4Am1",
-	"balance"				: "M76ycLAqHoAgbcej",
-	"commandAnAnimal"		: "q9nbyIF0PEBqMtYe",
-	"concealAnObject"		: "qVNVSmsgpKFGk9hV",
-	"createADiversion"		: "GkmbTGfg8KcgynOA",
-	"demoralize"			: "2u915NdUyQan6uKF",
-	"disableDevice"			: "cYdz2grcOcRt4jk6",
-	"disarm"				: "Dt6B1slsBy8ipJu9",
-	//"escape"				: "SkZAQRkLLkmBQNB9",
-	"feint"					: "QNAVeNKtHA0EUw4X",
-	"forceOpen"				: "SjmKHgI7a5Z9JzBx",
-	"grapple"				: "PMbdMWc2QroouFGD",
-	"hide"					: "XMcnh4cSI32tljXa",
-	"highJump"				: "2HJ4yuEFY1Cast4h",
-	"longJump"				: "JUvAvruz7yRQXfz2",
-	"palmAnObject"			: "ijZ0DDFpMkWqaShd",
-	"perform"				: "EEDElIyin4z60PXx",
-	"pickALock"				: "2EE4aF4SZpYf0R6H",
-	"request"				: "DCb62iCBrJXy0Ik6",
-	"seek"					: "BlAOM2X92SI6HMtJ",
-	"senseMotive"			: "1xRFPTFtWtGJ9ELw",
-	"shove"					: "7blmbDrQFNfdT731",
-	"sneak"					: "VMozDqMMuK5kpoX4",
-	"steal"					: "RDXXE7wMrSPCLv5k",
-	"trip"					: "ge56Lu1xXVFYUnLP",
-	"tumbleThrough"			: "21WIfSu7Xd7uKqV8"
+const settingActionIDs = {
+	PF2EECHActionItems : {
+		"administerFirstAid"	: "MHLuKy4nQO2Z4Am1",
+		"balance"				: "M76ycLAqHoAgbcej",
+		"commandAnAnimal"		: "q9nbyIF0PEBqMtYe",
+		"concealAnObject"		: "qVNVSmsgpKFGk9hV",
+		"createADiversion"		: "GkmbTGfg8KcgynOA",
+		"demoralize"			: "2u915NdUyQan6uKF",
+		"disableDevice"			: "cYdz2grcOcRt4jk6",
+		"disarm"				: "Dt6B1slsBy8ipJu9",
+		//"escape"				: "SkZAQRkLLkmBQNB9",
+		"feint"					: "QNAVeNKtHA0EUw4X",
+		"forceOpen"				: "SjmKHgI7a5Z9JzBx",
+		"grapple"				: "PMbdMWc2QroouFGD",
+		"hide"					: "XMcnh4cSI32tljXa",
+		"highJump"				: "2HJ4yuEFY1Cast4h",
+		"longJump"				: "JUvAvruz7yRQXfz2",
+		"palmAnObject"			: "ijZ0DDFpMkWqaShd",
+		"perform"				: "EEDElIyin4z60PXx",
+		"pickALock"				: "2EE4aF4SZpYf0R6H",
+		"request"				: "DCb62iCBrJXy0Ik6",
+		"seek"					: "BlAOM2X92SI6HMtJ",
+		"senseMotive"			: "1xRFPTFtWtGJ9ELw",
+		"shove"					: "7blmbDrQFNfdT731",
+		"sneak"					: "VMozDqMMuK5kpoX4",
+		"steal"					: "RDXXE7wMrSPCLv5k",
+		"trip"					: "ge56Lu1xXVFYUnLP",
+		"tumbleThrough"			: "21WIfSu7Xd7uKqV8"
+	}
+}
+
+const settingActionIMGs = {
+	PF2EECHActionItems : {
+		"administerFirstAid"	: `modules/${ModuleName}/icons/first-aid-kit.svg`,
+		"balance"				: `modules/${ModuleName}/icons/tightrope.svg`,
+		"commandAnAnimal"		: `icons/svg/pawprint.svg`,
+		"concealAnObject"		: `modules/${ModuleName}/icons/magic-hat.svg`,
+		"createADiversion"		: `modules/${ModuleName}/icons/firework-rocket.svg`,
+		"demoralize"			: `modules/${ModuleName}/icons/tear-tracks.svg`,
+		"disableDevice"			: `modules/${ModuleName}/icons/tinker.svg`,
+		"disarm"				: `modules/${ModuleName}/icons/drop-weapon.svg`,
+		//"escape"				: "SkZAQRkLLkmBQNB9",
+		"feint"					: `modules/${ModuleName}/icons/fence.svg`,
+		"forceOpen"				: `modules/${ModuleName}/icons/crowbar.svg`,
+		"grapple"				: `modules/${ModuleName}/icons/grab.svg`,
+		"hide"					: `modules/enhancedcombathud/icons/cloak-dagger.webp`,
+		"highJump"				: `modules/${ModuleName}/icons/jump-across.svg`,
+		"longJump"				: `modules/${ModuleName}/icons/jump-across.svg`,
+		"palmAnObject"			: `modules/${ModuleName}/icons/palm.svg`,
+		"perform"				: `modules/${ModuleName}/icons/drama-masks.svg`,
+		"pickALock"				: `modules/${ModuleName}/icons/lockpicks.svg`,
+		"request"				: `modules/${ModuleName}/icons/open-palm.svg`,
+		"seek"					: `icons/svg/eye.svg`,
+		"senseMotive"			: `modules/${ModuleName}/icons/psychic-waves.svg`,
+		"shove"					: `modules/enhancedcombathud/icons/shield-bash.webp`,
+		"sneak"					: `modules/${ModuleName}/icons/ninja-mask.svg`,
+		"steal"					: `modules/${ModuleName}/icons/snatch.svg`,
+		"trip"					: `modules/${ModuleName}/icons/tripwire.svg`,
+		"tumbleThrough"			: `modules/${ModuleName}/icons/run.svg`
+	}
 }
 
 var defaultActions = {};
@@ -75,11 +108,13 @@ async function registerPF2EECHSItems () {
 		Escape : {//conditional
 			img: `modules/${ModuleName}/icons/breaking-chain.svg`,
 			id: "SkZAQRkLLkmBQNB9"
-		},
+		}
+		/*
 		Sustain : {
 			img: `modules/${ModuleName}/icons/meditation.svg`,
 			id: "3f5DMFu8fPiqHpRg"
 		}
+		*/
 	}
 	
 	PF2EECHFreeActionItems = {
@@ -101,9 +136,24 @@ async function registerPF2EECHSItems () {
 			id: "dLgAMt3TbkmLkUqE"
 		}
 	}
+	
+	let ItemSets = {PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems}
 
 	//some preparation
-	for (let itemset of [PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems]) {
+	for (let setkey of Object.keys(ItemSets)) {
+		let itemset = ItemSets[setkey];
+	
+		for (let i = 1; i <= settingActionSpace[setkey]; i++) {
+			let chosenoption = game.settings.get(ModuleName, setkey + i);
+			
+			if (settingActionIDs[setkey] && settingActionIDs[setkey][chosenoption]) {
+				itemset[chosenoption] = {
+					id : settingActionIDs[setkey][chosenoption],
+					img : settingActionIMGs[setkey][chosenoption]
+				}
+			}
+		}
+		
 		for (let itemkey of Object.keys(itemset)) {
 			if (itemkey != "groupflags") {
 				if (!itemset[itemkey].flags) {
@@ -176,25 +226,25 @@ function itemfromRule(rule) {
 	//return Item.create(replacement);;
 }
 
-async function getDefaultActions() {
-	if (Object.keys(defaultActions).length) {//compendium already loaded
-		return defaultActions;
+async function getSettingActionOptions(category) {
+	if (Object.keys(settingActionIDs[category]).length) {//compendium already loaded
+		return settingActionIDs[category];
 	}
 	
-	for (key of Object.keys(defaultActionsIDs)) {
-		defaultActions[key] = await fromUuid("Compendium.pf2e.actionspf2e.Item" + defaultActionsIDs[key]);
+	for (let key of Object.keys(settingActionIDs[category])) {
+		settingActionIDs[category][key] = (await fromUuid("Compendium.pf2e.actionspf2e.Item." + settingActionIDs[category][key]));
 	}
 	
-	return await getDefaultActions();
+	return await getSettingActionOptions();
 }
 
-async function getTitlesDefaultActions() {
-	let actions = await getDefaultActions();
-	
+async function getSettingActionTitles(category) {
 	let titled = {};
 	
-	for (key of Object.keys(actions)) {
-		titled[key] = actions[key].name;
+	titled["none"] = "";
+	
+	for (let key of Object.keys(settingActionIDs[category])) {
+		titled[key] = game.i18n.localize(ModuleName + ".Titles." + key);;
 	}
 	
 	return titled;
@@ -204,4 +254,4 @@ function executefunction(key, options) {
 	game.pf2e.actions[key](options);
 }
 
-export {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule}
+export {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule, getSettingActionOptions, getSettingActionTitles}
