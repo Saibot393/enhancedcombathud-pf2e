@@ -28,7 +28,7 @@ const systemconditioncolor = {
 	wrecked : "red"
 }
 
-/* EXPERIMENTLA code to add custom colors
+/* EXPERIMENTAL code to add custom colors
 Hooks.once("argonDefaultColor", (defaultColors) => {
 	defaultColors.colors.movement.test123 = { background: "#c85f5aFF", boxShadow: "#dc736eCC" };
 	//ui.ARGON.setColorSettings();
@@ -47,31 +47,33 @@ Hooks.once("init", () => {
 });
 */
 
-Hooks.on("argonInit", async (CoreHUD) => {
-    const ARGON = CoreHUD.ARGON;
-  
-	await registerPF2EECHSItems();
-	
-	//ammend Hooks
-	Hooks.on("updateItem", (item) => {
+//ammend Hooks
+Hooks.on("updateItem", (item) => {
+	if (ui.ARGON) {
 		if (item.type == "condition" && item.parent == ui.ARGON?.components.portrait.actor) {
 			ui.ARGON.components.portrait.render();
 		}
 		if (item.type == "spellcastingEntry") {
-			for (const itemButton of ui.ARGON?.itemButtons) {
+			for (const itemButton of ui.ARGON.itemButtons) {
 				if (item.spells?.get(itemButton.item?.id)) {
 					itemButton.render();
 				}
 			}
 		}
 		if (item.rules?.length) {
-			for (const itemButton of ui.ARGON?.itemButtons) {
+			for (const itemButton of ui.ARGON.itemButtons) {
 				if (itemButton.item?.system?.item?.id == item.id) {
 					itemButton.render();
 				}
 			}
 		}
-	});
+	}
+});
+
+Hooks.on("argonInit", async (CoreHUD) => {
+    const ARGON = CoreHUD.ARGON;
+  
+	await registerPF2EECHSItems();
 	
 	function useAction(actionType, fallback = true) {
 		switch (actionType) {
@@ -151,7 +153,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get isDying() {
-			return this.actor.system.attributes.hp.value <= 0;
+			return this.actor.system.attributes?.dying?.value >= 1;
 		}
 		
 		async _onDeathSave(event) {

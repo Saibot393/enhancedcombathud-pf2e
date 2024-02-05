@@ -2,7 +2,36 @@ import { ModuleName } from "./utils.js";
 
 const ItemReplacementID = "_argonUI_";
 
-var PF2EECHReactionItems = {};
+const defaultActionsIDs = {
+	"administerFirstAid"	: "MHLuKy4nQO2Z4Am1",
+	"balance"				: "M76ycLAqHoAgbcej",
+	"commandAnAnimal"		: "q9nbyIF0PEBqMtYe",
+	"concealAnObject"		: "qVNVSmsgpKFGk9hV",
+	"createADiversion"		: "GkmbTGfg8KcgynOA",
+	"demoralize"			: "2u915NdUyQan6uKF",
+	"disableDevice"			: "cYdz2grcOcRt4jk6",
+	"disarm"				: "Dt6B1slsBy8ipJu9",
+	//"escape"				: "SkZAQRkLLkmBQNB9",
+	"feint"					: "QNAVeNKtHA0EUw4X",
+	"forceOpen"				: "SjmKHgI7a5Z9JzBx",
+	"grapple"				: "PMbdMWc2QroouFGD",
+	"hide"					: "XMcnh4cSI32tljXa",
+	"highJump"				: "2HJ4yuEFY1Cast4h",
+	"longJump"				: "JUvAvruz7yRQXfz2",
+	"palmAnObject"			: "ijZ0DDFpMkWqaShd",
+	"perform"				: "EEDElIyin4z60PXx",
+	"pickALock"				: "2EE4aF4SZpYf0R6H",
+	"request"				: "DCb62iCBrJXy0Ik6",
+	"seek"					: "BlAOM2X92SI6HMtJ",
+	"senseMotive"			: "1xRFPTFtWtGJ9ELw",
+	"shove"					: "7blmbDrQFNfdT731",
+	"sneak"					: "VMozDqMMuK5kpoX4",
+	"steal"					: "RDXXE7wMrSPCLv5k",
+	"trip"					: "ge56Lu1xXVFYUnLP",
+	"tumbleThrough"			: "21WIfSu7Xd7uKqV8"
+}
+
+var defaultActions = {};
 
 var PF2EECHActionItems = {};
 var PF2EECHFreeActionItems = {};
@@ -13,14 +42,15 @@ async function registerPF2EECHSItems () {
 		groupflags : {
 			actiontype : "action"
 		},
-		DropProne : {
+		DropProne : {//conditional
 			img: `icons/svg/down.svg`,
 			id: "HYNhdaPtF1QmQbR3"
 		},
-		Stand : {
+		Stand : {//conditional
 			img: `icons/svg/up.svg`,
 			id: "OdIUybJ3ddfL7wzj"
 		},
+		/*
 		Seek : {
 			img: `icons/svg/eye.svg`,
 			id: "BlAOM2X92SI6HMtJ"
@@ -29,6 +59,7 @@ async function registerPF2EECHSItems () {
 			img: `modules/${ModuleName}/icons/psychic-waves.svg`,
 			id: "1xRFPTFtWtGJ9ELw"
 		},
+		*/
 		Step : {
 			img: `modules/${ModuleName}/icons/walk.svg`,
 			id: "UHpkTuCtyaPqiCAB"
@@ -41,7 +72,7 @@ async function registerPF2EECHSItems () {
 			img: `modules/${ModuleName}/icons/sands-of-time.svg`,
 			id: "dLgAMt3TbkmLkUqE"
 		},
-		Escape : {
+		Escape : {//conditional
 			img: `modules/${ModuleName}/icons/breaking-chain.svg`,
 			id: "SkZAQRkLLkmBQNB9"
 		},
@@ -143,6 +174,34 @@ function itemfromRule(rule) {
 	
 	return replacement;
 	//return Item.create(replacement);;
+}
+
+async function getDefaultActions() {
+	if (Object.keys(defaultActions).length) {//compendium already loaded
+		return defaultActions;
+	}
+	
+	for (key of Object.keys(defaultActionsIDs)) {
+		defaultActions[key] = await fromUuid("Compendium.pf2e.actionspf2e.Item" + defaultActionsIDs[key]);
+	}
+	
+	return await getDefaultActions();
+}
+
+async function getTitlesDefaultActions() {
+	let actions = await getDefaultActions();
+	
+	let titled = {};
+	
+	for (key of Object.keys(actions)) {
+		titled[key] = actions[key].name;
+	}
+	
+	return titled;
+}
+
+function executefunction(key, options) {
+	game.pf2e.actions[key](options);
 }
 
 export {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule}
