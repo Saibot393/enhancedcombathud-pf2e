@@ -290,66 +290,66 @@ function firstUpper(string) {
 	return string[0].toUpperCase() + string.substr(1);
 }
 
-function activationCost(item) {
-	let glyphs = [];
-		
-	if (item.system.time) {
-		if (["1", "2", "3"].find(time => item.system.time.value.includes(time))) {
-			glyphs.push(item.system.time.value);
-		}
-		
-		if (item.system.time.value == "reaction") {
-			glyphs.push("R");
-		}
-		
-		if (item.system.time.value == "free") {
-			glyphs.push("F");
-		}
+function actioninfo(item) {
+	let action = {actionType : {}, actions : {}};
+	
+	if (item.system.actionType?.value) {
+		action.actionType.value = item.system.actionType.value;
+		action.actions.value = item.system.actions.value;
 	}
 	else {
-		let dom = $((new DOMParser).parseFromString(item.system.description.value, "text/html"));
-		
-		let actionGlyphs = dom.find("span.action-glyph");
-		
-		let glyphText = "";
-		
-		for (let i = 0; i < actionGlyphs.length; i++) {
-			glyphText = glyphText + actionGlyphs[i].innerHTML;
+		if (item.system.time) {
+			if (["1", "2", "3"].find(time => item.system.time.value.includes(time))) {
+				action.actionType.value = "action";
+				action.actions.value = Number(item.system.time.value);
+			}
+			
+			if (item.system.time.value == "reaction") {
+				action.actionType.value = "reaction";
+			}
+			
+			if (item.system.time.value == "free") {
+				action.actionType.value = "free";
+			}
 		}
-		
-		if (glyphText.toUpperCase().includes("F")) {
-			glyphs.push("F");
-		}
-		
-		if (glyphText.includes("1") || glyphText.toUpperCase().includes("A")) {
-			glyphs.push("1");
-		}
-		
-		if (glyphText.includes("2") || glyphText.toUpperCase().includes("D")) {
-			glyphs.push("2");
-		}
-		
-		if (glyphText.includes("3") || glyphText.toUpperCase().includes("T")) {
-			glyphs.push("3");
-		}
-		
-		if (glyphText.toUpperCase().includes("R")) {
-			glyphs.push("R");
+		else {
+			let dom = $((new DOMParser).parseFromString(item.system.description.value, "text/html"));
+			let actionGlyphs = dom.find("span.action-glyph");
+			let glyphText = "";
+			for (let i = 0; i < actionGlyphs.length; i++) {
+				glyphText = glyphText + actionGlyphs[i].innerHTML;
+			}
+			
+			if (glyphText.toUpperCase().includes("F")) {
+				action.actionType.value = "free";
+			}
+			
+			for (let keys of [["1", "A"], ["2", "D"], ["3", "T"]]) {
+				if (glyphText.includes(keys[0]) || glyphText.toUpperCase().includes(keys[1])) {
+					action.actionType.value = "action";
+					action.actions.value = Number(keys[0]);
+				}
+			}
+			
+			if (glyphText.toUpperCase().includes("R")) {
+				action.actionType.value = "reaction";
+			}
 		}
 	}
 	
-	if (glyphs.length == 0) {
+	if (!action.actionType.value) {
 		//assume one action by default
-		glyphs = ["1"];
+		action.actionType.value = "action";
+		action.actions.value = 1;
 	}
 	
-	return glyphs;
+	return action;
 }
 
-function actionGlyphs(actionType) {
+function actionGlyphs(actionType, number = 0) {
 	switch(actionType) {
 		case "action":
-			return ["1", "2", "3"];
+			return ["1", "2", "3"][number];
 			break;
 		case "free":
 			return ["F"];
@@ -385,7 +385,6 @@ function MAPtext(item, MAP = 0) {
 
 function spelluseAction(spell, spellGroup, level) {
 	return () => {
-		console.log(spell, spellGroup);
 		if (spell && spellGroup) {
 			spellGroup.cast(spell, {consume : true, rank : level});
 			
@@ -414,4 +413,4 @@ function connectedItem(action) {
 	return null;
 }
 
-export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem}
+export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem}

@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, activationCost, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem} from "./utils.js";
 import {openNewInput} from "./popupInput.js";
 
 const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2e/icons/actions/OneAction.webp", "systems/pf2e/icons/actions/OneThreeActions.webp", "systems/pf2e/icons/actions/OneTwoActions.webp", "systems/pf2e/icons/actions/Passive.webp", "systems/pf2e/icons/actions/Reaction.webp", "systems/pf2e/icons/actions/ThreeActions.webp", "systems/pf2e/icons/actions/TwoActions.webp", "systems/pf2e/icons/actions/TwoThreeActions.webp", "icons/sundries/books/book-red-exclamation.webp"]
@@ -51,14 +51,28 @@ Hooks.once("init", () => {
 
 //ammend Hooks
 Hooks.on("updateItem", (item) => {
-	if (ui.ARGON) {
-		if (item.type == "condition" && item.parent == ui.ARGON?.components.portrait.actor) {
+	const PF2EDailies = "pf2e-dailies";
+	if (ui.ARGON && item.parent == ui.ARGON?.components.portrait.actor) {
+		if (item.type == "condition") {
 			ui.ARGON.components.portrait.render();
 		}
-		if (item.type == "spellcastingEntry") {
+		if (item.type == "consumable" && item.system.category == "ammo") {
 			for (const itemButton of ui.ARGON.itemButtons) {
-				if (item.spells?.get(itemButton.item?.id)) {
+				if (itemButton.item?.ammo == item) {
 					itemButton.render();
+				}
+			}
+		}
+		if (item.type == "spellcastingEntry") {
+			let staffid;
+			
+			if (game.modules.get(PF2EDailies)?.active) {
+				staffid = item.getFlag(PF2EDailies, "staff")?.staveID;
+			}
+			
+			for (const itemButton of ui.ARGON.itemButtons) {
+				if (itemButton.item?.id == staffid || item.spells?.get(itemButton.item?.id)) {
+							itemButton.render();
 				}
 			}
 		}
@@ -709,27 +723,40 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		get quantity() {
 			switch (this.item?.type) {
 				case "weapon":
-				case "shield":
-					if (this.item.system?.container?.contents[0]?.id) {
-						const ammunition = this.actor.items.get(this.item.system.container.contents[0].id);
+					const PF2EDailies = "pf2e-dailies";
+					if (game.modules.get(PF2EDailies)?.active) {
+						let staffSpells = this.actor.items.find(item => item.type == "spellcastingEntry" && item.getFlag(PF2EDailies, "staff")?.staveID == this.item.id)
 						
-						if (ammunition) {
-							if (ammunition.system.capacity?.max) {
-								return ammunition.system.capacity?.value;
-							}
-							else {
-								return ammunition.system.quantity;
-							}
+						if (staffSpells) {
+							return staffSpells.getFlag(PF2EDailies, "staff").charges;
 						}
 					}
 					
-					if (this.item?.system.uses?.max && this.item?.system.uses?.max > 0) {
-						return this.item.system.capacity.value;
+					if (this.item.reload && this.item.reload != "-") {
+						if (this.item.ammo) {
+							if (this.item.ammo.system.uses?.max) {
+								return this.item.ammo.system.uses.value + (this.item.ammo.system.quantity - 1) * this.item.ammo.system.uses.max;
+							}
+							else {
+								return this.item.ammo.system.quantity;
+							}
+						}
+						else {
+							return 0;
+						}
 					}
 					
+					if (this.item?.getFlag(ModuleName, "thrown")) {
+						return this.item.system.quantity;
+					}
+					break;
+				case "shield":
+					if (this.item) {
+						if (this.item?.isBroken) return 0;
+						return this.item.system.hp?.value;
+					}
 					return null;
 					break;
-				
 				case "spell":
 					let uses = 0;
 					let hasuses = false;
@@ -751,17 +778,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						return null;
 					}
 					break;
-					
 				default :
 					if (this.item?.system.uses?.max) {
-						return this.item.system.uses.value;
+						return this.item.system.uses.value + (this.item.system.quantity - 1) * this.item.system.uses.max;
 					}
 					else{
 						if (this.item?.system.frequency?.max) {
-							return this.item?.system.frequency.value;
+							return this.item.system.frequency.value;
 						}
 						else {
-							return this.item?.system?.quantity;
+							return this.item?.system.quantity;
 						}
 					}
 					break;
@@ -899,7 +925,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _onTooltipMouseEnter(event) {
 			await super._onTooltipMouseEnter(event);
 			if (this.element.querySelector("#specialAction")) {
-				if (this.element.querySelector("span.action-element-title")) {
+				if (this.isWeaponSet) {
 					this.element.querySelector("span.action-element-title").style.visibility = "hidden";
 				}
 				for (const specialelement of this.element.querySelectorAll("#specialAction")) {
@@ -912,7 +938,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			await super._onTooltipMouseLeave(event);
 			
 			if (this.element.querySelector("#specialAction")) {
-				if (this.element.querySelector("span.action-element-title")) {
+				if (this.isWeaponSet) {
 					this.element.querySelector("span.action-element-title").style.visibility = "";
 				}
 				for (const specialelement of this.element.querySelectorAll("#specialAction")) {
@@ -923,6 +949,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		async _renderInner() {
 			const iconsize = 30;
+			let topoffset = 1;
 					
 			if (!this.visible) {//fix for potential bug
 				this.element.style.display = "none";
@@ -996,14 +1023,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					
 					ammoSelect.style.position = "absolute";
 					ammoSelect.style.top = "0";
-					ammoSelect.style.left = "0";
+					ammoSelect.style.left = "50%";
 					ammoSelect.style.width = `${100/2}%`;
-					ammoSelect.style.height = `${100/8}%`;
+					ammoSelect.style.height = `25px`;
+					topoffset = topoffset + 25;
 					ammoSelect.style.color = "#c8c8c8";
 					ammoSelect.style.backdropFilter = "var(--ech-blur-amount)";
 					ammoSelect.style.backgroundColor = "rgba(0,0,0,.3)";
 					ammoSelect.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
 					ammoSelect.style.borderColor = "inherit";
+					ammoSelect.style.visibility = "hidden";
 					
 					ammoSelect.onchange = () => {this.item.update({system : {selectedAmmoId : ammoSelect.value}})};
 					
@@ -1086,7 +1115,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					toggles.push(toggleData);
 			}
 			
-			let topoffset = 1;
 			for (let toggle of toggles) {
 				let icon;
 				if (toggle.iconclass) {
@@ -1272,7 +1300,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				default:
 					let items = this.actor.items.filter(item => item.type == this.type);
 					
-					items = items.filter(item => activationCost(item).find(glyph => actionGlyphs(this.actionType).includes(glyph)));
+					items = items.filter(item => actioninfo(item).actionType.value == this.actionType);
 					
 					return items;
 					break;
@@ -1298,7 +1326,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			let addcantrips = [];
 			
 			let isvalidspell = (spell, level) => {
-				if (!activationCost(spell).find(glyph => actionGlyphs(this.actionType).includes(glyph))) {
+				if (actioninfo(spell).actionType.value != this.actionType) {
 					return false;
 				}
 				
