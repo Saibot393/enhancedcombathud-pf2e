@@ -54,15 +54,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	
 	//ammend Hooks
 	Hooks.on("updateItem", (item) => {
+		if (item.type == "condition" && item.parent == ui.ARGON?.components.portrait.actor) {
+			ui.ARGON.components.portrait.render();
+		}
 		if (item.type == "spellcastingEntry") {
-			for (const itemButton of ui.ARGON.itemButtons) {
+			for (const itemButton of ui.ARGON?.itemButtons) {
 				if (item.spells?.get(itemButton.item?.id)) {
 					itemButton.render();
 				}
 			}
 		}
 		if (item.rules?.length) {
-			for (const itemButton of ui.ARGON.itemButtons) {
+			for (const itemButton of ui.ARGON?.itemButtons) {
 				if (itemButton.item?.system?.item?.id == item.id) {
 					itemButton.render();
 				}
@@ -206,6 +209,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			];
 		}
 		
+		get template() {
+			return `/modules/${ModuleName}/templates/PortraitPanel.hbs`;
+		}
+		
 		async _renderInner() {
 			await super._renderInner();
 			
@@ -248,8 +255,53 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 				
 				heroPoints.appendChild(heroSpan);
-				
 				this.element.appendChild(heroPoints);
+				
+				if (this.isDying) {
+					let max = this.actor.system.attributes?.dying?.max;
+					let value = this.actor.system.attributes?.dying?.value;
+					
+					let dying = this.element.querySelector("div.death-saves");
+					dying.style.display = "flex";
+					dying.style.justifyContent = "center";
+					dying.style.flexDirection = "column";
+					
+					let dyingcount = document.createElement("div");
+					dyingcount.classList.add("dots");
+					dyingcount.style.zIndex = "1";
+					dyingcount.style.marginTop = "5px"
+					dyingcount.onclick = () => {this.actor.increaseCondition("dying")};
+					dyingcount.oncontextmenu = () => {this.actor.decreaseCondition("dying")};
+					dyingcount.setAttribute("data-tooltip", game.i18n.localize("PF2E.ConditionTypeDying"));
+					
+					let dyingspan = document.createElement("span");
+					dyingspan.classList.add("pips");
+					dyingspan.style.fontSize = "20px";
+					
+					for (let i = 1; i <= max; i++) {
+						let icon = document.createElement("i");
+						
+						if (value == max) {
+							icon.classList.add("fa-solid", "fa-skull");
+						}
+						else {
+							if (i <= value) {
+								icon.classList.add("fa-solid", "fa-circle-x");
+							}
+							else {
+								icon.classList.add("fa-regular", "fa-circle");
+							}
+						}
+						icon.style.margin = "5px";
+						icon.style.marginLeft = "0px";
+						
+						dyingspan.appendChild(icon);
+					}
+					
+					dyingcount.appendChild(dyingspan);
+					
+					dying.appendChild(dyingcount);
+				}
 			}
 			
 			if (this.actor.system.attributes.shield.raised) {
