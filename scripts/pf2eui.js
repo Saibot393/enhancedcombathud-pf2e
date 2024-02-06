@@ -234,6 +234,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _renderInner() {
 			await super._renderInner();
 			
+			this.element.ondblclick = () => {
+				if (game.settings.get(ModuleName, "panondblclick") {				
+					let target = canvas.tokens.placeables.find(token => token.actor == this.actor);
+							
+					if (target) {
+						let panTarget = target.center;
+						
+						canvas.animatePan(panTarget);
+					}
+				}
+			}
+			
 			if (this.actor.system.resources.heroPoints?.max) {
 				let max = this.actor.system.resources.heroPoints.max;
 				let value = this.actor.system.resources.heroPoints.value;
@@ -245,6 +257,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				heroPoints.style.top = "0";
 				heroPoints.style.right = "0";
 				heroPoints.onclick = () => {this.actor.update({system : {resources : {heroPoints : {value : Math.min(value + 1, max)}}}})};
+				heroPoints.ondblclick = (event) => {event.stopPropagation()};
 				heroPoints.oncontextmenu = () => {this.actor.update({system : {resources : {heroPoints : {value : Math.max(value - 1, 0)}}}})};
 				
 				let heroSpan = document.createElement("span");
@@ -289,6 +302,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					dyingcount.style.zIndex = "1";
 					dyingcount.style.marginTop = "5px"
 					dyingcount.onclick = () => {this.actor.increaseCondition("dying")};
+					dyingcount.ondblclick = (event) => {event.stopPropagation()};
 					dyingcount.oncontextmenu = () => {this.actor.decreaseCondition("dying")};
 					dyingcount.setAttribute("data-tooltip", game.i18n.localize("PF2E.ConditionTypeDying"));
 					
@@ -1072,7 +1086,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							
 							let toggleData = {
 								iconclass : damageIcon(current),
-								onclick : () => {this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})},
+								onclick : () => {
+									if (togglekey == "modular") console.log("an action should be used here");
+									this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})
+								},
 								tooltip : game.i18n.localize("PF2E.Trait" + firstUpper(togglekey))
 							};
 							

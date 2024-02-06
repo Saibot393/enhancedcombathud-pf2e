@@ -6,6 +6,16 @@ const defaultECH = ["seek", "hide", "none", "none", "none", "none"];
 Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 	//Settings
 	//client
+	game.settings.register(ModuleName, "panondblclick", {
+		name: game.i18n.localize(`${ModuleName}.Settings.panondblclick.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.panondblclick.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		requiresReload : true,
+		default: true
+	});
+	
 	for (let key of Object.keys(settingActionSpace)) {
 		for (let i = 1; i <= settingActionSpace[key]; i++) {
 			game.settings.register(ModuleName, key + i, {
