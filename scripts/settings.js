@@ -16,6 +16,16 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		default: true
 	});
 	
+	game.settings.register(ModuleName, "directStaffuse", {
+		name: game.i18n.localize(`${ModuleName}.Settings.directStaffuse.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.directStaffuse.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		requiresReload : true,
+		default: false
+	});
+	
 	for (let key of Object.keys(settingActionSpace)) {
 		for (let i = 1; i <= settingActionSpace[key]; i++) {
 			game.settings.register(ModuleName, key + i, {

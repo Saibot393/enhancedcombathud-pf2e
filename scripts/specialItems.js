@@ -262,14 +262,24 @@ function itemfromRule(rule) {
 	replacement.name = rule.label;
 	
 	if (connectedItem) {
-		replacement.system.description = connectedItem.system.description.value;
-		replacement.img = connectedItem.img;
-		replacement.system.traits = connectedItem.system.traits;
-		replacement.system.item = connectedItem;
-	}
-	else {
+		let sourceitem = connectedItem;
 		
+		if (connectedItem.type == "action") {
+			if (connectedItem.getFlag("pf2e", "grantedBy")?.id) {
+				sourceitem = connectedItem.actor.items.get(connectedItem.getFlag("pf2e", "grantedBy").id);
+			}
+			if (!sourceitem) {
+				sourceitem = connectedItem;
+			}
+		}
+		
+		replacement.system.description = sourceitem.system.description.value;
+		replacement.img = sourceitem.img;
+		replacement.system.traits = sourceitem.system.traits;
+		replacement.system.item = sourceitem;
 	}
+	
+	replacement.system.updateID = connectedItem.id;
 	
 	if (rule.toggleable) {
 		replacement.flags = {

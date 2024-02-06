@@ -78,7 +78,7 @@ Hooks.on("updateItem", (item) => {
 		}
 		if (item.rules?.length) {
 			for (const itemButton of ui.ARGON.itemButtons) {
-				if (itemButton.item?.system?.item?.id == item.id) {
+				if (itemButton.item?.system?.updateID == item.id) {
 					itemButton.render();
 				}
 			}
@@ -875,7 +875,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		//
 
 		async _onLeftClick(event, options = {MAP : 0}) {
-			if (!(event.target.id != "specialAction" || options.specialAction)) return;
+			if (event.target.classList.contains("specialAction") && !options.specialAction) return;
 
 			var used = false;
 			
@@ -888,36 +888,41 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					this.item.flags[ModuleName].onclick();
 				}
 				else {
-					let action = this.actor.system.actions.find(action => action.slug == this.item.system.slug);
-					
-					if (action) {//default actions
-						let variant = action.variants[options.MAP];
-						
-						if (!variant) {
-							variant = action.variants[0];
-						}
-						
-						if (await variant?.roll()) {
-							used = true;
-						}
+					if (this.panel && game.settings.get(ModuleName, "directStaffuse")) {//panel action
+						this.panel.toggle()
 					}
 					else {
-						if (this.item.consume) {//consume actions
-							this.item.consume();
-						}
-						else {
-							if (this.item.system.selfEffect?.uuid) {//effect actions
-								this.actor.createEmbeddedDocuments("Item", [await fromUuid(this.item.system.selfEffect.uuid)]);
-								used = true;
-							}
-							else {//give up and let PF2E handle it
-								this.item.toChat();
-								used = true;
+						let action = this.actor.system.actions.find(action => action.slug == this.item.system.slug);
+						
+						if (action) {//default actions
+							let variant = action.variants[options.MAP];
+							
+							if (!variant) {
+								variant = action.variants[0];
 							}
 							
-							if (used) {//consume frequency charges by hand
-								if (this.item?.system.frequency?.max) {
-									return this.item.update({system : {frequency : {value : Math.max(this.item.system.frequency.value - 1, 0)}}});
+							if (await variant?.roll()) {
+								used = true;
+							}
+						}
+						else {
+							if (this.item.consume) {//consume actions
+								this.item.consume();
+							}
+							else {
+								if (this.item.system.selfEffect?.uuid) {//effect actions
+									this.actor.createEmbeddedDocuments("Item", [await fromUuid(this.item.system.selfEffect.uuid)]);
+									used = true;
+								}
+								else {//give up and let PF2E handle it
+									this.item.toChat();
+									used = true;
+								}
+								
+								if (used) {//consume frequency charges by hand
+									if (this.item?.system.frequency?.max) {
+										return this.item.update({system : {frequency : {value : Math.max(this.item.system.frequency.value - 1, 0)}}});
+									}
 								}
 							}
 						}
@@ -943,11 +948,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		async _onTooltipMouseEnter(event) {
 			await super._onTooltipMouseEnter(event);
-			if (this.element.querySelector("#specialAction")) {
+			if (this.element.querySelector(".specialAction")) {
 				if (this.isWeaponSet) {
 					this.element.querySelector("span.action-element-title").style.visibility = "hidden";
 				}
-				for (const specialelement of this.element.querySelectorAll("#specialAction")) {
+				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
 					specialelement.style.visibility = "";
 				}
 			}
@@ -956,11 +961,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _onTooltipMouseLeave(event) {
 			await super._onTooltipMouseLeave(event);
 			
-			if (this.element.querySelector("#specialAction")) {
+			if (this.element.querySelector(".specialAction")) {
 				if (this.isWeaponSet) {
 					this.element.querySelector("span.action-element-title").style.visibility = "";
 				}
-				for (const specialelement of this.element.querySelectorAll("#specialAction")) {
+				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
 					specialelement.style.visibility = "hidden";
 				}
 			}
@@ -996,7 +1001,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			let toggles = [];
 			
-			if (this.isWeaponSet) {
+			if (this.isWeaponSet && !(this.panel && game.settings.get(ModuleName, "directStaffuse"))) {
 				const MAPActions = [{MAP : 1}, {MAP : 2}];
 				if ((this.item.type == "weapon" || this.item.type == "shield") && this.actionType == "action") {
 					this.element.querySelector("span").id = "maintitle";
@@ -1004,7 +1009,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					for (let i = 0; i < MAPActions.length; i++) {
 						let Action = MAPActions[i];
 						let ActionTitle = document.createElement("span");
-						ActionTitle.id = "specialAction";
+						ActionTitle.classList.add("specialAction");
 						ActionTitle.classList.add("action-element-title");
 						ActionTitle.innerHTML = MAPtext(this.item, Action.MAP);
 						ActionTitle.onclick = (event) => {event.stopPropagation(); event.preventDefault(); this._onLeftClick(event, {MAP : Action.MAP, specialAction : true})};
@@ -1023,7 +1028,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (this.item?.requiresAmmo) {
 					let ammoSelect = document.createElement("select");
 					//ammoSelect.classList.add("action-element-title");
-					ammoSelect.id = "specialAction";
+					ammoSelect.classList.add("specialAction");
 					
 					for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => item.isAmmo)]) {
 						let option = document.createElement("option");
@@ -1117,13 +1122,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 				
 				if (this.panel) {
-					let toggleData = {
-						iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
-						onclick : () => {this.panel.toggle()},
-						tooltip : game.i18n.localize("PF2E.Item.Spell.Plural")
-					};	
+					if (!game.settings.get(ModuleName, "directStaffuse")) {
+						let toggleData = {
+							iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
+							onclick : () => {this.panel.toggle()},
+							tooltip : game.i18n.localize("PF2E.Item.Spell.Plural")
+						};	
 
-					toggles.push(toggleData);
+						toggles.push(toggleData);
+					}
 				}
 			}
 			
@@ -1161,7 +1168,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
 				
-				icon.id = "specialAction";
+				icon.classList.add("specialAction");
 				icon.onclick = toggle.onclick;
 				icon.style.position = "absolute";
 				icon.style.top = `${topoffset}px`;
