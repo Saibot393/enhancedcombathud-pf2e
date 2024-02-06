@@ -91,6 +91,11 @@ async function registerPF2EECHSItems () {
 		notprone : (await fromUuid("Compendium.pf2e.actionspf2e.Item.HYNhdaPtF1QmQbR3"))
 	};
 	
+	baseitem.ArrestorGrab = {
+		fly : (await fromUuid("Compendium.pf2e.actionspf2e.Item.qm7xptMSozAinnPS")),
+		nofly : (await fromUuid("Compendium.pf2e.actionspf2e.Item.3yoajuKjwHZ9ApUY"))
+	};
+	
 	PF2EECHActionItems = {
 		groupflags : {
 			actiontype : "action"
@@ -228,14 +233,85 @@ async function registerPF2EECHSItems () {
 		groupflags : {
 			actiontype : "reaction"
 		},
-		Aid : {
+		aid : {
 			img: `modules/${ModuleName}/icons/thumb-up.svg`,
 			id: "HCl3pzVefiv9ZKQW"
 		},
+		ArrestorGrab : {
+			flags : {
+				[ModuleName] : {
+					dynamicstate : {
+						img : (options) => {
+							let actor = options.actor;
+							
+							if (actor) {
+								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+									return `icons/svg/angel.svg`;
+								}
+								else {
+									return `modules/${ModuleName}/icons/grab.svg`;
+								}
+							}
+						},
+						name : (options) => {
+							let actor = options.actor;
+							
+							if (actor) {
+								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+									return baseitem.ArrestorGrab.fly?.name;
+								}
+								else {
+									return baseitem.ArrestorGrab.nofly?.name;
+								}
+							}
+						},
+						description : (options) => {
+							let actor = options.actor;
+							
+							if (actor) {
+								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+									return baseitem.ArrestorGrab.fly?.system.description;
+								}
+								else {
+									return baseitem.ArrestorGrab.nofly?.system.description;
+								}
+							}
+						}
+					},
+					onclick : async (options) => {
+						let actor = options.actor;
+						
+						if (actor) {
+							if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+								game.pf2e.actions.get("arrest-a-fall").toMessage();
+							}
+							else {
+								game.pf2e.actions.get("grab-an-edge").toMessage();
+							}
+						}
+					},
+					onrclick : async (options) => {
+						let actor = options.actor;
+						
+						if (actor) {
+							if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+								return baseitem.ArrestorGrab.fly?.sheet.render(true);
+							}
+							else {
+								return baseitem.ArrestorGrab.nofly?.sheet.render(true);
+							}
+						}
+					},
+					updateonclick : true
+				}
+			}
+		}
+		/*
 		ready : {
 			img: `modules/${ModuleName}/icons/sands-of-time.svg`,
 			id: "dLgAMt3TbkmLkUqE"
 		}
+		*/
 	}
 	
 	let ItemSets = {PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems}
@@ -300,6 +376,16 @@ async function registerPF2EECHSItems () {
 									}
 									
 									game.pf2e.actions[itemkey](settings);
+									return true;
+								}
+							}
+						}
+						else {
+							let simpleaction = game.pf2e.actions.get(itemkey);
+							
+							if (simpleaction) {
+								itemset[itemkey].flags[ModuleName].onclick = async (options) => {
+									simpleaction.toMessage();
 									return true;
 								}
 							}
