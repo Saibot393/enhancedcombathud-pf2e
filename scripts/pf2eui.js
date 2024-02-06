@@ -178,6 +178,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 					return `CR ${this.actor.system.details.level.value} ${status}`;
 					break;
+				case "familiar":
+					let master = game.actors.get(this.actor.system.master?.id);
+					
+					if (master) {
+						return replacewords(game.i18n.localize("PF2E.Actor.Familiar.Blurb"), {master : master.name});
+					}
+					break;
 			}
 		}
 
@@ -317,53 +324,53 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				heroPoints.appendChild(heroSpan);
 				this.element.appendChild(heroPoints);
+			}
+			
+			if (this.isDying) {
+				let max = this.actor.system.attributes?.dying?.max;
+				let value = this.actor.system.attributes?.dying?.value;
 				
-				if (this.isDying) {
-					let max = this.actor.system.attributes?.dying?.max;
-					let value = this.actor.system.attributes?.dying?.value;
+				let dying = this.element.querySelector("div.death-saves");
+				dying.style.display = "flex";
+				dying.style.justifyContent = "center";
+				dying.style.flexDirection = "column";
+				
+				let dyingcount = document.createElement("div");
+				dyingcount.classList.add("dots");
+				dyingcount.style.zIndex = "1";
+				dyingcount.style.marginTop = "5px"
+				dyingcount.onclick = () => {this.actor.increaseCondition("dying")};
+				dyingcount.ondblclick = (event) => {event.stopPropagation()};
+				dyingcount.oncontextmenu = () => {event.stopPropagation(); this.actor.decreaseCondition("dying")};
+				dyingcount.setAttribute("data-tooltip", game.i18n.localize("PF2E.ConditionTypeDying"));
+				
+				let dyingspan = document.createElement("span");
+				dyingspan.classList.add("pips");
+				dyingspan.style.fontSize = "20px";
+				
+				for (let i = 1; i <= max; i++) {
+					let icon = document.createElement("i");
 					
-					let dying = this.element.querySelector("div.death-saves");
-					dying.style.display = "flex";
-					dying.style.justifyContent = "center";
-					dying.style.flexDirection = "column";
-					
-					let dyingcount = document.createElement("div");
-					dyingcount.classList.add("dots");
-					dyingcount.style.zIndex = "1";
-					dyingcount.style.marginTop = "5px"
-					dyingcount.onclick = () => {this.actor.increaseCondition("dying")};
-					dyingcount.ondblclick = (event) => {event.stopPropagation()};
-					dyingcount.oncontextmenu = () => {event.stopPropagation(); this.actor.decreaseCondition("dying")};
-					dyingcount.setAttribute("data-tooltip", game.i18n.localize("PF2E.ConditionTypeDying"));
-					
-					let dyingspan = document.createElement("span");
-					dyingspan.classList.add("pips");
-					dyingspan.style.fontSize = "20px";
-					
-					for (let i = 1; i <= max; i++) {
-						let icon = document.createElement("i");
-						
-						if (value == max) {
-							icon.classList.add("fa-solid", "fa-skull");
+					if (value == max) {
+						icon.classList.add("fa-solid", "fa-skull");
+					}
+					else {
+						if (i <= value) {
+							icon.classList.add("fa-solid", "fa-circle-x");
 						}
 						else {
-							if (i <= value) {
-								icon.classList.add("fa-solid", "fa-circle-x");
-							}
-							else {
-								icon.classList.add("fa-regular", "fa-circle");
-							}
+							icon.classList.add("fa-regular", "fa-circle");
 						}
-						icon.style.margin = "5px";
-						icon.style.marginLeft = "0px";
-						
-						dyingspan.appendChild(icon);
 					}
+					icon.style.margin = "5px";
+					icon.style.marginLeft = "0px";
 					
-					dyingcount.appendChild(dyingspan);
-					
-					dying.appendChild(dyingcount);
+					dyingspan.appendChild(icon);
 				}
+				
+				dyingcount.appendChild(dyingspan);
+				
+				dying.appendChild(dyingcount);
 			}
 			
 			if (this.actor.system.attributes.shield?.raised) {
@@ -2076,34 +2083,54 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	class PF2EWeaponSets extends ARGON.WeaponSets {
 		async getDefaultSets() {
 			const sets = await super.getDefaultSets();
+			
+			let onlyactions = true;
+			
 			if (this.actor.type !== "npc") return sets;
 			const actions = this.actor.items.filter((item) => item.type === "melee").map((action) => {
 				let item = this.actor.items.find(item => item.type != "melee" && item.name == action.name);
 				
 				if (item) {
 					return item;
+					onlyactions = false;
 				}
 				else {
 					return action;
 				}
 			});
 			
-			console.log(actions);
-			
-			return {
-				1: {
-					primary: actions[0]?.uuid ?? null,
-					secondary: null,
-				},
-				2: {
-					primary: actions[1]?.uuid ?? null,
-					secondary: null,
-				},
-				3: {
-					primary: actions[2]?.uuid ?? null,
-					secondary: null,
-				},
-			};
+			if(onlyactions) {
+				return {
+					1: {
+						primary: actions[0]?.uuid ?? null,
+						secondary: actions[1]?.uuid ?? null,
+					},
+					2: {
+						primary: actions[2]?.uuid ?? null,
+						secondary: actions[3]?.uuid ?? null,
+					},
+					3: {
+						primary: actions[4]?.uuid ?? null,
+						secondary: actions[5]?.uuid ?? null,
+					},
+				}
+			} 
+			else {
+				return {
+					1: {
+						primary: actions[0]?.uuid ?? null,
+						secondary: null,
+					},
+					2: {
+						primary: actions[1]?.uuid ?? null,
+						secondary: null,
+					},
+					3: {
+						primary: actions[2]?.uuid ?? null,
+						secondary: null,
+					},
+				}
+			}
 		}
 
 		async _onSetChange({ sets, active }) {
@@ -2140,5 +2167,5 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	CoreHUD.defineMovementHud(PF2EMovementHud);
 	CoreHUD.defineButtonHud(PF2EButtonHud);
     CoreHUD.defineWeaponSets(PF2EWeaponSets);
-	CoreHUD.defineSupportedActorTypes(["character", "familiar", "npc", "vehicle"]);
+	CoreHUD.defineSupportedActorTypes(["character", "familiar", "npc"]);
 });
