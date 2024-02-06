@@ -245,6 +245,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 			}
+			this.element.oncontextmenu = () => {
+				if (this.actor.sheet.rendered) {
+					this.actor.sheet.close();
+				}
+				else {
+					this.actor.sheet.render(true);
+				}
+			};
 			
 			if (this.actor.system.resources.heroPoints?.max) {
 				let max = this.actor.system.resources.heroPoints.max;
@@ -258,7 +266,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				heroPoints.style.right = "0";
 				heroPoints.onclick = () => {this.actor.update({system : {resources : {heroPoints : {value : Math.min(value + 1, max)}}}})};
 				heroPoints.ondblclick = (event) => {event.stopPropagation()};
-				heroPoints.oncontextmenu = () => {this.actor.update({system : {resources : {heroPoints : {value : Math.max(value - 1, 0)}}}})};
+				heroPoints.oncontextmenu = () => {event.stopPropagation(); this.actor.update({system : {resources : {heroPoints : {value : Math.max(value - 1, 0)}}}})};
 				
 				let heroSpan = document.createElement("span");
 				heroSpan.classList.add("adjust-hero-points");
@@ -303,7 +311,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					dyingcount.style.marginTop = "5px"
 					dyingcount.onclick = () => {this.actor.increaseCondition("dying")};
 					dyingcount.ondblclick = (event) => {event.stopPropagation()};
-					dyingcount.oncontextmenu = () => {this.actor.decreaseCondition("dying")};
+					dyingcount.oncontextmenu = () => {event.stopPropagation(); this.actor.decreaseCondition("dying")};
 					dyingcount.setAttribute("data-tooltip", game.i18n.localize("PF2E.ConditionTypeDying"));
 					
 					let dyingspan = document.createElement("span");
@@ -538,15 +546,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
 			for (let i = 5; i < specialActions.length; i = i + 2) {
-				let splitcontent = [null, null];
+				let splititems = [null, null];
 				
 				if (specialActions[i]) {
-					splitcontent[0] = new PF2ESpecialActionButton(specialActions[i]);
+					splititems[0] = specialActions[i];
 				}
 				if (specialActions[i+1]) {
-					splitcontent[1] = new PF2ESpecialActionButton(specialActions[i+1]);
+					splititems[1] = specialActions[i+1];
 				}
-				buttons.push(new PF2ESplitButton(splitcontent[0], splitcontent[1]));
+				buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(splititems[0]), new PF2ESpecialActionButton(splititems[1])));
 			}
 			
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[3]), new PF2ESpecialActionButton(specialActions[4])));
@@ -1265,24 +1273,27 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		async _onLeftClick(event) {
-			var used = false;
-			
-			const item = this.item;
-			
-			let onclick = item.getFlag(ModuleName, "onclick");
-			if (onclick) {
-				used = await onclick({actor : this.actor});
-			}
-			else {
-				used = true;
-			}
-			
-			if (used) {
-				useAction(this.actionType);
-			}
-			
-			if (item.getFlag(ModuleName, "updateonclick")) {
-				this.render();
+			if (this.item) {
+				var used = false;
+				
+				const item = this.item;
+				
+				let onclick = item.getFlag(ModuleName, "onclick");
+				if (onclick) {
+					used = await onclick({actor : this.actor});
+				}
+				else {
+					used = true;
+				}
+				
+				if (used) {
+					console.log("an action should be used here");
+					useAction(this.actionType);
+				}
+				
+				if (item.getFlag(ModuleName, "updateonclick")) {
+					this.render();
+				}
 			}
 		}
     }
@@ -1580,8 +1591,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			this._prevUsepoint = 0;
 			this._speedtype = "land";
 			this._tempmaxspeed = {};
-			this._movementsegment = 0; //increases by one after one full movement segment was used
+			this._actionsused = 0; //increases by one after one full movement segment was used
 			this._freeAction = 0;
+			this._isstep = false;
 		}
 
 		get visible() {
@@ -1603,38 +1615,34 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			return this._movementUsed;
 		}
 		
+		get movementUsedthisAction() {
+			return this._movementUsed - this._prevUsepoint;
+		}
+		
 		set movementUsed(value) {
-			const prevUsed = this._movementUsed;
-			
-			this._movementUsed = value;
-			
-			if (this.movementMax > 0) {
-				let savepoint = false;
+			if (value > 0) {
+				const prevUsed = this._movementUsed;
 				
-				let usedactions = Math.ceil((this._movementUsed-this._prevUsepoint)/this.movementMax) - Math.ceil((prevUsed-this._prevUsepoint)/this.movementMax);
+				this._movementUsed = value;
 				
-				usedactions = usedactions - this._freeAction;
-				this._freeAction = 0;
+				let max = this.movementMax;
 				
-				if (usedactions > 0) {
-					savepoint = true;
-
-					console.log("an action should be used here");
-				}
-				
-				if (this._movementUsed-this._prevUsepoint >= this.movementMax) {
-					savepoint = true;
+				if (max > 0) {
+					let usedactions = Math.ceil((this._movementUsed-this._prevUsepoint)/max) - Math.ceil((prevUsed-this._prevUsepoint)/max);
 					
-					this._movementsegment = this._movementsegment + Math.max(1, usedactions);
+					this.useActions(usedactions);
 					
-					this.resettempspeed();
+					if (this._movementUsed-this._prevUsepoint >= max) {
+						this.resettempspeed();
+						
+						this._prevUsepoint = this._movementUsed - ((this._movementUsed - this._prevUsepoint)%max);
+					}
+					
+					this.updateMovement();
 				}
-				
-				if (savepoint) {
-					this._prevUsepoint = this._movementUsed - (this._movementUsed%this.movementMax);
+				else {//movement was invalid
+					this._movementUsed = prevUsed;
 				}
-				
-				this.updateMovement();
 			}
 		}
 		
@@ -1643,15 +1651,21 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			this._prevUsepoint = 0;
 			this._tempmaxspeed = {};
-			this._movementsegment = 0;
+			this._actionsused = 0;
 			this._freeAction = 0;
+			this._isstep = false;
 			
 			this.updateMovement();
 	    }
 		
-		async resettempspeed() {
-			if (Object.keys(this._tempmaxspeed).length) {
-				this._tempmaxspeed = {};
+		async resettempspeed(forcerender) {
+			const render = Object.keys(this._tempmaxspeed).length || this._isstep || forcerender;
+			this._prevUsepoint = this._movementUsed;
+			this._freeAction = 0;
+			this._isstep = false;
+			this._tempmaxspeed = {};
+			
+			if (render) {
 				this.render();
 			}
 		}
@@ -1663,11 +1677,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		set speedtype(value) {
 			this._speedtype = value;
 			
-			this._prevUsepoint = this._movementUsed;
-			this._tempmaxspeed = {};
-			this._freeAction = 0;
-			
-			this.render();
+			this.render(true);
 		}
 		
 		get typemaxspeed() {
@@ -1697,6 +1707,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				return 0;
 			}
 			
+			if (this.isstep) {
+				return 5;
+			}
+			
 			if (this.typemaxspeed) {
 				return this.typemaxspeed;
 			}
@@ -1716,6 +1730,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			return this.actor.hasCondition("immobilized");
 		}
 		
+		get isstep() {
+			return this._isstep;
+		}
+		
 		get requiredroll() {
 			if (this.maxspeed == 0) {
 				switch(this.speedtype) {
@@ -1729,8 +1747,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								actors : canvas.tokens.controlled[0].actor, 
 								difficultyClass: dc,
 								callback: (result) => {
-									console.log("an action should be used here");
-									this._freeAction = 1;
+									this.preuseaction();
 									
 									const landspeed = this.actor.system.attributes.speed.value;
 								
@@ -1752,6 +1769,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 									}
 									
 									this._tempmaxspeed = {[this.speedtype] : newspeed};
+									this._isstep = false;
 									
 									this._prevUsepoint = this._movementUsed;
 									
@@ -1770,8 +1788,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								actors : canvas.tokens.controlled[0].actor, 
 								difficultyClass: dc,
 								callback: (result) => {
-									console.log("an action should be used here");
-									this._freeAction = 1;
+									this.preuseaction();
 									
 									const landspeed = this.actor.system.attributes.speed.value;
 									
@@ -1793,6 +1810,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 									}
 									
 									this._tempmaxspeed = {[this.speedtype] : newspeed};
+									this._isstep = false;
 									
 									this._prevUsepoint = this._movementUsed;
 									
@@ -1810,7 +1828,80 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		get movementColor() {
 			const movementColors = [/*"test-movement",*/ "base-movement", "dash-movement", "danger-movement"];
 			
-			return movementColors[Math.min(Math.max(this._movementsegment, 0), 3)]
+			let segment = this._actionsused;
+			
+			if (this.movementUsedthisAction == 0 && !this.hasfreeaction()) {
+				segment = segment + 1;
+			}
+			
+			return movementColors[Math.min(Math.max(segment-1, 0), movementColors.length - 1)]
+		}
+		
+		async useActions(value) {
+			if (value > 0) {
+				let free = Math.max(this._freeAction, 0);
+				
+				let use = Math.max(value - free, 0);
+				
+				this._actionsused = this._actionsused + use;
+				
+				this._freeAction = Math.max(this._freeAction - value, 0)
+				
+				if (use > 0) {
+					this.updateMovement();
+					
+					console.log("an action should be used here");
+				}
+			}
+		}
+		
+		async preuseaction() {
+			if (this._freeAction == 0) {
+				this._freeAction = 1;
+				
+				this._actionsused = this._actionsused + 1;
+			}
+		}
+		
+		hasfreeaction() {
+			return this._freeAction > 0;
+		}
+		
+		async addstep() {
+			this._isstep = true;
+			
+			this._prevUsepoint = this._movementUsed;
+			
+			this._tempmaxspeed = {};
+			
+			this.preuseaction();
+			
+			this.render();
+		}
+		
+		updateMovement() {
+			if (!game.combat?.started) this.movementUsed = 0;
+			
+			const max = this.maxspeed;
+			
+			const movementColor = this.movementColor;
+
+			const disabledBars = Math.min(Math.max((this.movementUsedthisAction) || 0, 0), max);
+
+			const barsNumber = Math.min(Math.max(this.movementMax - disabledBars, 0), max);
+
+			const barsContainer = this.element.querySelector(".movement-spaces");
+
+			let newHtml = "";
+			for (let i = 0; i < barsNumber; i++) {
+			  newHtml += `<div class="movement-space  ${movementColor}"></div>`;
+			}
+			for (let i = 0; i < disabledBars; i++) {
+			  newHtml += `<div class="movement-space"></div>`;
+			}
+			this.element.querySelector(".movement-current").innerText = barsNumber;
+			this.element.querySelector(".movement-max").innerText = (this._prevUsepoint + this.movementMax);
+			barsContainer.innerHTML = newHtml;
 		}
 		
 		async _renderInner() {

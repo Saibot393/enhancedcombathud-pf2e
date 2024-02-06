@@ -1,4 +1,5 @@
 import { ModuleName, settingActionSpace, firstUpper } from "./utils.js";
+import {openNewInput} from "./popupInput.js";
 
 const ItemReplacementID = "_argonUI_";
 
@@ -63,6 +64,18 @@ const settingActionIMGs = {
 		"tumbleThrough"			: `modules/${ModuleName}/icons/run.svg`
 	}
 }
+
+const PERFORM_VARIANT_TRAITS = { //special for performance
+    acting: ["auditory", "linguistic", "visual"],
+    comedy: ["auditory", "linguistic", "visual"],
+    dance: ["move", "visual"],
+    keyboards: ["auditory", "manipulate"],
+    oratory: ["auditory", "linguistic"],
+    percussion: ["auditory", "manipulate"],
+    singing: ["auditory", "linguistic"],
+    strings: ["auditory", "manipulate"],
+    winds: ["auditory", "manipulate"]
+};
 
 var defaultActions = {};
 
@@ -147,10 +160,33 @@ async function registerPF2EECHSItems () {
 		},
 		*/
 		Step : {
+			flags : {
+				[ModuleName] : {
+					onclick : async (options) => {
+						if (ui.ARGON?.components?.movement && !ui.ARGON?.components?.movement?.isstep) {
+							ui.ARGON?.components?.movement.addstep();
+							
+							return true;
+						}
+					}
+				}
+			},
 			img: `modules/${ModuleName}/icons/walk.svg`,
 			id: "UHpkTuCtyaPqiCAB"
 		},
 		TakeCover : {
+			flags : {
+				[ModuleName] : {
+					onclick : async (options) => {
+						let actor = options.actor;
+						
+						if (actor) {
+							actor.createEmbeddedDocuments("Item", [await fromUuid("Compendium.pf2e.other-effects.Item.I9lfZUiCwMiGogVi")]);
+							return true;
+						}
+					}
+				}
+			},
 			img: `modules/${ModuleName}/icons/armor-upgrade.svg`,
 			id: "ust1jJSCZQUhBZIz"
 		},
@@ -223,7 +259,40 @@ async function registerPF2EECHSItems () {
 				if (abilityItem) {
 					itemset[itemkey].name = abilityItem.name;
 					itemset[itemkey].system.description = {value : abilityItem.system.description.value};
-					itemset[itemkey].system.actions = {value : abilityItem.system.actions.value}
+					if (abilityItem.system.actions?.value) itemset[itemkey].system.actions = {value : abilityItem.system.actions.value};
+					if (abilityItem.system.actionType?.value) itemset[itemkey].system.actionType = {value : abilityItem.system.actionType.value};
+					
+					if (!itemset[itemkey].flags[ModuleName].onclick) {
+						if (game.pf2e.actions[itemkey]) {
+							itemset[itemkey].flags[ModuleName].onclick = async (options) => {
+								let actor = options.actor;
+								
+								if (actor) {
+									let settings = {actors : actor};
+									
+									switch (itemkey) {
+										case "perform" :
+											let options = Object.keys(PERFORM_VARIANT_TRAITS);
+											
+											let optionsinfo = {};
+											
+											for (let key of options) {
+												optionsinfo[key] = {label : key};
+											}
+											
+											let variant = await openNewInput("choice", firstUpper(itemkey), `${firstUpper(itemkey)}:`, {defaultValue : options[0], options : optionsinfo});
+											
+											if (!variant) return;
+											settings.variant = variant; 
+											break;
+									}
+									
+									game.pf2e.actions[itemkey](settings);
+									return true;
+								}
+							}
+						}
+					}
 				}
 				
 				if (!itemset[itemkey].type) {

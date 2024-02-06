@@ -13,7 +13,7 @@ async function openNewInput(type, title, question, options = {}, argonstyle = fa
 		case "choice" :
 			content = content + `<select id="inputresult">`;
 								
-			for (key of Object.keys(options.options)) {
+			for (let key of Object.keys(options.options)) {
 				content = content + `<option value="${key}">${options.options[key].label}</option>`;
 			}
 			
