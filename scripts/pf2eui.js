@@ -1063,7 +1063,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						iconclass : ["fa-solid", "fa-shield"],
 						greyed : !this.item.isRaised,
 						onclick : () => {
-							console.log("action here");
+							console.log("acn action should be used here");
 							game.pf2e.actions.raiseAShield({actors : this.actor})
 						},
 						tooltip : (await fromUuid("Compendium.pf2e.actionspf2e.Item.xjGwis0uaC2305pm")).name

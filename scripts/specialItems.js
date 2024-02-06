@@ -1,4 +1,4 @@
-import { ModuleName, settingActionSpace } from "./utils.js";
+import { ModuleName, settingActionSpace, firstUpper } from "./utils.js";
 
 const ItemReplacementID = "_argonUI_";
 
@@ -305,7 +305,7 @@ async function getSettingActionTitles(category) {
 	titled["none"] = "";
 	
 	for (let key of Object.keys(settingActionIDs[category])) {
-		titled[key] = game.i18n.localize(ModuleName + ".Titles." + key);;
+		titled[key] = game.i18n.localize(`PF2E.Actions.${firstUpper(key)}.Title`);;
 	}
 	
 	return titled;
