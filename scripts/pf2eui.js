@@ -708,8 +708,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				//hide mystified items from non GMs
 				return this.item.system.identification.status == "identified" || game.user.isGM;
 			}
-			
-			return true;
 		}
 
 		get targets() {
@@ -717,6 +715,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get icon() {
+			if (this.item?.system.identification?.status == "unidentified") {
+				return this.item.system.identification.unidentified.img
+			}
+			
 			if (defaultIcons.includes(this.item.img)) {
 				
 				if (this.item?.type == "action" || this.item?.type == "feat") {
@@ -733,6 +735,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			return super.icon;
+		}
+		
+		get label() {
+			if (this.item?.system.identification?.status == "unidentified") {
+				return this.item.system.identification.unidentified.name
+			}
+			
+			return super.label;
 		}
 		
 		get actionType() {
@@ -851,7 +861,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async getTooltipData() {
-			const tooltipData = {};//await getTooltipDetails(this.item);
+			const tooltipData = await getTooltipDetails(this.item);
 			return tooltipData;
 		}
 		
@@ -987,8 +997,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 		
-		async _onTooltipMouseEnter(event) {
-			await super._onTooltipMouseEnter(event);
+		async _onTooltipMouseEnter(event, locked = false) {
+			await super._onTooltipMouseEnter(event, locked);
 			if (this.element.querySelector(".specialAction")) {
 				if (this.isWeaponSet) {
 					this.element.querySelector("span.action-element-title").style.visibility = "hidden";
@@ -1281,7 +1291,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get hasTooltip() {
-			return false;
 			return true;
 		}
 

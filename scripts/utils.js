@@ -20,214 +20,31 @@ function replacewords(text, words = {}){
 }
 
 async function getTooltipDetails(item) {
-	let description, footerText, itemType, category, subtitle, subtitlecolor, range, area, ammunitionType, attackbonus, save, target, actarget, duration, damage, level, spellschool, featType, specialAbilityType, weaponproperties, descriptors, role;
-	let actor, abilities, actordetails;
-	let title = "";
-	let propertiesLabel;
-	let properties = [];
-
-	let details = [];
+	let title, description, subtitle, subtitlecolor, details, properties , propertiesLabel, footerText;
 	
-	if (!item || !item.system) return;
-
-	actor = item.parent;
-	abilities = actor?.system.abilities;
-	actordetails = actor?.system.details;
-	
-	title = item.name;
-	description = item.system?.description.value ? item.system?.description.value : item.system?.description;
-	footerText = item.system?.description?.short;
-	itemType = item.type;
-	category = item.system.category;
-	range = item.system?.range;
-	area = item.system?.area;
-	ammunitionType = item.system?.ammunitionType;
-	attackbonus = item.system?.attackBonus;
-	save = item.system?.save;
-	target = item.system?.target;
-	actarget = item.system?.actionTarget;
-	duration = item.system?.duration;
-	damage = item.system?.damage;
-	level = item.system?.level;
-	spellschool = item.system?.school;
-	featType = item.system?.details?.category;
-	specialAbilityType = item.system?.details?.specialAbilityType;
-	weaponproperties = item.system?.properties;
-	descriptors = item.system?.descriptors;
-	role = item.system?.role;
-	
-	//sub title
-	switch (itemType) {
-		case "spell":
-			subtitle = game.i18n.localize(CONFIG.SFRPG.spellSchools[spellschool]);
-			break;
-		case "feat":
-			if (specialAbilityType && specialAbilityType != "none") {
-				subtitle = CONFIG.SFRPG.specialAbilityTypes[specialAbilityType];
-			}
-			break;
-		default:
-			if (!isNaN(level)) {
-				subtitle = game.i18n.localize("SFRPG.LevelLabelText") + " " + level;
-				
-				if (itemType == "spell") {
-					subtitlecolor = levelColor(level*4);
-				}
-				else {
-					subtitlecolor = levelColor(level);
-				}
-			}
-			else {
-				if (role) {
-					subtitle = game.i18n.localize(CONFIG.SFRPG.starshipRoleNames[role]);
-				}
-				else {
-					if (itemType != "base") {
-						subtitle = CONFIG.SFRPG.itemTypes[itemType];
-					}
-					else {
-						if (item.flags[ModuleName].subtitle) {
-							subtitle = game.i18n.localize(item.flags[ModuleName].subtitle);
-						}
-					}
-				}
-			}
-			break;
+	if (item.system.identification?.status == "unidentified" && game.user.isGM) {
+		title = this.item.system.identification.unidentified.name;
+		description = this.item.system.identification.unidentified.data.description.value;
+		subtitle = game.i18n.localize("PF2E.identification.Unidentified");
 	}
-	
-	//properties
-	properties = [];
-	switch (itemType) {
-		case "weapon":
-			propertiesLabel = game.i18n.localize("SFRPG.Items.Weapon.Properties");
-			properties = Object.keys(weaponproperties).filter(key => weaponproperties[key]).map(key => {return {label : CONFIG.SFRPG.weaponProperties[key]}});
-			break;
-		case "spell":
-			propertiesLabel = game.i18n.localize("SFRPG.Descriptors.Descriptors");
-			properties = Object.keys(descriptors).filter(key => descriptors[key]).map(key => {return {label : CONFIG.SFRPG.descriptors[key]}});
-			break;
-	}
-
-	//details
-	if (range && range.units && range.units != "none") {
-		let valuetext = range.units;
+	else {
+		title = item.name;
+		description = await TextEditor.enrichHTML(item.system.description.value);
+		subtitle = item.system.traits.rarity ? game.i18n.localize("PF2E.Trait" + firstUpper(item.system.traits.rarity)) : "";
+		subtitlecolor = item.system.traits.rarity ? `var(--color-rarity-${item.system.traits.rarity})` : "";
+		properties = item.system.traits.value?.map((trait) => {return {label : trait.toUpperCase()}});
+		propertiesLabel = properties?.length ? game.i18n.localize("PF2E.TraitsLabel") : "";
 		
-		if (range.value) {
-			valuetext = range.value + " " + valuetext;
-		}
-		else {
-			valuetext = firstUpper(valuetext);
-		}
-		
+		details = [];
 		details.push({
-			label: "SFRPG.Items.Activation.Range",
-			value: valuetext,
+			label: game.i18n.localize("PF2E.ActionTypeAction"),
+			value: "<span class=\"action-glyph\">A</span>",
 		});
-	}
-	
-	if (area) {
-		if (area.shape && area.total && area.units) {
-			details.push({
-				label: "SFRPG.Items.Activation.Area",
-				value: `${area.total}${area.units} ${firstUpper(area.shape)} ${area.effect ? firstUpper(area.effect) : ""}`,
-			});
+		
+		if (game.user.isGM) {
+			footerText = await TextEditor.enrichHTML(item.system.description.gm);
 		}
 	}
-	
-	if (damage?.parts.length) {
-		let damageparts = damage.parts.map(part => {return{formula : part.formula, types : part.types}});
-		
-		for (const part of damageparts) {
-			const roll = new Roll(part.formula, {actor, abilities, details : actordetails});
-			
-			await roll.evaluate();
-			
-			part.formulaReduced = roll.formula;
-		}
-		
-		let label;
-		if (!damageparts.find(part => part.types?.healing)) {
-			label = "SFRPG.Damage.Title";
-		}
-		else {
-			label  = "SFRPG.HealingTypesHealing";
-		}
-		
-		details.push({
-			label: label,
-			value: damageparts.map(part => part.formulaReduced + " " +Object.keys(part.types).filter(key => part.types[key]).map(key => damageIcon(key)).join("<br>")),
-		});
-	}
-	
-	if (attackbonus) {
-		let attackbonustext = attackbonus;
-		
-		if (attackbonus > 0) {
-			attackbonustext = "+" + attackbonustext;
-		}
-		
-		details.push({
-			label: "SFRPG.Items.Action.AttackRollBonus",
-			value: attackbonustext,
-		});
-	}
-	
-	if (target?.value) {
-		details.push({
-			label: "SFRPG.Items.Activation.Target",
-			value: target.value,
-		});
-	}
-	
-	if (duration?.value) {
-		let durationtext = duration.value;
-		
-		if (durationtext && durationtext.includes("@")) {
-			const roll = new Roll(durationtext, {actor, details : actordetails});
-			
-			await roll.evaluate();
-			
-			durationtext = roll.total;
-		}
-		
-		if (duration.units != "text" && duration.units) {
-			durationtext = durationtext + " " + CONFIG.SFRPG.effectDurationTypes[duration.units];
-		}
-		
-		details.push({
-			label: "SFRPG.Items.Activation.Duration",
-			value: durationtext,
-		});
-	}
-	
-	if (ammunitionType && ammunitionType != "none") {
-		details.push({
-			label: "SFRPG.WeaponPropertiesAmmunition",
-			value: CONFIG.SFRPG.ammunitionTypes[ammunitionType],
-		});
-	}
-	
-	if (save?.type && save?.dc) {
-		const roll = new Roll(save.dc, {actor, item, abilities});
-		
-		await roll.evaluate();
-		
-		let dc = roll.total;
-		
-		details.push({
-			label: "SFRPG.Save",
-			value: `DC ${dc} ${CONFIG.SFRPG.saves[save.type]} ${CONFIG.SFRPG.saveDescriptors[save.descriptor]}`,
-		});	
-	}
-	
-	if (actarget) {
-		details.push({
-			label: ModuleName + ".Titles.Against",
-			value: actarget.toUpperCase(),
-		});
-	}
-
-	if (description) description = await TextEditor.enrichHTML(description);
 
 	return { title, description, subtitle, subtitlecolor, details, properties , propertiesLabel, footerText };
 }
@@ -287,6 +104,8 @@ function damageIcon(damageType) {
 }
 
 function firstUpper(string) {
+	if (string.length == 0) return string;
+	
 	return string[0].toUpperCase() + string.substr(1);
 }
 

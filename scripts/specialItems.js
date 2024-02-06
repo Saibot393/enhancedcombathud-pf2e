@@ -360,6 +360,7 @@ async function registerPF2EECHSItems () {
 				if (abilityItem) {
 					itemset[itemkey].name = abilityItem.name;
 					itemset[itemkey].system.description = {value : abilityItem.system.description.value};
+					itemset[itemkey].system.traits = {value : abilityItem.system.traits.value.map(trait => trait)};
 					if (abilityItem.system.actions?.value) itemset[itemkey].system.actions = {value : abilityItem.system.actions.value};
 					if (abilityItem.system.actionType?.value) itemset[itemkey].system.actionType = {value : abilityItem.system.actionType.value};
 					
@@ -412,11 +413,11 @@ async function registerPF2EECHSItems () {
 				}
 				
 				if (!itemset[itemkey].type) {
-					itemset[itemkey].type = "base";
+					itemset[itemkey].type = "action";
 				}
 				
-				if (!itemset[itemkey].system.traits) {
-					itemset[itemkey].system.traits = [];
+				if (!itemset[itemkey].system.traits?.value) {
+					itemset[itemkey].system.traits = {value : []};
 				}
 				
 				if (!itemset[itemkey].name) {
