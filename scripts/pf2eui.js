@@ -235,7 +235,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			await super._renderInner();
 			
 			this.element.ondblclick = () => {
-				if (game.settings.get(ModuleName, "panondblclick") {				
+				if (game.settings.get(ModuleName, "panondblclick")) {				
 					let target = canvas.tokens.placeables.find(token => token.actor == this.actor);
 							
 					if (target) {
@@ -528,16 +528,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2EItemButton({ parent : this, item: null, isWeaponSet : true, isPrimary: true}));
 			buttons.push(new PF2EItemButton({ parent : this, item: null, isWeaponSet : true, isPrimary: false}));
 			
-			buttons.push(new PF2ESplitButton(new PF2EButtonPanelButton({parent : this, type: "toggle"}), new PF2ESpecialActionButton(specialActions[1])));
+			buttons.push(new PF2ESplitButton(new PF2EButtonPanelButton({parent : this, type: "toggle"}), new PF2ESpecialActionButton(specialActions[0])));
 			
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "spell"}));
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
 			
-			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[2]), new PF2ESpecialActionButton(specialActions[3])));
+			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[1]), new PF2ESpecialActionButton(specialActions[2])));
 			
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
-			for (let i = 6; i < specialActions.length; i = i + 2) {
+			for (let i = 5; i < specialActions.length; i = i + 2) {
 				let splitcontent = [null, null];
 				
 				if (specialActions[i]) {
@@ -549,7 +549,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				buttons.push(new PF2ESplitButton(splitcontent[0], splitcontent[1]));
 			}
 			
-			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[4]), new PF2ESpecialActionButton(specialActions[5])));
+			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[3]), new PF2ESpecialActionButton(specialActions[4])));
 			
 			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			
@@ -591,6 +591,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get colorScheme() {
 			return 1;
+		}
+		
+		_onNewRound(combat) {
+			this._currentActions = this.maxActions;
+			this.updateActionUse();
 		}
 		
 		async _getButtons() {
@@ -993,7 +998,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (this.isWeaponSet) {
 				const MAPActions = [{MAP : 1}, {MAP : 2}];
-				if (this.item.type == "weapon" || this.item.type == "shield") {
+				if ((this.item.type == "weapon" || this.item.type == "shield") && this.actionType == "action") {
 					this.element.querySelector("span").id = "maintitle";
 					
 					for (let i = 0; i < MAPActions.length; i++) {
@@ -1053,7 +1058,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					this.element.appendChild(ammoSelect);
 				}
 				
-				if (this.item?.type == "shield" && this.isPrimary) {
+				if (this.item?.type == "shield" && this.actionType == "action") {
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-shield"],
 						greyed : !this.item.isRaised,
@@ -1184,10 +1189,26 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get label() {
+			let dynamicstate = this.item?.getFlag(ModuleName, "dynamicstate");
+			
+			if (dynamicstate) {
+				if (dynamicstate.name) {
+					return dynamicstate.name({actor : this.actor});
+				}
+			}
+			
 			return this.item?.name;
 		}
 
 		get icon() {
+			let dynamicstate = this.item?.getFlag(ModuleName, "dynamicstate");
+			
+			if (dynamicstate) {
+				if (dynamicstate.img) {
+					return dynamicstate.img({actor : this.actor});
+				}
+			}
+			
 			return this.item?.img;
 		}
 		
@@ -1204,6 +1225,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get hasTooltip() {
+			return false;
 			return true;
 		}
 
@@ -1240,8 +1262,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			const item = this.item;
 			
-			if (item?.flags[ModuleName]?.onclick) {
-				used = item?.flags[ModuleName]?.onclick(item);
+			let onclick = item.getFlag(ModuleName, "onclick");
+			if (onclick) {
+				used = await onclick({actor : this.actor});
 			}
 			else {
 				used = true;
@@ -1249,6 +1272,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (used) {
 				useAction(this.actionType);
+			}
+			
+			if (item.getFlag(ModuleName, "updateonclick")) {
+				this.render();
 			}
 		}
     }

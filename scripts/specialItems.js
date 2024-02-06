@@ -70,18 +70,71 @@ var PF2EECHActionItems = {};
 var PF2EECHFreeActionItems = {};
 var PF2EECHReActionItems = {};
 
+var baseitem = {}
+
 async function registerPF2EECHSItems () {
+	baseitem.ProneDropStand = {
+		prone : (await fromUuid("Compendium.pf2e.actionspf2e.Item.OdIUybJ3ddfL7wzj")),
+		notprone : (await fromUuid("Compendium.pf2e.actionspf2e.Item.HYNhdaPtF1QmQbR3"))
+	};
+	
 	PF2EECHActionItems = {
 		groupflags : {
 			actiontype : "action"
 		},
-		DropProne : {//conditional
-			img: `icons/svg/down.svg`,
-			id: "HYNhdaPtF1QmQbR3"
-		},
-		Stand : {//conditional
-			img: `icons/svg/up.svg`,
-			id: "OdIUybJ3ddfL7wzj"
+		ProneDropStand : {
+			flags : {
+				[ModuleName] : {
+					dynamicstate : {
+						img : (options) => {
+							let actor = options.actor;
+							
+							if (actor) {
+								if (actor.hasCondition("prone")) {
+									return `icons/svg/up.svg`;
+								}
+								else {
+									return `icons/svg/down.svg`;
+								}
+							}
+						},
+						name : (options) => {
+							let actor = options.actor;
+							
+							if (actor) {
+								if (actor.hasCondition("prone")) {
+									return baseitem.ProneDropStand.prone?.name;
+								}
+								else {
+									return baseitem.ProneDropStand.notprone?.name;
+								}
+							}
+						},
+						description : (options) => {
+							let actor = options.actor;
+							
+							if (actor) {
+								if (actor.hasCondition("prone")) {
+									return baseitem.ProneDropStand.prone?.system.description;
+								}
+								else {
+									return baseitem.ProneDropStand.notprone?.system.description;
+								}
+							}
+						}
+					},
+					onclick : async (options) => {
+						let actor = options.actor;
+						
+						if (actor) {
+							await actor.toggleCondition("prone");
+							
+							return true;
+						}
+					},
+					updateonclick : true
+				}
+			}
 		},
 		/*
 		Seek : {
@@ -162,12 +215,12 @@ async function registerPF2EECHSItems () {
 				
 				itemset[itemkey].flags[ModuleName] = {...itemset.groupflags, ...itemset[itemkey].flags[ModuleName], specialaction : true};
 				
+				if (!itemset[itemkey].system) {
+					itemset[itemkey].system = {};
+				}
+				
 				let abilityItem = await fromUuid("Compendium.pf2e.actionspf2e.Item." + itemset[itemkey].id);
 				if (abilityItem) {
-					if (!itemset[itemkey].system) {
-						itemset[itemkey].system = {};
-					}
-					
 					itemset[itemkey].name = abilityItem.name;
 					itemset[itemkey].system.description = {value : abilityItem.system.description.value};
 					itemset[itemkey].system.actions = {value : abilityItem.system.actions.value}
@@ -179,6 +232,14 @@ async function registerPF2EECHSItems () {
 				
 				if (!itemset[itemkey].system.traits) {
 					itemset[itemkey].system.traits = [];
+				}
+				
+				if (!itemset[itemkey].name) {
+					itemset[itemkey].name = itemkey;
+				}
+				
+				if (!itemset[itemkey].system.description) {
+					itemset[itemkey].system.description = {};
 				}
 			}
 		}

@@ -6,7 +6,7 @@ const settingActionSpace = {
 	PF2EECHReActionItems : 0
 };
 
-const AoOid = "NMWXHGWUcZGoLDKb"; //id of Attack of Opportunity id
+const AoOids = ["NMWXHGWUcZGoLDKb", "hmShTfPOcTaKgbf4", "hmShTfPOcTaKgbf4"]; //id of Attack of Opportunity id
 const SBid = "jM72TjJ965jocBV8"; //id of Shield Block
 
 function replacewords(text, words = {}){
@@ -364,7 +364,7 @@ function actionGlyphs(actionType, number = 0) {
 }	
 
 function hasAoO(actor) {
-	return Boolean(actor.items.find(item => item.flags?.core?.sourceId?.includes(AoOid)));
+	return Boolean(actor.items.find(item => AoOids.find(id => item.flags?.core?.sourceId?.includes(id))));
 }
 
 function hasSB(actor) {
