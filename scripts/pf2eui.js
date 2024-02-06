@@ -1296,6 +1296,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 		}
+		
+		async _onRightClick(event) {
+			if (this.item?.getFlag(ModuleName, "onrclick")) {
+				this.item?.getFlag(ModuleName, "onrclick")({actor : this.actor})
+			}
+		}
     }
   
     class PF2EButtonPanelButton extends ARGON.MAIN.BUTTONS.ButtonPanelButton {

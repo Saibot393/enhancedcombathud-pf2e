@@ -145,6 +145,18 @@ async function registerPF2EECHSItems () {
 							return true;
 						}
 					},
+					onrclick : async (options) => {
+						let actor = options.actor;
+						
+						if (actor) {
+							if (actor.hasCondition("prone")) {
+								return baseitem.ProneDropStand.prone?.sheet.render(true);
+							}
+							else {
+								return baseitem.ProneDropStand.notprone?.sheet.render(true);
+							}
+						}
+					},
 					updateonclick : true
 				}
 			}
@@ -190,11 +202,11 @@ async function registerPF2EECHSItems () {
 			img: `modules/${ModuleName}/icons/armor-upgrade.svg`,
 			id: "ust1jJSCZQUhBZIz"
 		},
-		Ready : {
+		ready : {
 			img: `modules/${ModuleName}/icons/sands-of-time.svg`,
 			id: "dLgAMt3TbkmLkUqE"
 		},
-		Escape : {//conditional
+		escape : {//conditional
 			img: `modules/${ModuleName}/icons/breaking-chain.svg`,
 			id: "SkZAQRkLLkmBQNB9"
 		}
@@ -220,7 +232,7 @@ async function registerPF2EECHSItems () {
 			img: `modules/${ModuleName}/icons/thumb-up.svg`,
 			id: "HCl3pzVefiv9ZKQW"
 		},
-		Ready : {
+		ready : {
 			img: `modules/${ModuleName}/icons/sands-of-time.svg`,
 			id: "dLgAMt3TbkmLkUqE"
 		}
@@ -291,6 +303,11 @@ async function registerPF2EECHSItems () {
 									return true;
 								}
 							}
+						}
+					}
+					if (!itemset[itemkey].flags[ModuleName].onrclick) {
+						itemset[itemkey].flags[ModuleName].onrclick = async (options) => {
+							abilityItem.sheet.render(true);
 						}
 					}
 				}
