@@ -161,6 +161,23 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					
 					return `${game.i18n.localize("PF2E.CharacterLevelLabel")} ${this.actor.system.details.level.value} ${classname} (${ancestryname})`;
 					break;
+				case "npc":
+					let status = "";
+					
+					if (this.actor.isWeak) {
+						status = game.i18n.localize("PF2E.NPC.Adjustment.WeakLabel")
+					}
+					
+					if (this.actor.isElite) {
+						status = game.i18n.localize("PF2E.NPC.Adjustment.EliteLabel")
+					}
+					
+					if (status) {
+						status = `(${status})`;
+					}
+				
+					return `CR ${this.actor.system.details.level.value} ${status}`;
+					break;
 			}
 		}
 
@@ -188,7 +205,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const tempMax = this.actor.system.attributes.hp.tempmax;
 			const hpMaxColor = tempMax ? (tempMax > 0 ? "rgb(222 91 255)" : "#ffb000") : "rgb(255 255 255)";
 
-			return [
+			let blocks = [
 				[
 					{
 						text: `${this.actor.system.attributes.hp.value + (this.actor.system.attributes.hp.temp ?? 0)}`,
@@ -214,17 +231,22 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						color: "var(--ech-movement-baseMovement-background)",
 						id: "ACvalue"
 					},
-				],
-				[
+				]
+			];
+			
+			if (this.actor.system.attributes.classDC?.dc) {
+				blocks.push([
 					{
 						text: ClassDC,
 					},
 					{
 						text: this.actor.system.attributes.classDC?.dc,
 						color: "var(--ech-movement-baseMovement-background)",
-					},
-				],
-			];
+					}
+				]);
+			}
+			
+			return blocks;
 		}
 		
 		get template() {
@@ -344,7 +366,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			if (this.actor.system.attributes.shield.raised) {
+			if (this.actor.system.attributes.shield?.raised) {
 				let shieldIcon = document.createElement("i");
 				shieldIcon.classList.add("fa-solid", "fa-shield");
 				shieldIcon.setAttribute("data-tooltip", game.i18n.localize("TYPES.Item.shield"));
@@ -902,6 +924,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					else {
 						let action = this.actor.system.actions.find(action => action.slug == this.item.system.slug);
 						
+						if (!action && this.item.type == "melee") {
+							action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase());
+						}
+						
 						if (action) {//default actions
 							let variant = action.variants[options.MAP];
 							
@@ -1011,7 +1037,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (this.isWeaponSet && !(this.panel && game.settings.get(ModuleName, "directStaffuse"))) {
 				const MAPActions = [{MAP : 1}, {MAP : 2}];
-				if ((this.item.type == "weapon" || this.item.type == "shield") && this.actionType == "action") {
+				if ((this.item.type == "weapon" || this.item.type == "shield" || this.item.type == "melee") && this.actionType == "action") {
 					this.element.querySelector("span").id = "maintitle";
 					
 					for (let i = 0; i < MAPActions.length; i++) {
@@ -1204,6 +1230,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get label() {
+			if (!this.enabled) {
+				return "";
+			}
+			
 			let dynamicstate = this.item?.getFlag(ModuleName, "dynamicstate");
 			
 			if (dynamicstate) {
@@ -1216,6 +1246,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get icon() {
+			if (!this.enabled) {
+				return "";
+			}
+			
 			let dynamicstate = this.item?.getFlag(ModuleName, "dynamicstate");
 			
 			if (dynamicstate) {
@@ -1251,6 +1285,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		get actionType() {
 			return this.parent.actionType;
 		}
+		
+		get enabled() {
+			if (this.item.getFlag(ModuleName, "enabled")) {
+				if (!this.item.getFlag(ModuleName, "enabled")({actor : this.actor})) {
+					return false;
+				}
+			}	
+			
+			return true;
+		}
 
 		async getTooltipData() {
 			const tooltipData = await getTooltipDetails(this.item);
@@ -1274,6 +1318,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 		async _onLeftClick(event) {
 			if (this.item) {
+				if (!this.enabled) {
+					return;
+				}
+				
 				var used = false;
 				
 				const item = this.item;
@@ -1298,6 +1346,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _onRightClick(event) {
+			if (!this.enabled) {
+				return;
+			}
+			
 			if (this.item?.getFlag(ModuleName, "onrclick")) {
 				this.item?.getFlag(ModuleName, "onrclick")({actor : this.actor})
 			}
@@ -2024,34 +2076,34 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	class PF2EWeaponSets extends ARGON.WeaponSets {
 		async getDefaultSets() {
 			const sets = await super.getDefaultSets();
-			const actions = this.actor.items.filter((item) => item.type === "weapon" && item.system.activation?.type === "action");
-			const bonus = this.actor.items.filter((item) => item.type === "weapon" && item.system.activation?.type === "bonus");
+			if (this.actor.type !== "npc") return sets;
+			const actions = this.actor.items.filter((item) => item.type === "melee").map((action) => {
+				let item = this.actor.items.find(item => item.type != "melee" && item.name == action.name);
+				
+				if (item) {
+					return item;
+				}
+				else {
+					return action;
+				}
+			});
+			
+			console.log(actions);
+			
 			return {
 				1: {
 					primary: actions[0]?.uuid ?? null,
-					secondary: bonus[0]?.uuid ?? null,
+					secondary: null,
 				},
 				2: {
 					primary: actions[1]?.uuid ?? null,
-					secondary: bonus[1]?.uuid ?? null,
+					secondary: null,
 				},
 				3: {
 					primary: actions[2]?.uuid ?? null,
-					secondary: bonus[2]?.uuid ?? null,
+					secondary: null,
 				},
 			};
-		}
-
-		async _getSets() {
-			const isTransformed = this.actor.flags?.dnd5e?.isPolymorphed;
-
-			const sets = isTransformed ? await this.getDefaultSets() : mergeObject(await this.getDefaultSets(), deepClone(this.actor.getFlag("enhancedcombathud", "weaponSets") || {}));
-		
-			for (const [set, slots] of Object.entries(sets)) {
-			  slots.primary = slots.primary ? await fromUuid(slots.primary) : null;
-			  slots.secondary = slots.secondary ? await fromUuid(slots.secondary) : null;
-			}
-			return sets;
 		}
 
 		async _onSetChange({ sets, active }) {
@@ -2088,5 +2140,5 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	CoreHUD.defineMovementHud(PF2EMovementHud);
 	CoreHUD.defineButtonHud(PF2EButtonHud);
     CoreHUD.defineWeaponSets(PF2EWeaponSets);
-	CoreHUD.defineSupportedActorTypes(["character", "drone", "npc", "npc2", "starship" /*, "starship", "vehicle" */]);
+	CoreHUD.defineSupportedActorTypes(["character", "familiar", "npc", "vehicle"]);
 });

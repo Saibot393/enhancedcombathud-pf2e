@@ -212,6 +212,19 @@ async function registerPF2EECHSItems () {
 			id: "dLgAMt3TbkmLkUqE"
 		},
 		escape : {//conditional
+			flags : {
+				[ModuleName] : {
+					enabled : (options) => {
+						let actor = options.actor;
+						
+						if (actor) {
+							if (actor.hasCondition("grabbed") || actor.hasCondition("immobilized") || actor.hasCondition("restrained")) {
+								return true;
+							}
+						}
+					}
+				}
+			},
 			img: `modules/${ModuleName}/icons/breaking-chain.svg`,
 			id: "SkZAQRkLLkmBQNB9"
 		}
