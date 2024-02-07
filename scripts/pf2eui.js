@@ -1921,7 +1921,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				return 0;
 			}
 			else {
-				return typeinfo.value;
+				return typeinfo.total;
 			}
 		}
 		
@@ -2294,6 +2294,17 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 		}
+		
+		async _getSets() {
+			const sets = mergeObject(await this.getDefaultSets(), deepClone(this.actor.getFlag("enhancedcombathud", "weaponSets") || {}));
+
+			for (const [set, slots] of Object.entries(sets)) {
+				
+			  slots.primary = slots.primary ? (await fromUuid(slots.primary) || this.actor.system.actions?.find(action => action.item.uuid == slots.primary)?.item) : null;
+			  slots.secondary = slots.secondary ? (await fromUuid(slots.secondary) || this.actor.system.actions?.find(action => action.item.uuid == slots.primary)?.item) : null;
+			}
+			return sets;
+		}
 
 		async _onSetChange({ sets, active }) {
 			const updates = [];
@@ -2315,6 +2326,33 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			});
 			
 			return await this.actor.updateEmbeddedDocuments("Item", updates);
+		}
+		
+		async _onDrop(event) {
+			try {      
+				event.preventDefault();
+				event.stopPropagation();
+				const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+
+				const set = event.currentTarget.dataset.set;
+				const slot = event.currentTarget.dataset.slot;
+				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
+				sets[set] = sets[set] || {};
+				
+				if (data.uuid) {
+					sets[set][slot] = data.uuid
+				}
+				else {
+					if (data.index) {
+						sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid || null;
+					}
+				}
+
+				await this.actor.setFlag("enhancedcombathud", "weaponSets", sets);
+				await this.render();
+			} catch (error) {
+		  
+			}
 		}
     }
   
