@@ -214,7 +214,7 @@ async function registerPF2EECHSItems () {
 		escape : {//conditional
 			flags : {
 				[ModuleName] : {
-					enabled : async (options) => {
+					enabled : (options) => {
 						let actor = options.actor;
 						
 						if (actor) {
