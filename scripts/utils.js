@@ -113,13 +113,28 @@ async function getTooltipDetails(item) {
 		if (item.type == "spell") {
 			let entries = [];
 			for (let key of Object.keys(item.system.damage)) {
-				entries.push(`${item.system.damage[key].formula} ${categoryIcon(item.system.damage[key].category)} <i class="${damageIcon(item.system.damage[key].type).join(" ")}"></i>`)
+				let type = item.system.damage[key].type || item.system.damage[key].kind;
+				
+				if (!type && item.system.damage[key].kinds) {
+					type = Object.values(item.system.damage[key].kinds).find(value => damageIcon(value).length);
+				}
+				
+				entries.push(`${item.system.damage[key].formula} ${categoryIcon(item.system.damage[key].category)} <i class="${damageIcon(type).join(" ")}"></i>`)
 			}
 			damageentry = entries.join("<br>");
 		}
 		else {
 			if (item.system.damage) {
-				damageentry = `${item.system.damage.dice}${item.system.damage.die} ${categoryIcon(item.system.damage.category)} <i class="${damageIcon(item.system.damage.damageType).join(" ")}"></i>`
+				console.log(item.system.damage);
+				
+				let type = item.system.damage.damageType || item.system.damage.kind;
+				
+				let formula = item.system.damage.dice && item.system.damage.die ? `${item.system.damage.dice}${item.system.damage.die}` : item.system.damage.formula;
+				
+				console.log(type);
+				console.log(formula);
+				
+				damageentry = `${formula} ${categoryIcon(item.system.damage.category)} <i class="${damageIcon(type).join(" ")}"></i>`
 			}
 		}
 		if (damageentry) {
@@ -155,6 +170,8 @@ function levelColor(level) {
 function damageIcon(damageType) {
 	let iconclass = [];
 	
+	if (!damageType) return iconclass;
+	
 	switch (damageType.toLowerCase()) {
 		case "acid":
 			return ["fa-solid", "fa-flask"];
@@ -186,6 +203,8 @@ function damageIcon(damageType) {
 			return ["fa-solid", "fa-droplet"];
 		case "precision":
 			return ["fa-solid", "fa-crosshairs"];
+		case "healing":
+			return ["fa-solid", "fa-heart"]
 		default:
 			return [];
 	}
@@ -222,7 +241,7 @@ function actioninfo(item) {
 			if (item.system.time) {
 				if (["1", "2", "3"].find(time => item.system.time.value.includes(time))) {
 					action.actionType.value = "action";
-					action.actions.value = Number(item.system.time.value);
+					action.actions.value = Number(["1", "2", "3"].find(time => item.system.time.value.includes(time)));
 				}
 				
 				if (item.system.time.value == "reaction") {

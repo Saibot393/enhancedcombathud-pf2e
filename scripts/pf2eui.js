@@ -1467,6 +1467,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			let addcantrips = [];
 			
 			let isvalidspell = (spell, level) => {
+				
 				if (actioninfo(spell).actionType.value != this.actionType) {
 					return false;
 				}
@@ -1479,6 +1480,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						return !spell.isCantrip
 					}
 					else {
+						if (!spell.system.level || (spell.system.level.value == undefined)) return true;
+						
 						return !spell.isCantrip && spell.system.level.value == level;
 					}
 				}
@@ -1567,7 +1570,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						addusecounts(usecountbuffer);
 					}
 					
-					spellbuttons = spellbuttons.concat(group.spells.filter(spell => ids.includes(spell.id)).filter(spell => isvalidspell(spell, i)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, i)})));
+					spellbuttons = spellbuttons.concat(group.spells.filter(spell => ids.includes(spell.id)).filter(spell => isvalidspell(spell, i == 0 ? 0  : undefined)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, i)})));
 				}
 				
 				if (spellbuttons.length) {
@@ -1684,7 +1687,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			this.element.style.transition = "none";
 			this.element.style.width = `unset`;
-			//await new Promise(resolve => setTimeout(resolve, 5));
+			await new Promise(resolve => setTimeout(resolve, 1));
 			const width = this.element.offsetWidth;
 			this._realWidth = width;
 			this.element.style.width = `0px`;
