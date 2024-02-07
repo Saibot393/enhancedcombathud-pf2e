@@ -36,7 +36,6 @@ async function getTooltipDetails(item) {
 		
 		title = dynamicstate ? dynamicstate.name({actor}) : item.name;
 		description = await TextEditor.enrichHTML(system.description.value);
-		console.log(system.traits.rarity);
 		subtitle = system.traits.rarity ? game.i18n.localize("PF2E.Trait" + firstUpper(system.traits.rarity)) : "";
 		subtitlecolor = system.traits.rarity ? `var(--color-rarity-${system.traits.rarity})` : "";
 		properties = system.traits.value?.map((trait) => {return {label : trait.toUpperCase()}});
@@ -132,14 +131,9 @@ async function getTooltipDetails(item) {
 		}
 		else {
 			if (item.system.damage) {
-				console.log(item.system.damage);
-				
 				let type = item.system.damage.damageType || item.system.damage.kind;
 				
 				let formula = item.system.damage.dice && item.system.damage.die ? `${item.system.damage.dice}${item.system.damage.die}` : item.system.damage.formula;
-				
-				console.log(type);
-				console.log(formula);
 				
 				damageentry = `${formula} ${categoryIcon(item.system.damage.category)} <i class="${damageIcon(type).join(" ")}"></i>`
 			}

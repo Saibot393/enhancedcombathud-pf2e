@@ -92,51 +92,23 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	await registerPF2EECHSItems();
 	
 	CoreHUD._movementSave = {};
+	CoreHUD._actionSave = {action : {}, reaction : {}};
 	
-	function useAction(actionType, fallback = true) {
+	function useAction(actionType, actions = 1) {
+		let used = actions;
+		
+		if (isNaN(used)) {
+			used = 1;
+		}
+		
 		switch (actionType) {
 			case "action":
-				if (!ui.ARGON.components.main[0].isActionUsed) {
-					ui.ARGON.components.main[0].isActionUsed = true;
-					ui.ARGON.components.main[0].updateActionUse();
-				}
-				else {
-					if (fallback) {
-						useAction("full");
-					}
-				}
+				ui.ARGON.components.main[0].currentActions = ui.ARGON.components.main[0].currentActions - used;
 				break;
-			case "move":
-				if (!ui.ARGON.components.main[1].isActionUsed) {
-					ui.ARGON.components.main[1].isActionUsed = true;
-					ui.ARGON.components.main[1].updateActionUse();
-				}
-				else {
-					if (fallback) {
-						useAction("action");
-					}
-				}
-				break;
-			case "swift":
-				if (!ui.ARGON.components.main[2].isActionUsed) {
-					ui.ARGON.components.main[2].isActionUsed = true;
-					ui.ARGON.components.main[2].updateActionUse();
-				}
-				else {
-					if (fallback) {
-						useAction("move");
-					}
-				}
-				break;
-			case "full":
-				for (let i = 0; i <= 2; i++) {
-					ui.ARGON.components.main[i].isActionUsed = true;
-					ui.ARGON.components.main[i].updateActionUse();
-				}
+			case "free":
 				break;
 			case "reaction":
-				ui.ARGON.components.main[3].isActionUsed = true;
-                ui.ARGON.components.main[3].updateActionUse();
+				ui.ARGON.components.main[1].currentActions = ui.ARGON.components.main[2].currentActions - used;
 				break;
 		}
 	}
@@ -234,6 +206,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				[
 					{
 						text: ACText,
+						id : "ac"
 					},
 					{
 						text: this.actor.system.attributes.ac.value,
@@ -276,7 +249,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 			}
-			this.element.oncontextmenu = () => {
+			this.element.oncontextmenu = (event) => {
+				if (!event.target?.classList.contains("portrait-hud-image")) return;
+				
 				if (this.actor.sheet.rendered) {
 					this.actor.sheet.close();
 				}
@@ -284,6 +259,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					this.actor.sheet.render(true);
 				}
 			};
+			
+			let acBlock = this.element.querySelector("#ac")?.parentElement;
+			
+			if (acBlock) {
+				acBlock.oncontextmenu = () => {
+					let armor = this.actor.items.find(item => item.type == "armor" && item.system.equipped?.carryType == "worn" && item.system.equipped?.inSlot);
+					
+					if (armor) {
+						armor.sheet.render(true);
+					}
+				}
+			}
 			
 			if (this.actor.system.resources.heroPoints?.max) {
 				let max = this.actor.system.resources.heroPoints.max;
@@ -515,7 +502,21 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		constructor(...args) {
 			super(...args);
 			
-			this._currentActions = this.maxActions;
+			if (!CoreHUD._actionSave[this.actionType][this.actor.id]) {
+				CoreHUD._actionSave[this.actionType][this.actor.id] = {};
+			}
+			
+			if (CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions == undefined) {
+				CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions = this.maxActions;
+			}
+			
+			this.__defineGetter__("_currentActions", () => {
+				return CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions;
+			});
+			
+			this.__defineSetter__("_currentActions", (value) => {
+				CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions = value;
+			})
 		}
 
 		get label() {
@@ -537,6 +538,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		set currentActions(value) {
 			this._currentActions = Math.min(Math.max(value, 0), this.maxActions);
+			this.updateActionUse();
 		}
 		
 		get actionType() {
@@ -548,10 +550,21 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		_onNewRound(combat) {
-			let stunned = this.actor.items.find(i => i.system.slug == "stunned")?.system.value?.value;
-			let slowed = this.actor.items.find(i => i.system.slug == "slowed")?.system.value?.value;
+			for (let key of Object.keys(CoreHUD._actionSave[this.actionType])) {
+				let reduction = 0;
+				
+				let actor = game.actors.get(key);
+				
+				if (actor) {
+					let stunned = actor.items.find(i => i.system.slug == "stunned")?.system.value?.value || 0;
+					let slowed = actor.items.find(i => i.system.slug == "slowed")?.system.value?.value || 0;
+					
+					reduction = Math.min(Math.max(stunned, slowed), this.maxActions);
+				}
+				
+				CoreHUD._actionSave[this.actionType][key]._currentActions = this.maxActions - reduction;
+			}
 			
-			this._currentActions = this.maxActions;
 			this.updateActionUse();
 		}
 		
@@ -597,13 +610,44 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			return buttons.filter(button => button.isvalid);
 		}
+		
+		async _renderInner() {
+			await super._renderInner();
+			
+			if (this.maxActions) {
+				this.element.onclick = (event) => {
+					if (event.target == this.element) {
+						this.currentActions = this.currentActions + 1;
+					}
+				};
+				this.element.oncontextmenu = () => {
+					if (event.target == this.element) {
+						this.currentActions = this.currentActions - 1;
+					}
+				};
+			}
+		}
     }
 	
     class PF2EReActionPanel extends ARGON.MAIN.ActionPanel {
 		constructor(...args) {
 			super(...args);
 			
-			this._currentActions = this.maxActions;
+			if (!CoreHUD._actionSave[this.actionType][this.actor.id]) {
+				CoreHUD._actionSave[this.actionType][this.actor.id] = {};
+			}
+			
+			if (CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions == undefined) {
+				CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions = this.maxActions;
+			}
+			
+			this.__defineGetter__("_currentActions", () => {
+				return CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions;
+			});
+			
+			this.__defineSetter__("_currentActions", (value) => {
+				CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions = value;
+			})
 		}
 
 		get label() {
@@ -625,6 +669,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		set currentActions(value) {
 			this._currentActions = Math.min(Math.max(value, 0), this.maxActions);
+			this.updateActionUse();
 		}
 		
 		get actionType() {
@@ -636,7 +681,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		_onNewRound(combat) {
-			this._currentActions = this.maxActions;
+			for (let key of Object.keys(CoreHUD._actionSave[this.actionType])) {
+				CoreHUD._actionSave[this.actionType][key]._currentActions = this.maxActions;
+			}
 			this.updateActionUse();
 		}
 		
@@ -656,6 +703,23 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			
 			return buttons.filter(button => button.isvalid);
+		}
+		
+		async _renderInner() {
+			await super._renderInner();
+			
+			if (this.maxActions) {
+				this.element.onclick = (event) => {
+					if (event.target == this.element) {
+						this.currentActions = this.currentActions + 1;
+					}
+				};
+				this.element.oncontextmenu = () => {
+					if (event.target == this.element) {
+						this.currentActions = this.currentActions - 1;
+					}
+				};
+			}
 		}
     }
 	
@@ -849,6 +913,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						return null;
 					}
 					break;
+				case "equipment":
+					return null;
 				default :
 					if (this.item?.system.uses?.max) {
 						return this.item.system.uses.value + (this.item.system.quantity - 1) * this.item.system.uses.max;
@@ -937,7 +1003,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (this.item) {
 				if (this.item.flags.hasOwnProperty(ModuleName) && this.item.flags[ModuleName].onclick) {//custom on clicks
-					this.item.flags[ModuleName].onclick();
+					used = this.item.flags[ModuleName].onclick();
 				}
 				else {
 					if (this.panel && game.settings.get(ModuleName, "directStaffuse")) {//panel action
@@ -964,6 +1030,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						else {
 							if (this.item.consume) {//consume actions
 								this.item.consume();
+								used = true;
 							}
 							else {
 								if (this.item.system.selfEffect?.uuid) {//effect actions
@@ -987,7 +1054,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			if (used) {
-				useAction(this.actionType);
+				let action = actioninfo(this.item);
+				
+				useAction(action?.actionType?.value, action?.actions?.value);
 			}
 		}
 		
@@ -1124,7 +1193,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						iconclass : ["fa-solid", "fa-shield"],
 						greyed : !this.item.isRaised,
 						onclick : () => {
-							console.log("acn action should be used here");
+							useAction("action");
 							game.pf2e.actions.raiseAShield({actors : this.actor})
 						},
 						tooltip : (await fromUuid("Compendium.pf2e.actionspf2e.Item.xjGwis0uaC2305pm")).name
@@ -1153,7 +1222,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							let toggleData = {
 								iconclass : damageIcon(current),
 								onclick : () => {
-									if (togglekey == "modular") console.log("an action should be used here");
+									if (togglekey == "modular") useAction("action");
 									this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})
 								},
 								tooltip : game.i18n.localize("PF2E.Trait" + firstUpper(togglekey))
@@ -1200,7 +1269,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					toggles.push(toggleData);
 			}
 			
-			/*
 			if (this.item.type == "spell" && this.item.system.duration?.sustained) {
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-s"],
@@ -1209,7 +1277,17 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 					toggles.push(toggleData);
 			}
-			*/
+			
+			if (this.item.isInvested) {
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-gem"],
+						tooltip : game.i18n.localize("PF2E.InvestedLabel")
+					};	
+
+					toggles.push(toggleData);
+			}
+			
+			const rightoffset = this.inActionPanel ? 0 : -12; 
 			
 			for (let toggle of toggles) {
 				let icon;
@@ -1220,7 +1298,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (toggle.greyed) {
 						icon.style.filter = "invert(0.6)"; //for white icon
 					}
-					icon.style.right = `${1}px`;
+					icon.style.right = `${1 + rightoffset}px`;
 				}
 				if (toggle.iconsource) {
 					icon = document.createElement("div");
@@ -1230,7 +1308,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (toggle.greyed) {
 						icon.style.filter = "invert(0.4)"; //for white icon
 					}
-					icon.style.right = `${5}px`;
+					icon.style.right = `${5 + rightoffset}px`;
 				}
 				
 				if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
@@ -1367,8 +1445,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 				
 				if (used) {
-					console.log("an action should be used here");
-					useAction(this.actionType);
+					let number = 1;
+					if (this.actionType == "action") {
+						let system = item.system;
+						if (item.getFlag(ModuleName, "dynamicstate")) {
+							system = item.getFlag(ModuleName, "dynamicstate").system({actor : this.actor});
+						}
+						number = system.actions?.value;
+					}
+					
+					useAction(this.actionType, number);
 				}
 				
 				if (item.getFlag(ModuleName, "updateonclick")) {
@@ -1785,7 +1871,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		_onNewRound(combat) {
-			console.log(combat);
 			for (let key of Object.keys(CoreHUD._movementSave)) {
 				CoreHUD._movementSave[key]._movementUsed = 0;
 				CoreHUD._movementSave[key]._prevUsepoint = 0;
@@ -1989,7 +2074,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (use > 0) {
 					this.updateMovement();
 					
-					console.log("an action should be used here");
+					useAction("action", use);
 				}
 			}
 		}
