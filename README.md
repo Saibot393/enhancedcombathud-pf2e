@@ -20,6 +20,7 @@ This module adjust various Argon features for the Starfinder system:
     - Icons for toggles such as thrown, versatile and modular will be displayed on the hud
     - The used ammunition can be adjusted from the hud
 - **Tooltips** will display traits, required actions and further details such as damage, range, area...
+- **Movement HUD** will track different movement types (including step and crawl) and allows for check like swim or climb to be rolled
 
 ### Client Customization
 - **Standard action slots** several standard PF2E actions (e.g. Seek, Hide, Shove) can be chosen to be displayed on the action bar for quick use
