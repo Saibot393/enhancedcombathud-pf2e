@@ -91,6 +91,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
   
 	await registerPF2EECHSItems();
 	
+	CoreHUD._movementSave = {};
+	
 	function useAction(actionType, fallback = true) {
 		switch (actionType) {
 			case "action":
@@ -546,6 +548,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		_onNewRound(combat) {
+			let stunned = this.actor.items.find(i => i.system.slug == "stunned")?.system.value?.value;
+			let slowed = this.actor.items.find(i => i.system.slug == "slowed")?.system.value?.value;
+			
 			this._currentActions = this.maxActions;
 			this.updateActionUse();
 		}
@@ -1662,12 +1667,48 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		constructor (...args) {
 			super(...args);
 			
+			//this might be ugly but it works and does so without tanking the performance
+			//necessary to prevent movement resets on on move
+			const defaults = {
+				_movementUsed : 0,
+				_prevUsepoint : 0,
+				_speedtype : "land",
+				_tempmaxspeed : {},
+				_actionsused : 0,
+				_freeAction : 0,
+				_isstep : false
+			}
+			
+			if (!CoreHUD._movementSave[this.actor.id]) {
+				CoreHUD._movementSave[this.actor.id] = {};
+			}
+			
+			for (let key of Object.keys(defaults)) {
+				if (CoreHUD._movementSave[this.actor.id][key] == undefined) {
+					CoreHUD._movementSave[this.actor.id][key] = defaults[key];
+				}
+				
+				this.__defineGetter__(key, () => {
+					return CoreHUD._movementSave[this.actor.id][key];
+					//return this["_" + key];
+				});
+				
+				this.__defineSetter__(key, (value) => {
+					//this["_" + key] = value;
+					
+					CoreHUD._movementSave[this.actor.id][key] = value;
+				})
+			}
+
+			/*
+			this._movementUsed = 0;
 			this._prevUsepoint = 0;
 			this._speedtype = "land";
 			this._tempmaxspeed = {};
 			this._actionsused = 0; //increases by one after one full movement segment was used
 			this._freeAction = 0;
 			this._isstep = false;
+			*/
 		}
 
 		get visible() {
@@ -1721,15 +1762,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		_onNewRound(combat) {
+			console.log(combat);
+			for (let key of Object.keys(CoreHUD._movementSave)) {
+				CoreHUD._movementSave[key]._movementUsed = 0;
+				CoreHUD._movementSave[key]._prevUsepoint = 0;
+				CoreHUD._movementSave[key]._tempmaxspeed = {};
+				CoreHUD._movementSave[key]._actionsused = 0;
+				CoreHUD._movementSave[key]._freeAction = 0;
+				CoreHUD._movementSave[key]._isstep = false;
+			}
 			super._onNewRound(combat);
-			
-			this._prevUsepoint = 0;
-			this._tempmaxspeed = {};
-			this._actionsused = 0;
-			this._freeAction = 0;
-			this._isstep = false;
-			
-			this.updateMovement();
 	    }
 		
 		async resettempspeed(forcerender) {
