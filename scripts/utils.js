@@ -37,6 +37,8 @@ async function getTooltipDetails(item) {
 		
 		details = [];
 		
+		console.log(item);
+		
 		let actionGlyph = actionGlyphofItem(item);
 		if (actionGlyph) {
 			details.push({
@@ -52,7 +54,7 @@ async function getTooltipDetails(item) {
 			});
 		}
 		
-		if (item.system.category && !(item.type == "weapon" || item.type == "shield")) {
+		if (item.system.category && item.type == "consumable") {
 			details.push({
 				label: game.i18n.localize("PF2E.Category"),
 				value: game.i18n.localize("PF2E.Item.Consumable.Category." + item.system.category)
@@ -141,6 +143,25 @@ async function getTooltipDetails(item) {
 			details.push({
 				label: game.i18n.localize("PF2E.DamageLabel"),
 				value: damageentry
+			});
+		}
+		
+		if (item.system.duration?.value || item.system.duration?.sustained) {
+			let symbol = "";
+			if (item.system.duration?.sustained) {
+				symbol = `<i class="fa-solid fa-s"></i> `;
+			}
+			
+			details.push({
+				label: game.i18n.localize("PF2E.Time.Duration"),
+				value: symbol + item.system.duration.value
+			});
+		}
+		
+		if (item.system.defense?.save?.statistic) {
+			details.push({
+				label: game.i18n.localize("PF2E.Item.Spell.Defense.Label"),
+				value: game.i18n.localize("PF2E.Saves" + firstUpper(item.system.defense.save.statistic))
 			});
 		}
 		

@@ -459,7 +459,7 @@ function itemfromRule(rule) {
 			}
 		}
 		
-		replacement.system.description = sourceitem.system.description.value;
+		replacement.system.description = {value : sourceitem.system.description.value};
 		replacement.img = sourceitem.img;
 		replacement.system.traits = sourceitem.system.traits;
 		replacement.system.item = sourceitem;
