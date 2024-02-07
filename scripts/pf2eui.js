@@ -1606,16 +1606,40 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _getPanel() {
 			switch (this.type) {
 				case "spell":
-					return new PF2EAccordionPanel({accordionPanelCategories: this.sortedSpells().map(data => new PF2EAccordionPanelCategory(data)) });
+					return new PF2EAccordionPanel({id: this.id, accordionPanelCategories: this.sortedSpells().map(data => new PF2EAccordionPanelCategory(data)) });
 					break;
 				default:
-					return new PF2EButtonPanel({buttons: this.validitems.map(item => new PF2EItemButton({item}))});
+					return new PF2EButtonPanel({id: this.id, buttons: this.validitems.map(item => new PF2EItemButton({item}))});
 					break;
 			}
 		}
     }
 	
 	class PF2EAccordionPanel extends ARGON.MAIN.BUTTON_PANELS.ACCORDION.AccordionPanel {
+		async _renderInner() {
+			const data = await this.getData();
+			const rendered = await renderTemplate(this.template, data);
+			const tempElement = document.createElement("div");
+			tempElement.innerHTML = rendered;
+			this.element.innerHTML = tempElement.firstElementChild.innerHTML;
+			this.setColorScheme();
+			this.setVisibility();
+			
+			await super._renderInner();
+			this._subPanels.forEach(panel => {
+				this.element.appendChild(panel.element);
+				panel._parent = this;
+			});
+			const promises = this._subPanels.map(panel => panel.render());
+			await Promise.all(promises);
+			
+			//to solve bug, simply toggle first two subpannels
+			this._subPanels[0]?.toggle(true);
+			this._subPanels[1]?.toggle(true);
+			
+			this.restoreState();
+		}
+		
 		get actionType() {
 			return this.parent?.actionType;
 		}

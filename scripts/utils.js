@@ -36,10 +36,98 @@ async function getTooltipDetails(item) {
 		propertiesLabel = properties?.length ? game.i18n.localize("PF2E.TraitsLabel") : "";
 		
 		details = [];
-		details.push({
-			label: game.i18n.localize("PF2E.ActionTypeAction"),
-			value: "<span class=\"action-glyph\">A</span>",
-		});
+		
+		let actionGlyph = actionGlyphofItem(item);
+		if (actionGlyph) {
+			details.push({
+				label: game.i18n.localize("PF2E.ActionTypeAction"),
+				value: `<span class=\"action-glyph\">${actionGlyph}</span>`
+			});
+		}
+		
+		if (item.system.target?.value) {
+			details.push({
+				label: game.i18n.localize("PF2E.SpellTargetLabel"),
+				value: item.system.target?.value
+			});
+		}
+		
+		if (item.system.category && !(item.type == "weapon" || item.type == "shield")) {
+			details.push({
+				label: game.i18n.localize("PF2E.Category"),
+				value: game.i18n.localize("PF2E.Item.Consumable.Category." + item.system.category)
+			});
+		}
+		
+		let range;
+		if (item.type == "weapon" || item.type == "shield") {
+			if (item.system.range) {
+				range = replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : item.system.range});
+			}
+			else {
+				range = replacewords(game.i18n.localize("PF2E.Item.Weapon.NoRangeMelee"));
+			}
+		}
+		else {
+			if (item.system.range) {
+				range = item.system.range;
+				
+				if (range && range.hasOwnProperty("value")) {
+					range = range.value;
+				}
+			}
+		}
+		if (range) {
+			details.push({
+				label: game.i18n.localize("PF2E.TraitRange"),
+				value: range
+			});
+		}
+		
+		if (item.system.area) {
+			details.push({
+				label: game.i18n.localize("PF2E.AreaLabel"),
+				value: replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : item.system.area.value}) + " " + game.i18n.localize("PF2E.AreaType" + firstUpper(item.system.area.type))
+			});
+		}
+		
+		if (item.type == "weapon") {
+			let action = item.actor?.system.actions.find(action => action.slug == item.system.slug);
+			
+			if (action?.variants?.length) {
+				details.push({
+					label: game.i18n.localize("PF2E.TraitAttack"),
+					value: action.variants[0].label
+				});
+			}
+		}
+		
+		if (item.system.acBonus) {
+			details.push({
+				label: game.i18n.localize("PF2E.ArmorArmorLabel"),
+				value: item.system.acBonus
+			});
+		}
+		
+		let damageentry;
+		if (item.type == "spell") {
+			let entries = [];
+			for (let key of Object.keys(item.system.damage)) {
+				entries.push(`${item.system.damage[key].formula} ${categoryIcon(item.system.damage[key].category)} <i class="${damageIcon(item.system.damage[key].type).join(" ")}"></i>`)
+			}
+			damageentry = entries.join("<br>");
+		}
+		else {
+			if (item.system.damage) {
+				damageentry = `${item.system.damage.dice}${item.system.damage.die} ${categoryIcon(item.system.damage.category)} <i class="${damageIcon(item.system.damage.damageType).join(" ")}"></i>`
+			}
+		}
+		if (damageentry) {
+			details.push({
+				label: game.i18n.localize("PF2E.DamageLabel"),
+				value: damageentry
+			});
+		}
 		
 		if (game.user.isGM) {
 			footerText = await TextEditor.enrichHTML(item.system.description.gm);
@@ -103,6 +191,15 @@ function damageIcon(damageType) {
 	}
 }
 
+function categoryIcon(category) {
+	switch (category) {
+		case "persistent": return `<i class="fa-solid fa-hourglass"></i>`;
+		case "precision": return `<i class="fa-solid fa-crosshair"></i>`;
+		case "splash": return `<i class="fa-solid fa-burst"></i>`;
+		default : return "";
+	}
+}
+
 function firstUpper(string) {
 	if (string.length == 0) return string;
 	
@@ -112,46 +209,52 @@ function firstUpper(string) {
 function actioninfo(item) {
 	let action = {actionType : {}, actions : {}};
 	
-	if (item.system.actionType?.value) {
-		action.actionType.value = item.system.actionType.value;
-		action.actions.value = item.system.actions.value;
+	if (item.type == "weapon" || item.type == "shield") {
+		action.actionType.value = "action";
+		action.actions.value = 1;
 	}
 	else {
-		if (item.system.time) {
-			if (["1", "2", "3"].find(time => item.system.time.value.includes(time))) {
-				action.actionType.value = "action";
-				action.actions.value = Number(item.system.time.value);
-			}
-			
-			if (item.system.time.value == "reaction") {
-				action.actionType.value = "reaction";
-			}
-			
-			if (item.system.time.value == "free") {
-				action.actionType.value = "free";
-			}
+		if (item.system.actionType?.value) {
+			action.actionType.value = item.system.actionType.value;
+			action.actions.value = item.system.actions.value;
 		}
 		else {
-			let dom = $((new DOMParser).parseFromString(item.system.description.value, "text/html"));
-			let actionGlyphs = dom.find("span.action-glyph");
-			let glyphText = "";
-			for (let i = 0; i < actionGlyphs.length; i++) {
-				glyphText = glyphText + actionGlyphs[i].innerHTML;
-			}
-			
-			if (glyphText.toUpperCase().includes("F")) {
-				action.actionType.value = "free";
-			}
-			
-			for (let keys of [["1", "A"], ["2", "D"], ["3", "T"]]) {
-				if (glyphText.includes(keys[0]) || glyphText.toUpperCase().includes(keys[1])) {
+			if (item.system.time) {
+				if (["1", "2", "3"].find(time => item.system.time.value.includes(time))) {
 					action.actionType.value = "action";
-					action.actions.value = Number(keys[0]);
+					action.actions.value = Number(item.system.time.value);
+				}
+				
+				if (item.system.time.value == "reaction") {
+					action.actionType.value = "reaction";
+				}
+				
+				if (item.system.time.value == "free") {
+					action.actionType.value = "free";
 				}
 			}
-			
-			if (glyphText.toUpperCase().includes("R")) {
-				action.actionType.value = "reaction";
+			else {
+				let dom = $((new DOMParser).parseFromString(item.system.description.value, "text/html"));
+				let actionGlyphs = dom.find("span.action-glyph");
+				let glyphText = "";
+				for (let i = 0; i < actionGlyphs.length; i++) {
+					glyphText = glyphText + actionGlyphs[i].innerHTML;
+				}
+				
+				if (glyphText.toUpperCase().includes("F")) {
+					action.actionType.value = "free";
+				}
+				
+				for (let keys of [["1", "A"], ["2", "D"], ["3", "T"]]) {
+					if (glyphText.includes(keys[0]) || glyphText.toUpperCase().includes(keys[1])) {
+						action.actionType.value = "action";
+						action.actions.value = Number(keys[0]);
+					}
+				}
+				
+				if (glyphText.toUpperCase().includes("R")) {
+					action.actionType.value = "reaction";
+				}
 			}
 		}
 	}
@@ -168,19 +271,31 @@ function actioninfo(item) {
 function actionGlyphs(actionType, number = 0) {
 	switch(actionType) {
 		case "action":
-			return ["1", "2", "3"][number];
+			return ["1", "2", "3"][number-1];
 			break;
 		case "free":
-			return ["F"];
+			return "F";
 			break;
 		case "reaction":
-			return ["R"];
+			return "R";
 			break;
 		default:
 			return [];
 			break;
 	}
 }	
+
+function actionGlyphofItem(item) {
+	if (item.system.actionType?.value) {
+		return actionGlyphs(item.system.actionType.value, item.system.actions.value);
+	}
+	
+	let actionInfo = actioninfo(item);
+	
+	if (actionInfo) {
+		return actionGlyphs(actionInfo.actionType.value, actionInfo.actions.value);
+	}
+}
 
 function hasAoO(actor) {
 	return Boolean(actor.items.find(item => AoOids.find(id => item.flags?.core?.sourceId?.includes(id))));
