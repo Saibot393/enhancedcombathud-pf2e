@@ -29,8 +29,8 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 	for (let key of Object.keys(settingActionSpace)) {
 		for (let i = 1; i <= settingActionSpace[key]; i++) {
 			game.settings.register(ModuleName, key + i, {
-				name: game.i18n.localize(replacewords(`${ModuleName}.Settings.ECHAction.name`, {n:i})),
-				hint: game.i18n.localize(replacewords(`${ModuleName}.Settings.ECHAction.descrp`, {n:i})),
+				name: game.i18n.localize(replacewords(`${ModuleName}.Settings.ECHAction.name${i}`)),
+				//hint: game.i18n.localize(replacewords(`${ModuleName}.Settings.ECHAction.descrp`, {n:i})),
 				scope: "client",
 				config: true,
 				type: String,

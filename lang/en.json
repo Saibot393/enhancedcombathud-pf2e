@@ -3,16 +3,31 @@
 		"Titles" : {
 			"refocus"			: "refocus",
 			"accept"			: "Accept",
-			"abbort"			: "Aboort"
+			"abbort"			: "Abbort"
 		},
 		
 		"Settings" : {
-			
+			"panondblclick" : {
+				"name"			: "Pan on portrait doubleclick",
+				"descrp"		: "Camera pans to the current token when the portrait image is double clicked"
+			},
+			"directStaffuse" : {
+				"name"			: "Direct Staff use",
+				"descrp"		: "If magical Staves should be used as spell casting items instead of weapons by default"
+			},
+			"ECHAction" : {
+				"name1"			: "Standard Action 1",
+				"name2"			: "Standard Action 2",
+				"name3"			: "Standard Action 3",
+				"name4"			: "Standard Action 4",
+				"name5"			: "Standard Action 5",
+				"name6"			: "Standard Action 6"
+			}
 		}
 	},
 	
     "enhancedcombathud.themeOptions.mainAction" : "Standard Action Colors",
-    "enhancedcombathud.themeOptions.bonusAction" : "Move/Swift Action Colors",
-    "enhancedcombathud.themeOptions.freeAction" : "Reaction Colors",
-    "enhancedcombathud.themeOptions.reaction" : "Full Action Colors"
+    "enhancedcombathud.themeOptions.bonusAction" : "Reaction Colors",
+    "enhancedcombathud.themeOptions.freeAction" : "Free Action Colors",
+    "enhancedcombathud.themeOptions.reaction" : "Unused by Argon PF2E"
 }

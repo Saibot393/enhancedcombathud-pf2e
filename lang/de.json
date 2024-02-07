@@ -1,81 +1,33 @@
 {
-	"enhancedcombathud-pf2e-lite" : {
+	"enhancedcombathud-pf2e" : {
 		"Titles" : {
-			"StandardAction"			: "Standard Aktionen",
-			"MoveAction"				: "Bewegungsaktionen",
-			"SwiftAction"				: "Schnelle Aktionen",
-			"ReAction"					: "Reaktionen",
-			"FullAction"				: "Volle Aktionen",
-			"Action"					: "Aktion",
-			
-			"CombatManeuver"			: "Kampfmaneuver",
-			"BullRush"					: "Ansturm",
-			"DirtyTrick"				: "Schmutziger Trick",
-			"Disarm"					: "Entwaffnen",
-			"Grapple"					: "Ringkampf",
-			"Reposition"				: "Versetzen",
-			"Sunder"					: "Gegenstand zerschmettern",
-			"Trip"						: "Zu Fall bringen",
-			"CoveringFire"				: "Deckungsfeuer",
-			"Feint"						: "Finte",
-			"Fight Defensively"			: "Defensiv kämpfen",
-			"HarryingFire"				: "Unterstützungsfeuer",
-			"TotalDefense"				: "Volle Verteidigung",
-			
-			"DrawSheathe"				: "Ziehen/Verstauen",
-			"GuardedStep"				: "Vorsichtiger Schritt",
-			"Reload"					: "Nachladen",
-			"StandUp"					: "Aufstehen",
-			
-			"Charge"					: "Rennen",
-			"CoupdeGrace"				: "Coup de Grace",
-			"Withdraw"					: "Rückzug",
-			
-			"Attack"					: "Angriff",
-			"Move"						: "Bewegung",
-			"MeleeAttack"				: "Nahkampf",
-			"RangedAttack"				: "Fernkampf",
-			"Against"					: "Gegen"
+			"refocus"			: "neu fokussieren",
+			"accept"			: "Akzeptieren",
+			"abbort"			: "Abbrechen"
 		},
 		
 		"Settings" : {
-			"CheckWeaponSets" : {
-				"name"					: "Waffensets überprüfen",
-				"descrp"				: "Ob Waffensets überprüft werden sollen um invalide Kombinationen zu verhindern"
+			"panondblclick" : {
+				"name"			: "Bei Doppelklick zoomen",
+				"descrp"		: "Zoomt die Kamera zur aktiven Figur wenn des Charakterportrait gedoppelklickt wird"
 			},
-			"ShowSwiftActions" : {
-				"name"					: "Zeige schnelle Aktionen",
-				"descrp"				: "Ob eine Leiste für schnelle Aktionen angezeigt werden soll (wenn verfügbar)"
+			"directStaffuse" : {
+				"name"			: "Direkte Stab Nutzung",
+				"descrp"		: "Ob magische Stäbe direkt zum Zauberwirken anstatt als Waffe benutzt werden sollen"
 			},
-			"ShowFullActions" : {
-				"name"					: "Zeige volle Aktionen",
-				"descrp"				: "Ob eine Leiste für volle Aktionen angezeigt werden soll "
-			},
-			"Showintegratedweapons" : {
-				"name"					: "Zeige integrierte Waffen",
-				"descrp"				: "Ob Waffen welche in getragene Rüstungen integriert sind in den Aktionsleisten angezeigt werden sollen"
-			},
-			"allowallItemsinItemslots" : {
-				"name"					: "Erlaube alle Gegenstände in Waffensets",
-				"descrp"				: "Ob alle Gegenstände in den Slots der Waffensets erlaubt sein sollen"
-			},
-			"HealthBarWidthScale" : {
-				"name"					: "Statusleisten Breite",
-				"descrp"				: "Die Breiten Skalierung der Statusleiste im Portrait"
-			},
-			"HealthBarHeightScale" : {
-				"name"					: "Statusleisten Höhe",
-				"descrp"				: "Die Höhen Skalierung der Statusleiste im Portrait"
-			},
-			"OwnSpellSlotConsume" : {
-				"name"					: "Angepasster Zauberplatz Verbrauch",
-				"descrp"				: "Ob Argon - Starfinder den Zauberplatz Verbrauch verwalten soll (wenn via Argon verursacht) um den Zauberplatz Verbrauch Bug zu umgehen"
+			"ECHAction" : {
+				"name1"			: "Standard Aktion 1",
+				"name2"			: "Standard Aktion 2",
+				"name3"			: "Standard Aktion 3",
+				"name4"			: "Standard Aktion 4",
+				"name5"			: "Standard Aktion 5",
+				"name6"			: "Standard Aktion 6"
 			}
 		}
 	},
 	
     "enhancedcombathud.themeOptions.mainAction" : "Standard Aktion Farben",
-    "enhancedcombathud.themeOptions.bonusAction" : "Bewegungs-/Schnelle- Aktion Farben",
-    "enhancedcombathud.themeOptions.freeAction" : "Reaktion Farben",
-    "enhancedcombathud.themeOptions.reaction" : "Volle Aktion Farben"
+    "enhancedcombathud.themeOptions.bonusAction" : "Reaktion Farben",
+    "enhancedcombathud.themeOptions.freeAction" : "Freie Aktion Farben",
+    "enhancedcombathud.themeOptions.reaction" : "Nicht genutzt von Argon PF2E"
 }

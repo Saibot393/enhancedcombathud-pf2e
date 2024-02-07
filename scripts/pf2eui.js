@@ -1272,7 +1272,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (this.item.type == "spell" && this.item.system.duration?.sustained) {
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-s"],
-						tooltip : game.i18n.localize("PF2E.Item.Spell.Sustained.Label")
+						tooltip : game.i18n.localize("PF2E.Item.Spell.Sustained.Label"),
+						showalways : true
 					};	
 
 					toggles.push(toggleData);
@@ -1313,13 +1314,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
 				
-				icon.classList.add("specialAction");
+				if (!toggle.showalways) {
+					icon.classList.add("specialAction");
+					icon.style.visibility = "hidden";
+				}
 				icon.onclick = toggle.onclick;
 				icon.style.position = "absolute";
 				icon.style.top = `${topoffset}px`;
 				icon.style.height = `${iconsize}px`;
 				icon.style.width = `${iconsize}px`;
-				icon.style.visibility = "hidden";
 				
 				this.element.appendChild(icon);
 				
