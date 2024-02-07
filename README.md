@@ -4,7 +4,6 @@ An implementation of the [Argon - Combat HUD](https://foundryvtt.com/packages/en
 ![image](https://github.com/Saibot393/enhancedcombathud-pf2e/assets/137942782/2be49f41-4358-4d2f-b1e9-8072ae77cfd1)
 ![image](https://github.com/Saibot393/enhancedcombathud-pf2e/assets/137942782/0fa0b68a-a2cb-4275-8e1b-af6417b17f0e)
 
-![image](https://github.com/Saibot393/enhancedcombathud-sfrpg/assets/137942782/0acea995-f42f-4097-8473-d802ff3ade64)
 <sup>All icon included in this project are from [Game-icons.net](game-icons.net), used under the [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) license</sup>
 
 ### The documentation for the core argon features can be found [here](https://api.theripper93.com/modulewiki/enhancedcombathud/free)
