@@ -1307,7 +1307,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get hasTooltip() {
-			return true;
+			return this.enabled;
 		}
 
 		get colorScheme() {

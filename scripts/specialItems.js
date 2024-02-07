@@ -128,15 +128,15 @@ async function registerPF2EECHSItems () {
 								}
 							}
 						},
-						description : (options) => {
+						system : (options) => {
 							let actor = options.actor;
 							
 							if (actor) {
 								if (actor.hasCondition("prone")) {
-									return baseitem.ProneDropStand.prone?.system.description;
+									return baseitem.ProneDropStand.prone?.system;
 								}
 								else {
-									return baseitem.ProneDropStand.notprone?.system.description;
+									return baseitem.ProneDropStand.notprone?.system;
 								}
 							}
 						}
@@ -278,15 +278,15 @@ async function registerPF2EECHSItems () {
 								}
 							}
 						},
-						description : (options) => {
+						system : (options) => {
 							let actor = options.actor;
 							
 							if (actor) {
 								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
-									return baseitem.ArrestorGrab.fly?.system.description;
+									return baseitem.ArrestorGrab.fly?.system;
 								}
 								else {
-									return baseitem.ArrestorGrab.nofly?.system.description;
+									return baseitem.ArrestorGrab.nofly?.system;
 								}
 							}
 						}

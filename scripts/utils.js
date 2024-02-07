@@ -22,24 +22,29 @@ function replacewords(text, words = {}){
 async function getTooltipDetails(item) {
 	let title, description, subtitle, subtitlecolor, details, properties , propertiesLabel, footerText;
 	
+	const actor = item.actor;
+			
 	if (item.system.identification?.status == "unidentified" && game.user.isGM) {
 		title = this.item.system.identification.unidentified.name;
 		description = this.item.system.identification.unidentified.data.description.value;
 		subtitle = game.i18n.localize("PF2E.identification.Unidentified");
 	}
 	else {
-		title = item.name;
-		description = await TextEditor.enrichHTML(item.system.description.value);
-		subtitle = item.system.traits.rarity ? game.i18n.localize("PF2E.Trait" + firstUpper(item.system.traits.rarity)) : "";
-		subtitlecolor = item.system.traits.rarity ? `var(--color-rarity-${item.system.traits.rarity})` : "";
-		properties = item.system.traits.value?.map((trait) => {return {label : trait.toUpperCase()}});
+		const dynamicstate = item.getFlag(ModuleName, "dynamicstate");
+		
+		const system = dynamicstate ? dynamicstate.system({actor}) : item.system;
+		
+		title = dynamicstate ? dynamicstate.name({actor}) : item.name;
+		description = await TextEditor.enrichHTML(system.description.value);
+		console.log(system.traits.rarity);
+		subtitle = system.traits.rarity ? game.i18n.localize("PF2E.Trait" + firstUpper(system.traits.rarity)) : "";
+		subtitlecolor = system.traits.rarity ? `var(--color-rarity-${system.traits.rarity})` : "";
+		properties = system.traits.value?.map((trait) => {return {label : trait.toUpperCase()}});
 		propertiesLabel = properties?.length ? game.i18n.localize("PF2E.TraitsLabel") : "";
 		
 		details = [];
 		
-		console.log(item);
-		
-		let actionGlyph = actionGlyphofItem(item);
+		let actionGlyph = actionGlyphofItem(dynamicstate ? {system} : item);
 		if (actionGlyph) {
 			details.push({
 				label: game.i18n.localize("PF2E.ActionTypeAction"),
