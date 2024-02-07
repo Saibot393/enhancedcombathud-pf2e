@@ -1567,7 +1567,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						addusecounts(usecountbuffer);
 					}
 					
-					spellbuttons = spellbuttons.concat(group.spells.filter(spell => ids.includes(spell.id)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, i)})));
+					spellbuttons = spellbuttons.concat(group.spells.filter(spell => ids.includes(spell.id)).filter(spell => isvalidspell(spell, i)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, i)})));
 				}
 				
 				if (spellbuttons.length) {
@@ -1616,7 +1616,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
     }
 	
 	class PF2EAccordionPanel extends ARGON.MAIN.BUTTON_PANELS.ACCORDION.AccordionPanel {
-		async _renderInner() {
+		async _renderInner() {//delete after core update
 			const data = await this.getData();
 			const rendered = await renderTemplate(this.template, data);
 			const tempElement = document.createElement("div");
@@ -1625,7 +1625,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			this.setColorScheme();
 			this.setVisibility();
 			
-			await super._renderInner();
 			this._subPanels.forEach(panel => {
 				this.element.appendChild(panel.element);
 				panel._parent = this;
@@ -1633,11 +1632,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const promises = this._subPanels.map(panel => panel.render());
 			await Promise.all(promises);
 			
-			//to solve bug, simply toggle first two subpannels
-			this._subPanels[0]?.toggle(true);
-			this._subPanels[1]?.toggle(true);
+			await this.toggleDefaults();
 			
 			this.restoreState();
+		}
+		
+		async toggleDefaults() {
+			this._subPanels[0]?.toggle(true);
+			this._subPanels[1]?.toggle(true);
 		}
 		
 		get actionType() {
@@ -1652,6 +1654,45 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			this._level = level;
 			
 			this._usecounts = usecounts;
+		}
+		
+		async _renderInner() {//delete after core update
+			const data = await this.getData();
+			const rendered = await renderTemplate(this.template, data);
+			const tempElement = document.createElement("div");
+			tempElement.innerHTML = rendered;
+			this.element.innerHTML = tempElement.firstElementChild.innerHTML;
+			this.setColorScheme();
+			this.setVisibility();
+			
+			const buttonContainer = this.buttonContainer;
+			this._buttons.forEach(button => {
+			  button._parent = this;
+			  buttonContainer.appendChild(button.element);
+			});
+			const promises = this._buttons.map(button => button.render());
+			await Promise.all(promises);
+			this._setUses();
+			let closestMultiplier = 0;
+			this.buttonMultipliers.forEach(multiplier => {
+			  if (this._buttons.length % multiplier === 0) closestMultiplier = multiplier;
+			});
+			if (this._buttons.length < 3) {
+			  buttonContainer.style.gridTemplateColumns = `repeat(${this._buttons.length}, 1fr)`;
+			} else if (closestMultiplier) {
+			  buttonContainer.style.gridTemplateColumns = `repeat(${closestMultiplier}, 1fr)`;
+			}
+			this.element.style.transition = "none";
+			this.element.style.width = `unset`;
+			//await new Promise(resolve => setTimeout(resolve, 5));
+			const width = this.element.offsetWidth;
+			this._realWidth = width;
+			this.element.style.width = `0px`;
+			this.element.style.transition = null;
+		}
+		
+		get buttonMultipliers() {
+			return [2, 3, 4, 5, 7];
 		}
 		
 		get actionType() {
