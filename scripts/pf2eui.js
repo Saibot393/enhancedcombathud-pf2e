@@ -52,7 +52,7 @@ Hooks.once("init", () => {
 //ammend Hooks
 Hooks.on("updateItem", (item) => {
 	const PF2EDailies = "pf2e-dailies";
-	if (ui.ARGON && item.parent == ui.ARGON?.components.portrait.actor) {
+	if (ui.ARGON && item.parent == ui.ARGON?.components.portrait?.actor) {
 		if (item.type == "condition") {
 			ui.ARGON.components.portrait.render();
 		}
@@ -1016,6 +1016,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase());
 						}
 						
+						console.log(this.item.getFlag(ModuleName, "thrown"));
+						console.log(action);
+						console.log(action?.altUsage?.length);
+						if (action?.altUsages?.length && (this.item.getFlag(ModuleName, "thrown") || this.item.getFlag(ModuleName, "combination-melee"))) {
+							action = action.altUsages[0];
+						}
+						
 						if (action) {//default actions
 							let variant = action.variants[options.MAP];
 							
@@ -1242,6 +1249,23 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						onclick : () => {this.item.setFlag(ModuleName, "thrown", !isthrown)},
 						tooltip : game.i18n.localize("PF2E.TraitThrown")
 					};	
+
+					toggles.push(toggleData);
+				}
+				
+				if (this.item.system?.traits.value?.includes("combination")) {
+					let ismelee = this.item.getFlag(ModuleName, "combination-melee");
+					
+					let toggleData = {
+						onclick : () => {this.item.setFlag(ModuleName, "combination-melee", !ismelee)}
+					};	
+					
+					if (ismelee) {
+						toggleData.iconsource = "systems/pf2e/icons/mdi/sword.svg";
+					}
+					else {
+						toggleData.iconclass = ["fa-solid", "fa-gun"];
+					}
 
 					toggles.push(toggleData);
 				}
@@ -2333,7 +2357,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				event.preventDefault();
 				event.stopPropagation();
 				const data = JSON.parse(event.dataTransfer.getData("text/plain"));
-
+				console.log(data);
 				const set = event.currentTarget.dataset.set;
 				const slot = event.currentTarget.dataset.slot;
 				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
