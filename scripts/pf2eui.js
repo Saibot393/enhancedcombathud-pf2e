@@ -1,6 +1,7 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
 import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem} from "./utils.js";
 import {openNewInput} from "./popupInput.js";
+import {elementalBlastProxy} from "./proxyfake.js";
 
 const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2e/icons/actions/OneAction.webp", "systems/pf2e/icons/actions/OneThreeActions.webp", "systems/pf2e/icons/actions/OneTwoActions.webp", "systems/pf2e/icons/actions/Passive.webp", "systems/pf2e/icons/actions/Reaction.webp", "systems/pf2e/icons/actions/ThreeActions.webp", "systems/pf2e/icons/actions/TwoActions.webp", "systems/pf2e/icons/actions/TwoThreeActions.webp", "icons/sundries/books/book-red-exclamation.webp"]
 
@@ -1003,7 +1004,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (this.item) {
 				if (this.item.flags.hasOwnProperty(ModuleName) && this.item.flags[ModuleName].onclick) {//custom on clicks
-					used = this.item.flags[ModuleName].onclick();
+					used = this.item.flags[ModuleName].onclick(options);
 				}
 				else {
 					if (this.panel && game.settings.get(ModuleName, "directStaffuse")) {//panel action
@@ -1290,23 +1291,43 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					toggles.push(toggleData);
 			}
 			
-			if (this.item.type == "spell" && this.item.system.duration?.sustained) {
-					let toggleData = {
-						iconclass : ["fa-solid", "fa-s"],
-						tooltip : game.i18n.localize("PF2E.Item.Spell.Sustained.Label"),
-						showalways : true
-					};	
+			if (this.item.isElementalBlast) {
+				let toggleData
+				
+				toggleData = {
+					iconclass : this.item.getFlag(ModuleName, "ranged") ? ["fa-regular", "fa-meteor"] : ["fa-solid", "fa-hand"],
+					onclick : () => {this.item.setFlag(ModuleName, "ranged", !this.item.getFlag(ModuleName, "ranged")); this.render();},
+					tooltip : this.item.getFlag(ModuleName, "ranged") ? game.i18n.localize("PF2E.NPCAttackRanged") : game.i18n.localize("PF2E.NPCAttackMelee")
+				};
 
-					toggles.push(toggleData);
+				toggles.push(toggleData);
+				
+				toggleData = {
+					iconclass : damageIcon(this.item.system.damage.damageType),
+					onclick : () => {this.item.setFlag(ModuleName, "damageType", (this.item.getFlag(ModuleName, "damageType") + 1)%2); this.render();},
+					tooltip : game.i18n.localize("PF2E.Trait" + firstUpper(this.item.system.damage.damageType))
+				};	
+
+				toggles.push(toggleData);
+			}
+			
+			if (this.item.type == "spell" && this.item.system.duration?.sustained) {
+				let toggleData = {
+					iconclass : ["fa-solid", "fa-s"],
+					tooltip : game.i18n.localize("PF2E.Item.Spell.Sustained.Label"),
+					showalways : true
+				};	
+
+				toggles.push(toggleData);
 			}
 			
 			if (this.item.isInvested) {
-					let toggleData = {
-						iconclass : ["fa-solid", "fa-gem"],
-						tooltip : game.i18n.localize("PF2E.InvestedLabel")
-					};	
+				let toggleData = {
+					iconclass : ["fa-solid", "fa-gem"],
+					tooltip : game.i18n.localize("PF2E.InvestedLabel")
+				};	
 
-					toggles.push(toggleData);
+				toggles.push(toggleData);
 			}
 			
 			const rightoffset = this.inActionPanel ? 0 : -12; 
@@ -2324,10 +2345,19 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let item;
 					
 					if (slots[key]) {
-						item = await fromUuid(slots[key]);
-						
-						if (!item) {
-							item = this.actor.system.actions?.find(action => action.item.uuid == slots[key])?.item;
+						switch (slots[key].split(".")[0]) {
+							case "Actor":
+								item = await fromUuid(slots[key]);
+								
+								if (!item) {
+									item = this.actor.system.actions?.find(action => action.item.uuid == slots[key])?.item;
+								}
+								break;
+							case "ElementalBlast":
+								//the misery begins
+								item = await elementalBlastProxy(this.actor, slots[key]);
+								break;
+							break;
 						}
 					}
 					
@@ -2378,19 +2408,22 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
 				sets[set] = sets[set] || {};
 				
-				console.log(data);
-				
-				if (data.uuid) {
-					sets[set][slot] = data.uuid
+				if (data.elementTrait) {
+					sets[set][slot] = "ElementalBlast." + data.elementTrait;
 				}
 				else {
-					if (data.hasOwnProperty("index")) {
-						console.log(this.actor.system.actions[data.index]?.item);
-						sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid || null;
+					if (data.uuid) {
+						sets[set][slot] = data.uuid
+					}
+					else {
+						if (data.hasOwnProperty("index")) {
+							sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid || null;
+						}
+						else {
+							
+						}
 					}
 				}
-				
-				console.log(sets[set][slot]);
 
 				await this.actor.setFlag("enhancedcombathud", "weaponSets", sets);
 				await this.render();

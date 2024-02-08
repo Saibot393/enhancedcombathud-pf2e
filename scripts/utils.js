@@ -30,7 +30,7 @@ async function getTooltipDetails(item) {
 		subtitle = game.i18n.localize("PF2E.identification.Unidentified");
 	}
 	else {
-		const dynamicstate = item.getFlag(ModuleName, "dynamicstate");
+		const dynamicstate = item.getFlag && item.getFlag(ModuleName, "dynamicstate");
 		
 		const system = dynamicstate ? dynamicstate.system({actor}) : item.system;
 		
@@ -98,12 +98,19 @@ async function getTooltipDetails(item) {
 		}
 		
 		if (item.type == "weapon") {
-			let action = item.actor?.system.actions.find(action => action.slug == item.system.slug);
+			let value = item.system.attackValue;
 			
-			if (action?.variants?.length) {
+			if (!value) {
+				let action = item.actor?.system.actions.find(action => action.slug == item.system.slug);
+				if (action?.variants?.length) {
+					value = action.variants[0].label;
+				}
+			}
+			
+			if (value) {
 				details.push({
 					label: game.i18n.localize("PF2E.TraitAttack"),
-					value: action.variants[0].label
+					value: value
 				});
 			}
 		}
