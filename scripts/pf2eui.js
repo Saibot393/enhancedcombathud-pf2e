@@ -526,7 +526,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get maxActions() {
 			if (this.actor.inCombat) {
-				return 3;
+				if (this.actor.hasCondition("quickened") {
+					return 4;
+				}
+				else {
+					return 3;
+				}
 			}
 			else {
 				return null;
