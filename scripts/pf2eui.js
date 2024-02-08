@@ -1260,6 +1260,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						let Action = MAPActions[i];
 						let ActionTitle = document.createElement("span");
 						ActionTitle.classList.add("specialAction");
+						ActionTitle.classList.add("titleoverride");
 						ActionTitle.classList.add("action-element-title");
 						ActionTitle.innerHTML = MAPtext(this.item, Action.MAP);
 						ActionTitle.onclick = (event) => {event.stopPropagation(); event.preventDefault(); this._onLeftClick(event, {MAP : Action.MAP, specialAction : true})};
@@ -1279,7 +1280,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let ammoSelect = document.createElement("select");
 					//ammoSelect.classList.add("action-element-title");
 					ammoSelect.classList.add("specialAction");
-					ammoSelect.classList.add("titleoverride");
 					
 					for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => item.isAmmo)]) {
 						let option = document.createElement("option");
@@ -2496,6 +2496,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 									item = this.actor.system.actions?.find(action => action.item.uuid == slots[key])?.item;
 								}
 								break;
+							case "ActorAction":
+								item = this.actor.system.actions?.find(action => action.item.uuid == slots[key].replace("ActorAction", "Actor"))?.item;
+								break;
 							case "ElementalBlast":
 								//the misery begins
 								item = await elementalBlastProxy(this.actor, slots[key]);
@@ -2560,7 +2563,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 					else {
 						if (data.hasOwnProperty("index")) {
-							sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid || null;
+							sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid.replace("Actor", "ActorAction") || null;
 						}
 						else {
 							
