@@ -804,6 +804,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 				
+				if (this.item?.type == "feat") {
+					let action = this.actor.system.actions?.find(action => action.slug == this.item.system.slug);
+					
+					if (action.item) {
+						return action.item.img;
+					}
+				}
+				
 				if (this.item?.system.selfEffect?.img) {
 					return this.item.system.selfEffect.img;
 				}
@@ -1179,7 +1187,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (this.isWeaponSet && !(this.panel && game.settings.get(ModuleName, "directStaffuse"))) {
 				const MAPActions = [{MAP : 1}, {MAP : 2}];
-				if ((this.item.type == "weapon" || this.item.type == "shield" || this.item.type == "melee") && this.actionType == "action") {
+				if ((this.item.type == "weapon" || this.item.type == "shield" || this.item.type == "melee" || (this.actor.system.actions.find(action => action.slug == this.item.system.slug)?.variants?.length == 3)) && this.actionType == "action") {
 					this.element.querySelector("span").id = "maintitle";
 					
 					for (let i = 0; i < MAPActions.length; i++) {
