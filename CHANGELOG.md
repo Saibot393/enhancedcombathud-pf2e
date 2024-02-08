@@ -1,3 +1,6 @@
+## v1.1.2
+- Improved aid action automation
+
 ## v1.1.1
 - small bug fix
 
