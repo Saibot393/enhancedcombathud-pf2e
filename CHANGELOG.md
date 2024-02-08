@@ -1,3 +1,6 @@
+## v1.1.1
+- small bug fix
+
 ## v1.1.0
 - Attacks for combination items can now be toggled
 - Kineticist elemental blasts can now be dragged into the weapon set
