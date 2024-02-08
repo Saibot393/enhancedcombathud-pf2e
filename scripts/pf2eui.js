@@ -87,6 +87,12 @@ Hooks.on("updateItem", (item) => {
 	}
 });
 
+Hooks.on("createCombatant", (combatant) => {
+	if (ui.ARGON?._actor?.id == combatant?.actorId) {
+		ui.ARGON.render();
+	}
+});
+
 Hooks.on("argonInit", async (CoreHUD) => {
     const ARGON = CoreHUD.ARGON;
   
@@ -369,6 +375,66 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				shieldIcon.setAttribute("data-tooltip", game.i18n.localize("TYPES.Item.shield"));
 				
 				this.element.querySelector("#ACvalue").appendChild(shieldIcon);
+			}
+			
+			if (!this.isDying && !this.isDead) {
+				if (this.actor.inCombat && this.actor.combatant && (this.actor.combatant.initiative == null)) {
+					let initiativeBox = document.createElement("div");
+					initiativeBox.style.position = "absolute";
+					initiativeBox.style.width = "100%";
+					initiativeBox.style.height = "60%";
+					initiativeBox.style.left = "0";
+					initiativeBox.style.top = "20%";
+					initiativeBox.style.display = "flex";
+					initiativeBox.style.flexDirection = "column";
+					initiativeBox.style.alignItems = "center";
+					initiativeBox.style.justifyContent = "center";
+					initiativeBox.style.backgroundColor = "rgb(0,0,0,0.5)";
+					
+					let initiativedice = document.createElement("i");
+					initiativedice.classList.add("fa-solid", "fa-dice-d20");
+					initiativedice.style.fontSize = "100px";
+					initiativedice.setAttribute("data-tooltip", game.i18n.localize("PF2E.InitiativeLabel"));
+					initiativedice.onclick = async () => {
+						await this.actor.rollInitiative();
+						this.render();
+					}
+					
+					let skillselect = document.createElement("select");
+					skillselect.style.width = "50%";
+					skillselect.style.height = "40px";
+					skillselect.style.color = "white";
+					skillselect.style.fontSize = "25px";
+					skillselect.style.backdropFilter = "var(--ech-blur-amount)";
+					skillselect.style.backgroundColor = "rgba(0,0,0,.3)";
+					skillselect.style.marginTop = "30px";
+					skillselect.onchange = (value) => {
+						this.actor.update({system : {initiative : {statistic : value.srcElement.value}}});
+					}
+					
+					const skills = {perception : this.actor.perception, ...this.actor.skills};
+					for (let key of Object.keys(skills)) {
+						if (!skills[key].lore) {
+							let skilloption = document.createElement("option");
+							skilloption.text = skills[key].label;
+							skilloption.value = key;
+
+							skilloption.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
+							skilloption.style.width = "100%";
+							skilloption.style.height = "20px";
+							skilloption.style.backgroundColor = "grey";
+							//skilloption.style.fontSize = "25px";
+							skilloption.selected = key == this.actor.system.initiative.statistic;
+							
+							skillselect.appendChild(skilloption);
+						}
+					}
+					
+					initiativeBox.appendChild(initiativedice);
+					initiativeBox.appendChild(skillselect);
+					
+					this.element.appendChild(initiativeBox);
+				}
 			}
 		}
 	}
