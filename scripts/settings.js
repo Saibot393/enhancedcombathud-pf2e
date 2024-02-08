@@ -40,5 +40,34 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 			});
 		}
 	}
-	 
+	
+	game.settings.register(ModuleName, "onitemiconscale", {
+		name: game.i18n.localize(`${ModuleName}.Settings.onitemiconscale.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.onitemiconscale.descrp`),
+		scope: "client",
+		config: true,
+		type: Number,
+		range: {
+			min: 0.5,
+			max: 3,
+			step: 0.05
+		},
+		default: 1,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
+	game.settings.register(ModuleName, "iconshadow", {
+		name: game.i18n.localize(`${ModuleName}.Settings.iconshadow.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.iconshadow.descrp`),
+		scope: "client",
+		config: true,
+		type: Number,
+		range: {
+			min: 0,
+			max: 1,
+			step: 0.05
+		},
+		default: 0.3,
+		onChange: () => {ui.ARGON?.render()}
+	});
 });

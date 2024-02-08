@@ -807,7 +807,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (this.item?.type == "feat") {
 					let action = this.actor.system.actions?.find(action => action.slug == this.item.system.slug);
 					
-					if (action.item) {
+					if (action?.item) {
 						return action.item.img;
 					}
 				}
@@ -1119,7 +1119,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _renderInner() {
-			const iconsize = 30;
+			const iconsize = 30 * game.settings.get(ModuleName, "onitemiconscale");
 			let topoffset = 1;
 					
 			if (!this.visible) {//fix for potential bug
@@ -1385,7 +1385,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				toggles.push(toggleData);
 			}
 			
-			const rightoffset = this.inActionPanel ? 0 : -12; 
+			const rightoffset = this.inActionPanel ? 0 : 0; 
+			
+			let iconpanel = document.createElement("div");
+			iconpanel.style.top = `${topoffset}px`;
+			topoffset = 0;
+			iconpanel.style.position = "absolute";
+			iconpanel.style.right = 0;
+			iconpanel.style.width = `${iconsize}px`;
+			iconpanel.style.height = `${toggles.length * iconsize}px`;
+			iconpanel.style.backgroundColor = `rgba(0, 0, 0, ${game.settings.get(ModuleName, "iconshadow")})`;
+			iconpanel.style.display = "flex";
+			iconpanel.style.flexDirection = "column";
+			iconpanel.style.alignItems = "center";
+			iconpanel.style.justifyContent = "center";
+			if (toggles.find(toggle => !toggle.showalways)) {
+				iconpanel.classList.add("specialAction");
+				iconpanel.style.visibility = "hidden";
+			}
 			
 			for (let toggle of toggles) {
 				let icon;
@@ -1396,7 +1413,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (toggle.greyed) {
 						icon.style.filter = "invert(0.6)"; //for white icon
 					}
-					icon.style.right = `${1 + rightoffset}px`;
+					//icon.style.right = `${1 + rightoffset}px`;
 				}
 				if (toggle.iconsource) {
 					icon = document.createElement("div");
@@ -1406,7 +1423,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (toggle.greyed) {
 						icon.style.filter = "invert(0.4)"; //for white icon
 					}
-					icon.style.right = `${5 + rightoffset}px`;
+					//icon.style.right = `${5 + rightoffset}px`;
 				}
 				
 				if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
@@ -1416,15 +1433,19 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					icon.style.visibility = "hidden";
 				}
 				icon.onclick = toggle.onclick;
-				icon.style.position = "absolute";
-				icon.style.top = `${topoffset}px`;
+				//icon.style.position = "absolute";
+				//icon.style.top = `${topoffset}px`;
 				icon.style.height = `${iconsize}px`;
 				icon.style.width = `${iconsize}px`;
+				icon.style.textShadow = "0 0 10px rgba(0,0,0,0)";
+				icon.style.textAlign = "center";
 				
-				this.element.appendChild(icon);
+				iconpanel.appendChild(icon);
 				
 				topoffset = topoffset + iconsize;
 			}
+			
+			this.element.appendChild(iconpanel);
 		}
 	}
 	
