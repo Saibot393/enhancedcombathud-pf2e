@@ -942,7 +942,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (game.modules.get(PF2EDailies)?.active) {
 						let staffSpells = this.actor.items.find(item => item.type == "spellcastingEntry" && item.getFlag(PF2EDailies, "staff")?.staveID == this.item.id)
 						
-						if (staffSpells) {
+						if (staffSpells && staffSpells.getFlag(PF2EDailies, "staff")) {
 							return staffSpells.getFlag(PF2EDailies, "staff").charges;
 						}
 					}
