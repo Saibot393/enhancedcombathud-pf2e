@@ -1447,7 +1447,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get enabled() {
-			if (this.item.getFlag(ModuleName, "enabled")) {
+			if (this.item?.getFlag(ModuleName, "enabled")) {
 				if (!this.item.getFlag(ModuleName, "enabled")({actor : this.actor})) {
 					return false;
 				}
@@ -2350,8 +2350,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let item;
 					
 					if (slots[key]) {
+						console.log(slots[key]);
+						
 						switch (slots[key].split(".")[0]) {
 							case "Actor":
+							case "Scene":
 								item = await fromUuid(slots[key]);
 								
 								if (!item) {

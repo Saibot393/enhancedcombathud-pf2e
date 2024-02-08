@@ -65,18 +65,6 @@ const settingActionIMGs = {
 	}
 }
 
-const PERFORM_VARIANT_TRAITS = { //special for performance
-    acting: ["auditory", "linguistic", "visual"],
-    comedy: ["auditory", "linguistic", "visual"],
-    dance: ["move", "visual"],
-    keyboards: ["auditory", "manipulate"],
-    oratory: ["auditory", "linguistic"],
-    percussion: ["auditory", "manipulate"],
-    singing: ["auditory", "linguistic"],
-    strings: ["auditory", "manipulate"],
-    winds: ["auditory", "manipulate"]
-};
-
 var defaultActions = {};
 
 var PF2EECHActionItems = {};
@@ -372,21 +360,28 @@ async function registerPF2EECHSItems () {
 								if (actor) {
 									let settings = {actors : actor};
 									
+									let options;
+									
 									switch (itemkey) {
 										case "perform" :
-											let options = Object.keys(PERFORM_VARIANT_TRAITS);
-											
-											let optionsinfo = {};
-											
-											for (let key of options) {
-												optionsinfo[key] = {label : key};
-											}
-											
-											let variant = await openNewInput("choice", firstUpper(itemkey), `${firstUpper(itemkey)}:`, {defaultValue : options[0], options : optionsinfo});
-											
-											if (!variant) return;
-											settings.variant = variant; 
+											options = ["acting", "comedy", "dance", "keyboards", "oratory", "percussion", "singing", "strings", "winds"];
 											break;
+										case "administerFirstAid":
+											options = ["stabilize", "stop-bleeding"];
+											break;
+									}
+									
+									if (options) {
+										let optionsinfo = {};
+										
+										for (let key of options) {
+											optionsinfo[key] = {label : key};
+										}
+										
+										let variant = await openNewInput("choice", firstUpper(itemkey), `${firstUpper(itemkey)}:`, {defaultValue : options[0], options : optionsinfo});
+										
+										if (!variant) return;
+										settings.variant = variant; 	
 									}
 									
 									game.pf2e.actions[itemkey](settings);

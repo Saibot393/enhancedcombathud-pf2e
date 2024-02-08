@@ -51,6 +51,13 @@ async function getTooltipDetails(item) {
 			});
 		}
 		
+		if (item.type == "melee") {
+			details.push({
+				label: game.i18n.localize("PF2E.Roll.Type"),
+				value: item.isMelee ? game.i18n.localize("PF2E.NPCAttackMelee") : game.i18n.localize("PF2E.NPCAttackRanged")
+			});
+		}
+		
 		if (item.system.target?.value) {
 			details.push({
 				label: game.i18n.localize("PF2E.SpellTargetLabel"),
