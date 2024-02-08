@@ -1016,9 +1016,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase());
 						}
 						
-						console.log(this.item.getFlag(ModuleName, "thrown"));
-						console.log(action);
-						console.log(action?.altUsage?.length);
 						if (action?.altUsages?.length && (this.item.getFlag(ModuleName, "thrown") || this.item.getFlag(ModuleName, "combination-melee"))) {
 							action = action.altUsages[0];
 						}
@@ -2323,10 +2320,25 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const sets = mergeObject(await this.getDefaultSets(), deepClone(this.actor.getFlag("enhancedcombathud", "weaponSets") || {}));
 
 			for (const [set, slots] of Object.entries(sets)) {
-				
-			  slots.primary = slots.primary ? (await fromUuid(slots.primary) || this.actor.system.actions?.find(action => action.item.uuid == slots.primary)?.item) : null;
-			  slots.secondary = slots.secondary ? (await fromUuid(slots.secondary) || this.actor.system.actions?.find(action => action.item.uuid == slots.primary)?.item) : null;
+				for (let key of ["primary", "secondary"]) {
+					let item;
+					
+					if (slots[key]) {
+						item = await fromUuid(slots[key]);
+						
+						if (!item) {
+							item = this.actor.system.actions?.find(action => action.item.uuid == slots[key])?.item;
+						}
+					}
+					
+					if (!item) {
+						item = null;
+					}
+					
+					slots[key] = item;
+				}
 			}
+			
 			return sets;
 		}
 
@@ -2338,7 +2350,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const inactiveItems = inactiveSets.flatMap((set) => Object.values(set)).filter((item) => item).filter((item) => !activeItems.includes(item));
 			
 			inactiveItems.forEach((item) => {
-				updates.push({ _id: item.id, system : {equipped : {carryType : "worn"}} });
+				if (this.actor.items.get(item.id)) {
+					updates.push({ _id: item.id, system : {equipped : {carryType : "worn"}} });
+				}
 			});
 			
 			let handsHeld = 1;
@@ -2346,7 +2360,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				handsHeld = 2;
 			}
 			activeItems.forEach((item) => {
-				updates.push({ _id: item.id, system : {equipped : {carryType : "held", handsHeld : handsHeld}} });
+				if (this.actor.items.get(item.id)) {
+					updates.push({ _id: item.id, system : {equipped : {carryType : "held", handsHeld : handsHeld}} });
+				}
 			});
 			
 			return await this.actor.updateEmbeddedDocuments("Item", updates);
@@ -2357,20 +2373,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				event.preventDefault();
 				event.stopPropagation();
 				const data = JSON.parse(event.dataTransfer.getData("text/plain"));
-				console.log(data);
 				const set = event.currentTarget.dataset.set;
 				const slot = event.currentTarget.dataset.slot;
 				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
 				sets[set] = sets[set] || {};
 				
+				console.log(data);
+				
 				if (data.uuid) {
 					sets[set][slot] = data.uuid
 				}
 				else {
-					if (data.index) {
+					if (data.hasOwnProperty("index")) {
+						console.log(this.actor.system.actions[data.index]?.item);
 						sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid || null;
 					}
 				}
+				
+				console.log(sets[set][slot]);
 
 				await this.actor.setFlag("enhancedcombathud", "weaponSets", sets);
 				await this.render();
