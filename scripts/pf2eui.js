@@ -1084,8 +1084,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _onTooltipMouseEnter(event, locked = false) {
 			await super._onTooltipMouseEnter(event, locked);
 			if (this.element.querySelector(".specialAction")) {
-				if (this.isWeaponSet) {
-					this.element.querySelector("span.action-element-title").style.visibility = "hidden";
+				if (this.element.querySelector(".titleoverride")) {
+					let element = this.element.querySelector("span.action-element-title") || this.element.querySelector("span.feature-element-title");
+					
+					if (element) element.style.visibility = "hidden"; 
 				}
 				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
 					specialelement.style.visibility = "";
@@ -1097,8 +1099,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			await super._onTooltipMouseLeave(event);
 			
 			if (this.element.querySelector(".specialAction")) {
-				if (this.isWeaponSet) {
-					this.element.querySelector("span.action-element-title").style.visibility = "";
+				if (this.element.querySelector(".titleoverride")) {
+					let element = this.element.querySelector("span.action-element-title") || this.element.querySelector("span.feature-element-title");
+					
+					if (element) element.style.visibility = ""; 
 				}
 				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
 					specialelement.style.visibility = "hidden";
@@ -1132,6 +1136,43 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				else {
 					this.element.style.filter = "";
 				}
+				
+				if (this.item.flags[ModuleName].toggleoptions?.length) {
+					let optionselect = document.createElement("select");
+					optionselect.classList.add("specialAction");
+					optionselect.classList.add("titleoverride");
+					
+					for (let ruleoption of this.item.flags[ModuleName].toggleoptions) {
+						let option = document.createElement("option");
+						option.text = ruleoption.name;
+						option.value = ruleoption.value;
+
+						option.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
+						option.style.width = "200px";
+						option.style.height = "20px";
+						option.style.backgroundColor = "grey";
+						option.style.fontSize = "12px";
+						option.selected = ruleoption.value == this.item.flags[ModuleName].selectvalue;
+						
+						optionselect.appendChild(option);
+					}
+					
+					optionselect.style.position = "absolute";
+					optionselect.style.bottom = "0";
+					optionselect.style.left = "0";
+					optionselect.style.width = `100%`;
+					optionselect.style.height = `40px`;
+					optionselect.style.color = "#c8c8c8";
+					optionselect.style.backdropFilter = "var(--ech-blur-amount)";
+					optionselect.style.backgroundColor = "rgba(0,0,0,.3)";
+					optionselect.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
+					optionselect.style.borderColor = "inherit";
+					optionselect.style.visibility = "hidden";
+					
+					optionselect.onchange = (event) => {this.item.flags[ModuleName].onchange(event.target.value)};
+					
+					this.element.appendChild(optionselect);
+				}
 			}
 			
 			let toggles = [];
@@ -1164,6 +1205,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let ammoSelect = document.createElement("select");
 					//ammoSelect.classList.add("action-element-title");
 					ammoSelect.classList.add("specialAction");
+					ammoSelect.classList.add("titleoverride");
 					
 					for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => item.isAmmo)]) {
 						let option = document.createElement("option");
@@ -1453,7 +1495,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}	
 			
-			return true;
+			return this.item;
 		}
 
 		async getTooltipData() {
@@ -2349,9 +2391,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				for (let key of ["primary", "secondary"]) {
 					let item;
 					
-					if (slots[key]) {
-						console.log(slots[key]);
-						
+					if (slots[key] && (typeof slots[key] == "string")) {
 						switch (slots[key].split(".")[0]) {
 							case "Actor":
 							case "Scene":

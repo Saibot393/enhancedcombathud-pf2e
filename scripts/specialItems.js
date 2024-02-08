@@ -465,11 +465,17 @@ function itemfromRule(rule) {
 	if (rule.toggleable) {
 		replacement.flags = {
 			[ModuleName] : {
-				toggleable : rule.toggleable,
+				toggleable : rule.toggleable && !rule.alwaysActive,
 				onclick : () => {if (connectedItem) {
 					rule.actor.toggleRollOption(rule.domain, rule.option, connectedItem.id, !connectedItem.rules[ruleIndex].value);
 				}},
-				active : () => {return connectedItem.rules[ruleIndex].value}
+				active : () => {return connectedItem.rules[ruleIndex].value},
+				toggleoptions : rule.suboptions.map((option) => {return {value : option.value, name : game.i18n.localize(option.label)}}),
+				onchange : (value) => {if (connectedItem) {
+					console.log(rule.domain, rule.option, connectedItem.id, connectedItem.rules[ruleIndex].value, value);
+					rule.actor.toggleRollOption(rule.domain, rule.option, connectedItem.id, connectedItem.rules[ruleIndex].value, value)
+				}},
+				selectvalue : () => {return rule.suboptions?.find(option => option.selected).value}
 			}
 		}
 	}
