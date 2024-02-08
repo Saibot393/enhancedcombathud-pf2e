@@ -26,7 +26,7 @@ This module adjust various Argon features for the Starfinder system:
     - Certain actions like escape or drop/stand up will be tracked and switched automatically
     - Toggle options can be changed from the hud
 
-The staff automation added by **[PF2e Dailies](https://foundryvtt.com/packages/pf2e-dailies)** can be directly used from equipped staffs.
+The staff automation added by **[PF2e Dailies](https://foundryvtt.com/packages/pf2e-dailies)** can be directly used from staves in item sets.
 
 ### Client Customization
 - **Standard action slots** several standard PF2E actions (e.g. Seek, Hide, Shove) can be chosen to be displayed on the action bar for quick use
