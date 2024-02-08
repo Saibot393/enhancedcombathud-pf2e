@@ -22,6 +22,14 @@
 				"name4"			: "Standard Action 4",
 				"name5"			: "Standard Action 5",
 				"name6"			: "Standard Action 6"
+			},
+			"onitemiconscale" : {
+				"name"			: "Info icon scale",
+				"descrp"		: "The scale of info icons on item buttons"
+			},
+			"iconshadow" : {
+				"name"			: "Info icon shadow intensity",
+				"descrp"		: "The intensity of the info icon contrast shadow on item buttons"
 			}
 		}
 	},

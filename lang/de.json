@@ -22,6 +22,14 @@
 				"name4"			: "Standard Aktion 4",
 				"name5"			: "Standard Aktion 5",
 				"name6"			: "Standard Aktion 6"
+			},
+			"onitemiconscale" : {
+				"name"			: "Info Icon Skalierung",
+				"descrp"		: "Die Skalierung der Info Icons auf Gegenstandsknöpfen"
+			},
+			"iconshadow" : {
+				"name"			: "Info Icon Schatten Intensität",
+				"descrp"		: "Die Intensität des Info Icon Kontrastschattens Gegenstandsknöpfen"
 			}
 		}
 	},
