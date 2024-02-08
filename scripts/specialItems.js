@@ -235,6 +235,29 @@ async function registerPF2EECHSItems () {
 			actiontype : "reaction"
 		},
 		aid : {
+			flags : {
+				[ModuleName] : {
+					onclick : async (options) => {
+						let actor = options.actor;
+						
+						if (actor) {
+							let skilloptions = {};
+							const skills = {perception : actor.perception, ...actor.skills};
+							for (let key of Object.keys(skills)) {
+								skilloptions[key] = {label : skills[key].label}
+							}
+							
+							let skill = await openNewInput("choice", game.i18n.localize(game.pf2e.actions.get("aid").name), `${game.i18n.localize("PF2E.SkillLabel")}: `, {defaultValue : "perception", options : skilloptions});
+							
+							if (skill) {
+								game.pf2e.actions.get("aid").toActionVariant({actors : actor}).use({statistic : skill});
+								
+								return true;
+							}
+						}
+					}
+				}
+			},
 			img: `modules/${ModuleName}/icons/thumb-up.svg`,
 			id: "HCl3pzVefiv9ZKQW"
 		},
@@ -285,9 +308,11 @@ async function registerPF2EECHSItems () {
 						if (actor) {
 							if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
 								game.pf2e.actions.get("arrest-a-fall").toMessage();
+								return true;
 							}
 							else {
 								game.pf2e.actions.get("grab-an-edge").toMessage();
+								return true;
 							}
 						}
 					},
