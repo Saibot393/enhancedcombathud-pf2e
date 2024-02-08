@@ -285,7 +285,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				heroPoints.style.right = "0";
 				heroPoints.onclick = () => {this.actor.update({system : {resources : {heroPoints : {value : Math.min(value + 1, max)}}}})};
 				heroPoints.ondblclick = (event) => {event.stopPropagation()};
-				heroPoints.oncontextmenu = () => {event.stopPropagation(); this.actor.update({system : {resources : {heroPoints : {value : Math.max(value - 1, 0)}}}})};
+				heroPoints.oncontextmenu = () => {event.preventDefault(); event.stopPropagation(); this.actor.update({system : {resources : {heroPoints : {value : Math.max(value - 1, 0)}}}})};
 				
 				let heroSpan = document.createElement("span");
 				heroSpan.classList.add("adjust-hero-points");
@@ -331,7 +331,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				dyingcount.style.marginTop = "5px"
 				dyingcount.onclick = () => {this.actor.increaseCondition("dying")};
 				dyingcount.ondblclick = (event) => {event.stopPropagation()};
-				dyingcount.oncontextmenu = () => {event.stopPropagation(); this.actor.decreaseCondition("dying")};
+				dyingcount.oncontextmenu = () => {event.preventDefault(); event.stopPropagation(); this.actor.decreaseCondition("dying")};
 				dyingcount.setAttribute("data-tooltip", game.i18n.localize("PF2E.ConditionTypeDying"));
 				
 				let dyingspan = document.createElement("span");
@@ -526,7 +526,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get maxActions() {
 			if (this.actor.inCombat) {
-				if (this.actor.hasCondition("quickened") {
+				if (this.actor.hasCondition("quickened")) {
 					return 4;
 				}
 				else {
