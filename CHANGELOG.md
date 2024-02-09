@@ -1,3 +1,15 @@
+## v1.2.0
+- Added seting for the klick behaviour of consumable item buttons (consume, to chat, both)
+- Added setting to display the traits of NPCs in the portrait
+- Added setting for the amount of item sets displayed
+- Added setting to display the passives of NPCs in the hUD
+- Added option to display a swap icon for items that can be held, to swap them into the active item set
+- Saves, skills and lore skills will now be rolled secretly when clicked while holding down ctrl
+- Added option to send the take cover to chat instead of giving the effect
+- Improved some localizations
+- Fixed issue with spells being cast twice upon click
+- Fixed issue with the select box of toggles
+
 ## v1.1.3
 - Fixed bug that prevented the item title from hiding when map was displayed
 - Fixed bug that caused weapon sets to miss indetify natural weapons and similar (requires actions to be redraged into the item set)
