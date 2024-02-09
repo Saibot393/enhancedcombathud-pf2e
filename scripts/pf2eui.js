@@ -1113,7 +1113,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						}
 						else {
 							if (this.item.consume) {//consume actions
-								this.item.consume();
+								if (game.settings.get(ModuleName, "consumableuse").includes("consume")) {
+									this.item.consume();
+								}
+								
+								if (game.settings.get(ModuleName, "consumableuse").includes("chat")) {
+									this.item.toChat();
+								}
+					
 								used = true;
 							}
 							else {

@@ -23,6 +23,15 @@
 				"name5"			: "Standard Aktion 5",
 				"name6"			: "Standard Aktion 6"
 			},
+			"consumableuse" : {
+				"name"					: "Konsumierbares klick Verhalten",
+				"descrp"				: "Was passieren soll wenn konsumierbare Gegenstände angeklickt werden sollen:",
+				"options" : {
+					"consume"			: "Gegenstand konsumieren",
+					"chat"				: "Gegenstand in Chat senden",
+					"consumechat"		: "Gegenstand konsumieren & in Chat senden"
+				}
+			},
 			"onitemiconscale" : {
 				"name"			: "Info Icon Skalierung",
 				"descrp"		: "Die Skalierung der Info Icons auf Gegenstandsknöpfen"

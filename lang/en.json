@@ -1,35 +1,44 @@
 {
 	"enhancedcombathud-pf2e" : {
 		"Titles" : {
-			"refocus"			: "refocus",
-			"accept"			: "Accept",
-			"abbort"			: "Abbort"
+			"refocus"					: "refocus",
+			"accept"					: "Accept",
+			"abbort"					: "Abbort"
 		},
 		
 		"Settings" : {
 			"panondblclick" : {
-				"name"			: "Pan on portrait doubleclick",
-				"descrp"		: "Camera pans to the current token when the portrait image is double clicked"
+				"name"					: "Pan on portrait doubleclick",
+				"descrp"				: "Camera pans to the current token when the portrait image is double clicked"
 			},
 			"directStaffuse" : {
-				"name"			: "Direct Staff use",
-				"descrp"		: "If magical Staves should be used as spell casting items instead of weapons by default"
+				"name"					: "Direct Staff use",
+				"descrp"				: "If magical Staves should be used as spell casting items instead of weapons by default"
 			},
 			"ECHAction" : {
-				"name1"			: "Standard Action 1",
-				"name2"			: "Standard Action 2",
-				"name3"			: "Standard Action 3",
-				"name4"			: "Standard Action 4",
-				"name5"			: "Standard Action 5",
-				"name6"			: "Standard Action 6"
+				"name1"					: "Standard Action 1",
+				"name2"					: "Standard Action 2",
+				"name3"					: "Standard Action 3",
+				"name4"					: "Standard Action 4",
+				"name5"					: "Standard Action 5",
+				"name6"					: "Standard Action 6"
+			},
+			"consumableuse" : {
+				"name"					: "Consumable click behaviour",
+				"descrp"				: "What should happen when a consumable item is clicked:",
+				"options" : {
+					"consume"			: "Consume item",
+					"chat"				: "Send item to chat",
+					"consumechat"		: "Consume item & send to chat"
+				}
 			},
 			"onitemiconscale" : {
-				"name"			: "Info icon scale",
-				"descrp"		: "The scale of info icons on item buttons"
+				"name"					: "Info icon scale",
+				"descrp"				: "The scale of info icons on item buttons"
 			},
 			"iconshadow" : {
-				"name"			: "Info icon shadow intensity",
-				"descrp"		: "The intensity of the info icon contrast shadow on item buttons"
+				"name"					: "Info icon shadow intensity",
+				"descrp"				: "The intensity of the info icon contrast shadow on item buttons"
 			}
 		}
 	},

@@ -40,6 +40,20 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 			});
 		}
 	}
+
+	game.settings.register(ModuleName, "consumableuse", {
+		name: game.i18n.localize(`${ModuleName}.Settings.consumableuse.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.consumableuse.descrp`),
+		scope: "client",
+		config: true,
+		type: String,
+		choices : {
+			"consume" : game.i18n.localize(`${ModuleName}.Settings.consumableuse.options.consume`),
+			"chat" : game.i18n.localize(`${ModuleName}.Settings.consumableuse.options.chat`),
+			"consumechat" : game.i18n.localize(`${ModuleName}.Settings.consumableuse.options.consumechat`)
+		},
+		default: "consume"
+	});
 	
 	game.settings.register(ModuleName, "onitemiconscale", {
 		name: game.i18n.localize(`${ModuleName}.Settings.onitemiconscale.name`),
