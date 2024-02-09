@@ -1214,7 +1214,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (this.item.flags[ModuleName].toggleoptions?.length) {
 					let optionselect = document.createElement("select");
 					optionselect.classList.add("specialAction");
-					optionselect.classList.add("titleoverride");
+					//optionselect.classList.add("titleoverride");
 					
 					for (let ruleoption of this.item.flags[ModuleName].toggleoptions) {
 						let option = document.createElement("option");
@@ -1232,10 +1232,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 					
 					optionselect.style.position = "absolute";
-					optionselect.style.bottom = "0";
+					//optionselect.style.bottom = "0";
+					optionselect.style.top = "0";
 					optionselect.style.left = "0";
 					optionselect.style.width = `100%`;
 					optionselect.style.height = `40px`;
+					topoffset = topoffset + 40;
 					optionselect.style.color = "#c8c8c8";
 					optionselect.style.backdropFilter = "var(--ech-blur-amount)";
 					optionselect.style.backgroundColor = "rgba(0,0,0,.3)";
@@ -2554,30 +2556,22 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
 				sets[set] = sets[set] || {};
 				
-				console.log(data);
-				
 				if (data.elementTrait) {
-					console.log(1);
 					sets[set][slot] = "ElementalBlast." + data.elementTrait;
 				}
 				else {
 					if (data.uuid) {
-						console.log(2);
 						sets[set][slot] = data.uuid
 					}
 					else {
 						if (data.hasOwnProperty("index")) {
-							console.log(3);
 							sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid.replace("Actor", "ActorAction") || null;
 						}
 						else {
-							console.log(4);
+							
 						}
 					}
 				}
-				
-				console.log("set id:");
-				console.log(sets[set][slot]);
 
 				await this.actor.setFlag("enhancedcombathud", "weaponSets", sets);
 				await this.render();
