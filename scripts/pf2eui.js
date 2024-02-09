@@ -437,7 +437,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			if (game.settings.get(ModuleName, "shownpctraits") {
+			if (game.settings.get(ModuleName, "shownpctraits")) {
 				if (this.actor.type == "npc") {
 					const height = 23;
 					let traitbox = document.createElement("div");
@@ -957,8 +957,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _onSetChange({sets, active}) {
 			const activeSet = sets[active];
 
-			const item = this.isPrimary ? activeSet.primary : (activeSet.primary != activeSet.secondary ? activeSet.secondary : null);
-			this.setItem(item);    
+			if (activeSet) {
+				const item = this.isPrimary ? activeSet.primary : (activeSet.primary != activeSet.secondary ? activeSet.secondary : null);
+				this.setItem(item);    
+			}
 		}
 		
 		get visible() {
@@ -2482,56 +2484,54 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	}
 	
 	class PF2EWeaponSets extends ARGON.WeaponSets {
+		get setsnumber() {
+			return game.settings.get(ModuleName, "weaponsetscount");
+		}
+		
 		async getDefaultSets() {
-			const sets = await super.getDefaultSets();
+			let sets = {};
 			
-			let onlyactions = true;
-			
-			if (this.actor.type !== "npc") return sets;
-			const actions = this.actor.items.filter((item) => item.type === "melee").map((action) => {
-				let item = this.actor.items.find(item => item.type != "melee" && item.name == action.name);
-				
-				if (item) {
-					return item;
-					onlyactions = false;
-				}
-				else {
-					return action;
-				}
-			});
-			
-			if(onlyactions) {
-				return {
-					1: {
-						primary: actions[0]?.uuid ?? null,
-						secondary: actions[1]?.uuid ?? null,
-					},
-					2: {
-						primary: actions[2]?.uuid ?? null,
-						secondary: actions[3]?.uuid ?? null,
-					},
-					3: {
-						primary: actions[4]?.uuid ?? null,
-						secondary: actions[5]?.uuid ?? null,
-					},
-				}
-			} 
-			else {
-				return {
-					1: {
-						primary: actions[0]?.uuid ?? null,
-						secondary: null,
-					},
-					2: {
-						primary: actions[1]?.uuid ?? null,
-						secondary: null,
-					},
-					3: {
-						primary: actions[2]?.uuid ?? null,
-						secondary: null,
-					},
+			for (let i = 1; i <= this.setsnumber; i++) {
+				sets[i] = {
+					primary: null,
+					secondary: null
 				}
 			}
+			
+			if (this.actor.type == "npc") {
+				let onlyactions = true;
+				
+				const actions = this.actor.items.filter((item) => item.type === "melee").map((action) => {
+					let item = this.actor.items.find(item => item.type != "melee" && item.name == action.name);
+					
+					if (item) {
+						return item;
+						onlyactions = false;
+					}
+					else {
+						return action;
+					}
+				});
+				
+				if(onlyactions) {
+					for (let i = 1; i <= this.setsnumber; i++) {
+						sets[i] = {
+							primary: actions[(i-1)*2]?.uuid ?? null,
+							secondary: actions[(i-1)*2 + 1]?.uuid ?? null,
+						}
+					}
+				} 
+				else {
+					for (let i = 1; i <= this.setsnumber; i++) {
+						sets[i] = {
+							primary: actions[i-1]?.uuid ?? null,
+							secondary: null,
+						}
+					}
+				}
+			}
+			
+			return sets;
 		}
 		
 		async _getSets() {
@@ -2570,12 +2570,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			return sets;
+			let returnsets = {};
+			
+			for (let i = 1; i <= this.setsnumber; i++) {
+				returnsets[i] = sets[i];
+			}
+			
+			return returnsets;
 		}
 
 		async _onSetChange({ sets, active }) {
 			const updates = [];
-			const activeSet = sets[active];
+			const activeSet = sets[active] || {primary : null, secondary : null};
 			const activeItems = Object.values(activeSet).filter((item) => item);
 			const inactiveSets = Object.values(sets).filter((set) => set !== activeSet);
 			const inactiveItems = inactiveSets.flatMap((set) => Object.values(set)).filter((item) => item).filter((item) => !activeItems.includes(item));
@@ -2631,6 +2637,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			} catch (error) {
 		  
 			}
+		}
+		
+		async _renderInner() {
+			await super._renderInner();
+			
+			this.element.style.gridTemplateColumns = "repeat(3, 1fr)";
+			this.element.style.display = "grid";
+			this.element.style.transform = `translate(0, ${-Math.floor((this.setsnumber-1)/3) * 57 - 5}px)`;
+			this.element.querySelectorAll(".weapon-set").forEach((element) => {
+				element.style.marginTop = "5px";
+			});
+			//temp1.style.marginTop = "5px"
 		}
     }
   

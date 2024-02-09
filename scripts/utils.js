@@ -45,10 +45,7 @@ async function getTooltipDetails(item) {
 		
 		let actionGlyph = actionGlyphofItem(dynamicstate ? {system} : item);
 		if (actionGlyph) {
-			details.push({
-				label: game.i18n.localize("PF2E.ActionTypeAction"),
-				value: `<span class=\"action-glyph\">${actionGlyph}</span>`
-			});
+			title = `${title} <span class=\"action-glyph\">${actionGlyph}</span>`;
 		}
 		
 		if (item.type == "melee") {

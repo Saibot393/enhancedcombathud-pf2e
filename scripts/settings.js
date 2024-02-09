@@ -26,6 +26,21 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		default: true
 	});
 	
+	game.settings.register(ModuleName, "weaponsetscount", {
+		name: game.i18n.localize(`${ModuleName}.Settings.weaponsetscount.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.weaponsetscount.descrp`),
+		scope: "client",
+		config: true,
+		type: Number,
+		range: {
+			min: 1,
+			max: 9,
+			step: 1
+		},
+		default: 3,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "directStaffuse", {
 		name: game.i18n.localize(`${ModuleName}.Settings.directStaffuse.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.directStaffuse.descrp`),
