@@ -2554,22 +2554,30 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
 				sets[set] = sets[set] || {};
 				
+				console.log(data);
+				
 				if (data.elementTrait) {
+					console.log(1);
 					sets[set][slot] = "ElementalBlast." + data.elementTrait;
 				}
 				else {
 					if (data.uuid) {
+						console.log(2);
 						sets[set][slot] = data.uuid
 					}
 					else {
 						if (data.hasOwnProperty("index")) {
+							console.log(3);
 							sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid.replace("Actor", "ActorAction") || null;
 						}
 						else {
-							
+							console.log(4);
 						}
 					}
 				}
+				
+				console.log("set id:");
+				console.log(sets[set][slot]);
 
 				await this.actor.setFlag("enhancedcombathud", "weaponSets", sets);
 				await this.render();
