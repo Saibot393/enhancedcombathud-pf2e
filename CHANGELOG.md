@@ -1,3 +1,7 @@
+## v1.1.3
+- Fixed bug that prevented the item title from hiding when map was displayed
+- Fixed bug that caused weapon sets to miss indetify natural weapons and similar (requires actions to be redraged into the item set)
+
 ## v1.1.2
 - Improved aid action automation
 
