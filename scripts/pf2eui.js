@@ -502,14 +502,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let valueLabel = `<span style="margin: 0 1rem">+${save.mod}</span>`;
 				let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()})">${save.label}</span>`;
 				
+				let roll = (event) => {
+					let options = {};
+					
+					if (event.ctrlKey) {
+						options.rollMode = game.user.isGM ? "gmroll" : "blindroll";
+					}
+					
+					save.check.roll(options)
+				}
+					
 				return new ARGON.DRAWER.DrawerButton([
 					{
 						label: nameLabel,
-						onClick: () => {save.check.roll()}
+						onClick: roll
 					},
 					{
 						label: valueLabel,
-						onClick: () => {save.check.roll()},
+						onClick: roll,
 						style: "display: flex; justify-content: flex-end;"
 					}
 				]);
@@ -523,14 +533,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let valueLabel = `<span style="margin: 0 1rem">+${skill.mod}</span>`;
 					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${skill.label}</span>`;
 					
+					let roll = (event) => {
+						let options = {};
+						
+						if (event.ctrlKey) {
+							options.rollMode = game.user.isGM ? "gmroll" : "blindroll";
+						}
+						
+						skill.check.roll(options)
+					}
+					
 					return new ARGON.DRAWER.DrawerButton([
 						{
 							label: nameLabel,
-							onClick: () => {skill.check.roll()}
+							onClick: roll
 						},
 						{
 							label: valueLabel,
-							onClick: () => {skill.check.roll()},
+							onClick: roll,
 							style: "display: flex; justify-content: flex-end;"
 						},
 					]);
@@ -544,14 +564,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let valueLabel = `<span style="margin: 0 1rem">+${lore.mod}</span>`;
 					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank).toLowerCase()})">${lore.label}</span>`;
 					
+					let roll = (event) => {
+						let options = {};
+						
+						if (event.ctrlKey) {
+							options.rollMode = game.user.isGM ? "gmroll" : "blindroll";
+						}
+						
+						lore.check.roll(options)
+					}
+					
 					return new ARGON.DRAWER.DrawerButton([
 						{
 							label: nameLabel,
-							onClick: () => {lore.check.roll()}
+							onClick: roll
 						},
 						{
 							label: valueLabel,
-							onClick: () => {lore.check.roll()},
+							onClick: roll,
 							style: "display: flex; justify-content: flex-end;"
 						},
 					]);
@@ -1538,8 +1568,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-hand"],
 						tooltip : game.i18n.localize(ModuleName + ".Titles.swapin"),
-						onclick : () => {
-							ui.ARGON?.components?.weaponSets?.swapinitem(this.item);
+						onclick : async () => {
+							if (await ui.ARGON?.components?.weaponSets?.swapinitem(this.item)) {
+								useAction("action");
+							}
 						}
 					};	
 
@@ -2534,8 +2566,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
 				const activeset = this.actor.getFlag("enhancedcombathud", "activeWeaponSet");
 				
-				console.log(sets);
-				console.log(activeset);
 				if (sets && activeset) {
 					if (!sets[activeset]) {
 						sets[activeset] = {
@@ -2544,15 +2574,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						}
 					}
 					
-					sets[activeset].secondary = item.uuid;
-					
-					console.log(item?.system?.usage?.hands);
-					if (item?.system?.usage?.hands > 1) {
-						sets[activeset].primary = item.uuid;
+					if (sets[activeset].secondary != item.uuid) {
+						sets[activeset].secondary = item.uuid;
+						
+						if (item?.system?.usage?.hands > 1) {
+							sets[activeset].primary = item.uuid;
+						}
+						
+						await this.actor.setFlag("enhancedcombathud", "weaponSets", sets);
+						await this.render();
+						
+						return true;
 					}
-					
-					await this.actor.setFlag("enhancedcombathud", "weaponSets", sets);
-					await this.render();
 				}
 			}
 		}
