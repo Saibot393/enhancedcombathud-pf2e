@@ -109,4 +109,14 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		default: 0.3,
 		onChange: () => {ui.ARGON?.render()}
 	});
+	
+	game.settings.register(ModuleName, "showpassives", {
+		name: game.i18n.localize(`${ModuleName}.Settings.showpassives.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.showpassives.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: true,
+		onChange: () => {ui.ARGON?.render()}
+	});
 });

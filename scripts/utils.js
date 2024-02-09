@@ -62,10 +62,12 @@ async function getTooltipDetails(item) {
 			});
 		}
 		
-		if (item.system.category && item.type == "consumable") {
+		if (item.system.category && item.type == "action") {
+			let actionicon = categoryIcon(item.system.category);
+			
 			details.push({
 				label: game.i18n.localize("PF2E.Category"),
-				value: game.i18n.localize("PF2E.Item.Consumable.Category." + item.system.category)
+				value: game.i18n.localize("PF2E.Item.Action.Category." + firstUpper(item.system.category)) + (actionicon.length ? ` <i class="${actionicon.join(" ")}"></i>` : "")
 			});
 		}
 		
@@ -136,7 +138,7 @@ async function getTooltipDetails(item) {
 					type = Object.values(item.system.damage[key].kinds).find(value => damageIcon(value).length);
 				}
 				
-				entries.push(`${item.system.damage[key].formula} ${categoryIcon(item.system.damage[key].category)} <i class="${damageIcon(type).join(" ")}"></i>`)
+				entries.push(`${item.system.damage[key].formula} ${damagecategoryIcon(item.system.damage[key].category)} <i class="${damageIcon(type).join(" ")}"></i>`)
 			}
 			damageentry = entries.join("<br>");
 		}
@@ -146,7 +148,7 @@ async function getTooltipDetails(item) {
 				
 				let formula = item.system.damage.dice && item.system.damage.die ? `${item.system.damage.dice}${item.system.damage.die}` : item.system.damage.formula;
 				
-				damageentry = `${formula} ${categoryIcon(item.system.damage.category)} <i class="${damageIcon(type).join(" ")}"></i>`
+				damageentry = `${formula} ${damagecategoryIcon(item.system.damage.category)} <i class="${damageIcon(type).join(" ")}"></i>`
 			}
 		}
 		if (damageentry) {
@@ -242,6 +244,25 @@ function damageIcon(damageType) {
 }
 
 function categoryIcon(category) {
+	let iconclass = [];
+	
+	if (!category) return iconclass;
+	
+	switch (category.toLowerCase()) {
+		case "interaction":
+			return ["fa-solid", "fa-hand"];
+		case "defensive":
+			return ["fa-solid", "fa-circle-dot"];
+		case "offensive":
+			return ["fa-solid", "fa-swords"];
+		case "familiar":
+			return ["fa-solid", "fa-cat"];
+		default:
+			return [];
+	}
+}
+
+function damagecategoryIcon(category) {
 	switch (category) {
 		case "persistent": return `<i class="fa-solid fa-hourglass"></i>`;
 		case "precision": return `<i class="fa-solid fa-crosshair"></i>`;
@@ -330,7 +351,7 @@ function actionGlyphs(actionType, number = 0) {
 			return "R";
 			break;
 		case "passive":
-			return "";
+			return "◇";
 		default:
 			return [];
 			break;

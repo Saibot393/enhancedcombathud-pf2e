@@ -860,11 +860,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			return 2;
 		}
 		
-		_onNewRound(combat) {
-			this._currentActions = this.maxActions;
-			this.updateActionUse();
-		}
-		
 		async _getButtons() {
 			let buttons = [];
 			let specialActions = Object.values(PF2EFreeActionPanel);
@@ -877,6 +872,35 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			 
+			return buttons.filter(button => button.isvalid);
+		}
+    }
+	
+    class PF2EPassiveActionPanel extends ARGON.MAIN.ActionPanel {
+		constructor(...args) {
+			super(...args);
+		}
+
+		get label() {
+			//return "PF2E.ActionTypeFree";
+			return game.i18n.localize("PF2E.ActionTypePassive")//.split(" ")[0];
+		}
+		
+		get actionType() {
+			return "passive";
+		}
+		
+		get colorScheme() {
+			return 3;
+		}
+		
+		async _getButtons() {
+			let buttons = [];
+			
+			//buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[0]), new PF2ESpecialActionButton(specialActions[1])));
+			
+			buttons.push(new PF2EButtonPanelButton({parent : this, type: "action"}));
+			
 			return buttons.filter(button => button.isvalid);
 		}
     }
@@ -1765,6 +1789,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				case "spell": return "modules/enhancedcombathud/icons/svg/spell-book.svg";
 				case "feat": return "modules/enhancedcombathud/icons/svg/mighty-force.svg";
 				case "consumable": return "modules/enhancedcombathud/icons/svg/drink-me.svg";
+				case "action": return "modules/enhancedcombathud/icons/svg/mighty-force.svg";
 			}
 		}
 		
@@ -2653,14 +2678,20 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
     }
   
-    CoreHUD.definePortraitPanel(PF2EPortraitPanel);
-    CoreHUD.defineDrawerPanel(PF2EDrawerPanel);
-    CoreHUD.defineMainPanels([
+	let panels = [
 		PF2EActionPanel,
 		PF2EReActionPanel,
 		PF2EFreeActionPanel,
 		ARGON.PREFAB.PassTurnPanel
-    ]);  
+	];
+	
+	if (game.settings.get(ModuleName, "showpassives")) {
+		panels.push(PF2EPassiveActionPanel);
+	}
+  
+    CoreHUD.definePortraitPanel(PF2EPortraitPanel);
+    CoreHUD.defineDrawerPanel(PF2EDrawerPanel);
+    CoreHUD.defineMainPanels(panels);  
 	CoreHUD.defineMovementHud(PF2EMovementHud);
 	CoreHUD.defineButtonHud(PF2EButtonHud);
     CoreHUD.defineWeaponSets(PF2EWeaponSets);
