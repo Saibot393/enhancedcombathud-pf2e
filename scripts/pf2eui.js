@@ -1125,65 +1125,66 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 			var used = false;
 			
-			if (this._clickAction) {
+			if (this._clickAction) {//use button action
 				used = this._clickAction();
 			}
-			
-			if (this.item) {
-				if (this.item.flags.hasOwnProperty(ModuleName) && this.item.flags[ModuleName].onclick) {//custom on clicks
-					used = this.item.flags[ModuleName].onclick(options);
-				}
-				else {
-					if (this.panel && game.settings.get(ModuleName, "directStaffuse")) {//panel action
-						this.panel.toggle()
+			else {
+				if (this.item) {
+					if (this.item.flags.hasOwnProperty(ModuleName) && this.item.flags[ModuleName].onclick) {//custom on clicks
+						used = this.item.flags[ModuleName].onclick(options);
 					}
 					else {
-						let action = this.actor.system.actions.find(action => action.slug == this.item.system.slug);
-						
-						if (!action && this.item.type == "melee") {
-							action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase());
-						}
-						
-						if (action?.altUsages?.length && (this.item.getFlag(ModuleName, "thrown") || this.item.getFlag(ModuleName, "combination-melee"))) {
-							action = action.altUsages[0];
-						}
-						
-						if (action) {//default actions
-							let variant = action.variants[options.MAP];
-							
-							if (!variant) {
-								variant = action.variants[0];
-							}
-							
-							if (await variant?.roll()) {
-								used = true;
-							}
+						if (this.panel && game.settings.get(ModuleName, "directStaffuse")) {//panel action
+							this.panel.toggle()
 						}
 						else {
-							if (this.item.consume) {//consume actions
-								if (game.settings.get(ModuleName, "consumableuse").includes("consume")) {
-									this.item.consume();
+							let action = this.actor.system.actions.find(action => action.slug == this.item.system.slug);
+							
+							if (!action && this.item.type == "melee") {
+								action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase());
+							}
+							
+							if (action?.altUsages?.length && (this.item.getFlag(ModuleName, "thrown") || this.item.getFlag(ModuleName, "combination-melee"))) {
+								action = action.altUsages[0];
+							}
+							
+							if (action) {//default actions
+								let variant = action.variants[options.MAP];
+								
+								if (!variant) {
+									variant = action.variants[0];
 								}
 								
-								if (game.settings.get(ModuleName, "consumableuse").includes("chat")) {
-									this.item.toChat();
+								if (await variant?.roll()) {
+									used = true;
 								}
-					
-								used = true;
 							}
 							else {
-								if (this.item.system.selfEffect?.uuid) {//effect actions
-									this.actor.createEmbeddedDocuments("Item", [await fromUuid(this.item.system.selfEffect.uuid)]);
+								if (this.item.consume) {//consume actions
+									if (game.settings.get(ModuleName, "consumableuse").includes("consume")) {
+										this.item.consume();
+									}
+									
+									if (game.settings.get(ModuleName, "consumableuse").includes("chat")) {
+										this.item.toChat();
+									}
+						
 									used = true;
 								}
-								else {//give up and let PF2E handle it
-									this.item.toChat();
-									used = true;
-								}
-								
-								if (used) {//consume frequency charges by hand
-									if (this.item?.system.frequency?.max) {
-										return this.item.update({system : {frequency : {value : Math.max(this.item.system.frequency.value - 1, 0)}}});
+								else {
+									if (this.item.system.selfEffect?.uuid) {//effect actions
+										this.actor.createEmbeddedDocuments("Item", [await fromUuid(this.item.system.selfEffect.uuid)]);
+										used = true;
+									}
+									else {//give up and let PF2E handle it
+										this.item.toChat();
+										used = true;
+									}
+									
+									if (used) {//consume frequency charges by hand
+										if (this.item?.system.frequency?.max) {
+											return this.item.update({system : {frequency : {value : Math.max(this.item.system.frequency.value - 1, 0)}}});
+										}
 									}
 								}
 							}
