@@ -47,8 +47,18 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		scope: "client",
 		config: true,
 		type: Boolean,
-		requiresReload : true,
-		default: false
+		default: false,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
+	game.settings.register(ModuleName, "consumableswap", {
+		name: game.i18n.localize(`${ModuleName}.Settings.consumableswap.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.consumableswap.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: true,
+		onChange: () => {ui.ARGON?.render()}
 	});
 	
 	for (let key of Object.keys(settingActionSpace)) {

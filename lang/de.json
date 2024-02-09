@@ -1,9 +1,10 @@
 {
 	"enhancedcombathud-pf2e" : {
 		"Titles" : {
-			"refocus"			: "neu fokussieren",
-			"accept"			: "Akzeptieren",
-			"abbort"			: "Abbrechen"
+			"refocus"					: "neu fokussieren",
+			"accept"					: "Akzeptieren",
+			"abbort"					: "Abbrechen",
+			"swapin"					: "In die hand"
 		},
 		
 		"Settings" : {
@@ -12,20 +13,20 @@
 				"descrp"				: "Ob NPC Traits im Portrait angezeigt werden sollen"
 			},
 			"panondblclick" : {
-				"name"			: "Bei Doppelklick zoomen",
-				"descrp"		: "Zoomt die Kamera zur aktiven Figur wenn des Charakterportrait gedoppelklickt wird"
+				"name"					: "Bei Doppelklick zoomen",
+				"descrp"				: "Zoomt die Kamera zur aktiven Figur wenn des Charakterportrait gedoppelklickt wird"
 			},
 			"directStaffuse" : {
-				"name"			: "Direkte Stab Nutzung",
-				"descrp"		: "Ob magische Stäbe direkt zum Zauberwirken anstatt als Waffe benutzt werden sollen"
+				"name"					: "Direkte Stab Nutzung",
+				"descrp"				: "Ob magische Stäbe direkt zum Zauberwirken anstatt als Waffe benutzt werden sollen"
 			},
 			"ECHAction" : {
-				"name1"			: "Standard Aktion 1",
-				"name2"			: "Standard Aktion 2",
-				"name3"			: "Standard Aktion 3",
-				"name4"			: "Standard Aktion 4",
-				"name5"			: "Standard Aktion 5",
-				"name6"			: "Standard Aktion 6"
+				"name1"					: "Standard Aktion 1",
+				"name2"					: "Standard Aktion 2",
+				"name3"					: "Standard Aktion 3",
+				"name4"					: "Standard Aktion 4",
+				"name5"					: "Standard Aktion 5",
+				"name6"					: "Standard Aktion 6"
 			},
 			"consumableuse" : {
 				"name"					: "Konsumierbares klick Verhalten",
@@ -37,12 +38,12 @@
 				}
 			},
 			"onitemiconscale" : {
-				"name"			: "Info Icon Skalierung",
-				"descrp"		: "Die Skalierung der Info Icons auf Gegenstandsknöpfen"
+				"name"					: "Info Icon Skalierung",
+				"descrp"				: "Die Skalierung der Info Icons auf Gegenstandsknöpfen"
 			},
 			"iconshadow" : {
-				"name"			: "Info Icon Schatten Intensität",
-				"descrp"		: "Die Intensität des Info Icon Kontrastschattens Gegenstandsknöpfen"
+				"name"					: "Info Icon Schatten Intensität",
+				"descrp"				: "Die Intensität des Info Icon Kontrastschattens Gegenstandsknöpfen"
 			}
 		}
 	},

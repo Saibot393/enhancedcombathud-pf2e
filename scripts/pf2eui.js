@@ -1533,6 +1533,20 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				toggles.push(toggleData);
 			}
 			
+			if (game.settings.get(ModuleName, "consumableswap")) {
+				if (!this.isWeaponSet && this.item.system.usage?.type == "held") {
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-hand"],
+						tooltip : game.i18n.localize(ModuleName + ".Titles.swapin"),
+						onclick : () => {
+							ui.ARGON?.components?.weaponSets?.swapinitem(this.item);
+						}
+					};	
+
+					toggles.push(toggleData);
+				}
+			}
+			
 			const rightoffset = this.inActionPanel ? 0 : 0; 
 			
 			let iconpanel = document.createElement("div");
@@ -2512,6 +2526,35 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	class PF2EWeaponSets extends ARGON.WeaponSets {
 		get setsnumber() {
 			return game.settings.get(ModuleName, "weaponsetscount");
+		}
+		
+		async swapinitem(item) {
+			console.log(item);
+			if (item?.system?.usage?.type == "held") {
+				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
+				const activeset = this.actor.getFlag("enhancedcombathud", "activeWeaponSet");
+				
+				console.log(sets);
+				console.log(activeset);
+				if (sets && activeset) {
+					if (!sets[activeset]) {
+						sets[activeset] = {
+							primary : null,
+							secondary : null
+						}
+					}
+					
+					sets[activeset].secondary = item.uuid;
+					
+					console.log(item?.system?.usage?.hands);
+					if (item?.system?.usage?.hands > 1) {
+						sets[activeset].primary = item.uuid;
+					}
+					
+					await this.actor.setFlag("enhancedcombathud", "weaponSets", sets);
+					await this.render();
+				}
+			}
 		}
 		
 		async getDefaultSets() {

@@ -3,7 +3,8 @@
 		"Titles" : {
 			"refocus"					: "refocus",
 			"accept"					: "Accept",
-			"abbort"					: "Abbort"
+			"abbort"					: "Abbort",
+			"swapin"					: "Swap in"
 		},
 		
 		"Settings" : {
