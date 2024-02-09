@@ -929,7 +929,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			//buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[0]), new PF2ESpecialActionButton(specialActions[1])));
 			
-			buttons.push(new PF2EButtonPanelButton({parent : this, type: "action"}));
+			if (this.actor.type == "npc") {
+				buttons.push(new PF2EButtonPanelButton({parent : this, type: "action"}));
+			}
 			
 			return buttons.filter(button => button.isvalid);
 		}
