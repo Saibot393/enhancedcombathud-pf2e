@@ -61,6 +61,15 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "usetakecover", {
+		name: game.i18n.localize(`${ModuleName}.Settings.usetakecover.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.usetakecover.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: true
+	});
+	
 	for (let key of Object.keys(settingActionSpace)) {
 		for (let i = 1; i <= settingActionSpace[key]; i++) {
 			game.settings.register(ModuleName, key + i, {

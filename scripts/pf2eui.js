@@ -2757,13 +2757,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	let panels = [
 		PF2EActionPanel,
 		PF2EReActionPanel,
-		PF2EFreeActionPanel,
-		ARGON.PREFAB.PassTurnPanel
+		PF2EFreeActionPanel
 	];
 	
 	if (game.settings.get(ModuleName, "showpassives")) {
 		panels.push(PF2EPassiveActionPanel);
 	}
+	
+	panels.push(ARGON.PREFAB.PassTurnPanel);
   
     CoreHUD.definePortraitPanel(PF2EPortraitPanel);
     CoreHUD.defineDrawerPanel(PF2EDrawerPanel);

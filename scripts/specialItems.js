@@ -169,6 +169,12 @@ async function registerPF2EECHSItems () {
 				[ModuleName] : {
 					onclick : async (options) => {
 						if (ui.ARGON?.components?.movement && !ui.ARGON?.components?.movement?.isstep) {
+							let actor = options.actor;
+						
+							if (actor) {
+								game.pf2e.actions.get("step").toActionVariant({actors : actor}).toMessage();
+							}
+							
 							ui.ARGON?.components?.movement.addstep();
 							
 							return true;
@@ -186,7 +192,12 @@ async function registerPF2EECHSItems () {
 						let actor = options.actor;
 						
 						if (actor) {
-							actor.createEmbeddedDocuments("Item", [await fromUuid("Compendium.pf2e.other-effects.Item.I9lfZUiCwMiGogVi")]);
+							if (game.settings.get(ModuleName, "usetakecover")) {
+								game.pf2e.actions.get("take-cover").toActionVariant({actors : actor}).use();
+							}
+							else {
+								game.pf2e.actions.get("take-cover").toActionVariant({actors : actor}).toMessage()
+							}
 							return true;
 						}
 					}
@@ -403,7 +414,9 @@ async function registerPF2EECHSItems () {
 											optionsinfo[key] = {label : key};
 										}
 										
-										let variant = await openNewInput("choice", firstUpper(itemkey), `${firstUpper(itemkey)}:`, {defaultValue : options[0], options : optionsinfo});
+										let name = (await getSettingActionTitles(setkey))[itemkey];
+										
+										let variant = await openNewInput("choice", name, `${name}: `, {defaultValue : options[0], options : optionsinfo});
 										
 										if (!variant) return;
 										settings.variant = variant; 	

@@ -16,9 +16,21 @@
 				"name"					: "Bei Doppelklick zoomen",
 				"descrp"				: "Zoomt die Kamera zur aktiven Figur wenn des Charakterportrait gedoppelklickt wird"
 			},
+			"weaponsetscount" : {
+				"name"					: "Waffen Sets",
+				"descrp"				: "Anzahl der angezeigten Waffen sets"
+			},
 			"directStaffuse" : {
 				"name"					: "Direkte Stab Nutzung",
 				"descrp"				: "Ob magische Stäbe direkt zum Zauberwirken anstatt als Waffe benutzt werden sollen"
+			},
+			"consumableswap" : {
+				"name"					: "Konsumierbare tauschbar",
+				"descrp"				: "Ob konsumierbare Gegenstände wleche gehalten werden können ein Aktionsicon zum in die hand nehmen haben sollen"	
+			},
+			"usetakecover": {
+				"name"					: "Nutze In Deckung gehen",
+				"descrp"				: "Ob die Nutze Deckung Aktion benutzt werden soll (anstatt in den Chat gesendet zu werden)"	
 			},
 			"ECHAction" : {
 				"name1"					: "Standard Aktion 1",
@@ -44,6 +56,10 @@
 			"iconshadow" : {
 				"name"					: "Info Icon Schatten Intensität",
 				"descrp"				: "Die Intensität des Info Icon Kontrastschattens Gegenstandsknöpfen"
+			},
+			"showpassives" : {
+				"name"					: "Zeige NPC Passiven",
+				"descrp"				: "Ob die Passiven von NPCs angezeigt werden sollen"
 			}
 		}
 	},
