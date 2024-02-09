@@ -7,6 +7,10 @@
 		},
 		
 		"Settings" : {
+			"shownpctraits" : {
+				"name"					: "Zeige NPC Traits",
+				"descrp"				: "Ob NPC Traits im Portrait angezeigt werden sollen"
+			},
 			"panondblclick" : {
 				"name"			: "Bei Doppelklick zoomen",
 				"descrp"		: "Zoomt die Kamera zur aktiven Figur wenn des Charakterportrait gedoppelklickt wird"

@@ -7,6 +7,10 @@
 		},
 		
 		"Settings" : {
+			"shownpctraits" : {
+				"name"					: "Show NPC traits",
+				"descrp"				: "If NPC triats should be displayed in the character portrait"
+			},
 			"panondblclick" : {
 				"name"					: "Pan on portrait doubleclick",
 				"descrp"				: "Camera pans to the current token when the portrait image is double clicked"

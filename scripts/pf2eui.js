@@ -436,6 +436,52 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					this.element.appendChild(initiativeBox);
 				}
 			}
+			
+			if (game.settings.get(ModuleName, "shownpctraits") {
+				if (this.actor.type == "npc") {
+					const height = 23;
+					let traitbox = document.createElement("div");
+					traitbox.style.position = "absolute";
+					traitbox.style.top = 0;
+					traitbox.style.left = 0;
+					traitbox.style.width = "100%";
+					traitbox.style.height = `${height}px`;
+					traitbox.style.background = "rgba(65, 75, 85, 0.9)";
+					traitbox.style.zIndex = "1";
+					traitbox.style.overflowX = "auto";
+					traitbox.style.overflowY = "hidden";
+					traitbox.onmousewheel = (event) => {traitbox.scrollLeft = traitbox.scrollLeft + event.deltaY/3}
+					
+					let traits = this.actor.system.traits.value;
+					
+					for (let trait of traits) {
+						let traitspan = document.createElement("span");
+						traitspan.style.backgroundColor = "var(--ech-buttons-base-background)";
+						traitspan.style.borderColor = "var(--ech-buttons-base-border)";
+						traitspan.style.color = "var(--ech-buttons-base-color)";
+						traitspan.style.borderRadius = "0.25rem";
+						traitspan.style.paddingTop = "0.35em";
+						traitspan.style.paddingRight = "0.65em";
+						traitspan.style.paddingBottom = "0.35em";
+						traitspan.style.paddingLeft = "0.65em";
+						traitspan.style.fontSize = "1rem";
+						traitspan.style.marginRight = "0.2rem";
+						
+						traitspan.innerHTML = trait.toUpperCase();
+						if (CONFIG.PF2E.traitsDescriptions[trait]) {
+							traitspan.setAttribute("data-tooltip", game.i18n.localize(CONFIG.PF2E.traitsDescriptions[trait]));
+						}
+						else {
+							traitspan.setAttribute("data-tooltip", trait.toUpperCase());
+						}
+						
+						traitbox.appendChild(traitspan);
+					}
+					
+					this.element.prepend(traitbox);
+					this.element.querySelector(".portrait-stat-block.player-details").style.top = `${height}px`;
+				}
+			}
 		}
 	}
 	

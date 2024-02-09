@@ -6,6 +6,16 @@ const defaultECH = ["seek", "hide", "none", "none", "none", "none"];
 Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 	//Settings
 	//client
+	game.settings.register(ModuleName, "shownpctraits", {
+		name: game.i18n.localize(`${ModuleName}.Settings.shownpctraits.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.shownpctraits.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: true,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "panondblclick", {
 		name: game.i18n.localize(`${ModuleName}.Settings.panondblclick.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.panondblclick.descrp`),

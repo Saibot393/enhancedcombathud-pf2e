@@ -332,6 +332,8 @@ function actionGlyphs(actionType, number = 0) {
 		case "reaction":
 			return "R";
 			break;
+		case "passive":
+			return "";
 		default:
 			return [];
 			break;
