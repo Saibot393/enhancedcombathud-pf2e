@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem} from "./utils.js";
 import {openNewInput} from "./popupInput.js";
 import {elementalBlastProxy} from "./proxyfake.js";
 
@@ -1533,13 +1533,43 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			if (this.item?.system.frequency?.max > this.item?.system.frequency?.value) {
+				let toggleData = {
+					iconclass : ["fa-solid", "fa-rotate-right"],
+					onclick : () => {this.item.update({system : {frequency : {value : this.item.system.frequency.max}}});},
+					tooltip : game.i18n.localize(`${game.i18n.localize("PF2E.Frequency.per")} ${game.i18n.localize("PF2E.Duration." + this.item.system.frequency.per)}`)
+				};	
+
+				toggles.push(toggleData);
+			}
+			
+			if (game.modules.get("pf2e-ranged-combat").active) {
+				let itemaction = itemconnectedAction(this.item);
+				console.log(this.item);
+				console.log(itemaction);
+				
+				let reload = itemaction?.auxiliaryActions.find(action => action.action == "interact" && action.label == "Reload");
+				
+				let unload = itemaction?.auxiliaryActions.find(action => action.action == "interact" && action.label == "Unload");
+				
+				if (reload) {
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-rotate-right"],
-						onclick : () => {this.item.update({system : {frequency : {value : this.item.system.frequency.max}}});},
-						tooltip : game.i18n.localize(`${game.i18n.localize("PF2E.Frequency.per")} ${game.i18n.localize("PF2E.Duration." + this.item.system.frequency.per)}`)
+						onclick : () => {reload.execute(); useAction("action", reload.actions)},
+						tooltip : game.i18n.localize(reload.label)
 					};	
 
 					toggles.push(toggleData);
+				}
+				
+				if (unload) {
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-arrow-up-from-bracket"],
+						onclick : () => {unload.execute(); useAction("action", unload.actions)},
+						tooltip : game.i18n.localize(unload.label)
+					};	
+
+					toggles.push(toggleData);
+				}
 			}
 			
 			if (this.item.isElementalBlast) {

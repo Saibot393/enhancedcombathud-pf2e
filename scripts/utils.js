@@ -407,6 +407,14 @@ function spelluseAction(spell, level) {
 	}
 }
 
+function itemconnectedAction(item) {
+	if (item && item.actor) {
+		return item.actor.system.actions.find(action => action.item == item);
+	}
+	
+	return null;
+}
+
 function isClassFeature(item) {
 	let checkitem = item;
 	
@@ -425,4 +433,4 @@ function connectedItem(action) {
 	return null;
 }
 
-export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, isClassFeature, connectedItem}
+export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem}
