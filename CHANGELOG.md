@@ -1,3 +1,6 @@
+## v1.2.3
+- Fixed bug that prevented spells from being cast
+
 ## v1.2.2
 - Fixed problem with some prepared seplls not being entered into the right ranks
 - Fixed problems with elemental blast (including with feats like Weapon Infusion and Versatile Blast)
