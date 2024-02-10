@@ -1564,7 +1564,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				toggles.push(toggleData);
 			}
 			
-			if (game.modules.get("pf2e-ranged-combat").active) {
+			if (game.modules.get("pf2e-ranged-combat")?.active) {
 				let itemaction = itemconnectedAction(this.item);
 				console.log(this.item);
 				console.log(itemaction);
