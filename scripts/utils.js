@@ -1,3 +1,5 @@
+import {openNewInput} from "./popupInput.js";
+
 const ModuleName = "enhancedcombathud-pf2e";
 
 const settingActionSpace = {
@@ -411,10 +413,41 @@ function MAPtext(item, MAP = 0) {
 	return replacewords(game.i18n.localize("PF2E.MAPAbbreviationLabel"), {penalty : penalty});
 }
 
-function spelluseAction(spell, level) {
-	return () => {
+function spelluseAction(spell, level, heightenlevel = 0) {
+	return async () => {
 		if (spell) {
-			spell.spellcasting.cast(spell, {consume : true, rank : level});
+			if (heightenlevel > level) {
+				let castoptions = {};
+				
+				let spellgroup = spell.spellcasting;
+				
+				for (let i = level; i <= heightenlevel; i++) {
+					let ordinal;
+					switch (i) {
+						case 1:
+							ordinal = game.i18n.localize("PF2E.OrdinalSuffixes.one");
+							break;
+						case 2:
+							ordinal = game.i18n.localize("PF2E.OrdinalSuffixes.two");
+							break;
+						case 3:
+							ordinal = game.i18n.localize("PF2E.OrdinalSuffixes.few");
+							break;
+						default:
+							ordinal = game.i18n.localize("PF2E.OrdinalSuffixes.many");
+							break;
+					}
+					
+					castoptions[i] = {label : `${i}${ordinal} ${game.i18n.localize("PF2E.Item.Spell.Rank.Label")} [${spellgroup.system.slots["slot" + i].value}/${spellgroup.system.slots["slot" + i].max}]`};
+				}
+				
+				let heightenedto = await openNewInput("choice", game.i18n.localize("PF2E.CastLabel"), game.i18n.localize("PF2E.SpellLevelLabel.CastingItemCreateDialog"), {defaultValue : level,options : castoptions});
+				
+				spell.spellcasting.cast(spell, {consume : true, rank : Number(heightenedto)});
+			}
+			else {
+				spell.spellcasting.cast(spell, {consume : true, rank : level});
+			}
 			
 			return true;
 		}

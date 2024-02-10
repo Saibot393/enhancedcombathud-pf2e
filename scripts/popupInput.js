@@ -58,8 +58,9 @@ async function openNewInput(type, title, question, options = {}, argonstyle = fa
 	});
 	
 	if (argonstyle) {
-		const hookId = Hooks.once("renderDialog", (dialog, html) => { 
-			$(html).classList.add("ech-highjack-window");
+		const hookId = Hooks.once("renderDialog", (...args) => { 
+			console.log(args);
+			//$(html).classList.add("ech-highjack-window");
 		});
 	  
 		setTimeout(() => {

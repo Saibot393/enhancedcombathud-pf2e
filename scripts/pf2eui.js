@@ -775,7 +775,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			for (let i = 0; i < game.settings.get(ModuleName, "macrobuttons"); i = i + 2) {
-				buttons.push(new PF2ESplitButton(new PF2EMacroButton({inActionPanel : true, index : i}), new PF2EMacroButton({inActionPanel : true, index : i+1})));
+				buttons.push(new PF2ESplitButton(new PF2EMacroButton({parent : this, inActionPanel : true, index : i}), new PF2EMacroButton({parent : this, inActionPanel : true, index : i+1})));
 			}
 			
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[3]), new PF2ESpecialActionButton(specialActions[4])));
@@ -1215,7 +1215,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			else {
 				if (this.item) {
 					if (this.item.flags.hasOwnProperty(ModuleName) && this.item.flags[ModuleName].onclick) {//custom on clicks
-						used = this.item.flags[ModuleName].onclick(options);
+						used = await this.item.flags[ModuleName].onclick(options);
 					}
 					else {
 						if (this.panel && game.settings.get(ModuleName, "directStaffuse")) {//panel action
@@ -1566,8 +1566,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (game.modules.get("pf2e-ranged-combat")?.active) {
 				let itemaction = itemconnectedAction(this.item);
-				console.log(this.item);
-				console.log(itemaction);
 				
 				let reload = itemaction?.auxiliaryActions.find(action => action.action == "interact" && action.label == "Reload");
 				
@@ -1854,7 +1852,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	class PF2EMacroButton extends ARGON.MAIN.BUTTONS.ItemButton {
 		constructor (args) {
 			super(args);
-			
 			this._index = args.index;
 			
 			let setmacros = this.actor.getFlag(ModuleName, "setmacros");
@@ -1889,7 +1886,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get colorScheme() {
-			return this.parent.colorScheme;
+			return this.parent?.colorScheme;
 		}
 		
 		get actionType() {
@@ -1928,7 +1925,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				event.preventDefault();
 				event.stopPropagation();
 				const data = JSON.parse(event.dataTransfer.getData("text/plain"));
-				console.log(data);
 				if (data.type == "Macro") {
 					this.setitem(data.uuid);
 				}
@@ -1939,7 +1935,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		async _onLeftClick(event) {
 			if (event.shiftKey) {
-				console.log("delete");
 				this.setitem("");
 			}
 			else {
@@ -2064,7 +2059,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		sortedSpells() {//this is a mess, look away
 			let entries = this.actor.items.filter(entry => entry.type == "spellcastingEntry");
 			
-			let prepared = entries.filter(entry => entry.system.prepared.value == "prepared");
+			let prepared = entries.filter(entry => entry.system.prepared.value == "prepared" && !entry.system.prepared.flexible);
+			let flexible = entries.filter(entry => entry.system.prepared.value == "prepared" && entry.system.prepared.flexible);
 			let spontaneous = entries.filter(entry => entry.system.prepared.value == "spontaneous");
 			let innate = entries.filter(entry => entry.system.prepared.value == "innate");
 			let focus = entries.filter(entry => entry.system.prepared.value == "focus");
@@ -2155,6 +2151,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							value = value + group.system.slots["slot" + i]?.value;
 						}
 						
+						for (let group of flexible) {
+							max = max + group.system.slots["slot" + i]?.max;
+							value = value + group.system.slots["slot" + i]?.value;
+						}
+						
 						return {
 							max: max, 
 							value: value
@@ -2195,6 +2196,19 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 					
 					spellbuttons = spellbuttons.concat(group.spells.filter(spell => ids.includes(spell.id)).filter(spell => isvalidspell(spell, i == 0 ? 0  : undefined)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, i)})));
+				}
+				
+				for (let group of flexible) {
+					let spells;
+					
+					if (i == 0) {
+						spells = group.spells.filter(spell => spell.isCantrip && Object.values(group.system.slots.slot0.prepared).find(slot => slot.id == spell.id))
+					}
+					else {
+						spells = group.spells.filter(spell => spell.system.location.signature);
+					}
+					
+					spellbuttons = spellbuttons.concat(spells.filter(spell => isvalidspell(spell, i)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, i, i == 0 ? 0 : group.highestRank)})));	
 				}
 				
 				if (spontaneous.find(group => group.highestRank >= i)) {
