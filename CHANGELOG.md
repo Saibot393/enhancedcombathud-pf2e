@@ -1,3 +1,6 @@
+## v1.2.1
+- Fixed bug that caused some character abilities to show up as passives
+
 ## v1.2.0
 - Added seting for the klick behaviour of consumable item buttons (consume, to chat, both)
 - Added setting to display the traits of NPCs in the portrait
