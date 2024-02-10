@@ -1,3 +1,8 @@
+## v1.2.2
+- Fixed problem with some prepared seplls not being entered into the right ranks
+- Fixed problems with elemental blast (including with feats like Weapon Infusion and Versatile Blast)
+- Fixed problem with thrown weapons not working for NPCs
+
 ## v1.2.1
 - Fixed bug that caused some character abilities to show up as passives
 
