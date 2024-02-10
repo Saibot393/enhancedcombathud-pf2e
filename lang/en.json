@@ -16,6 +16,14 @@
 				"name"					: "Pan on portrait doubleclick",
 				"descrp"				: "Camera pans to the current token when the portrait image is double clicked"
 			},
+			"reversesaveskilllore" : {
+				"name"					: "Reverse save, skill, lore",
+				"descrp"				: "Reverses the order to lore skill saves"
+			},
+			"showtrainedrankletter" : {
+				"name"					: "Show trained rank latter",
+				"descrp"				: "Shows a letter next to saves & skills to indicate the training rank"
+			},
 			"weaponsetscount" : {
 				"name"					: "Weapon sets",
 				"descrp"				: "Amount of displayed weapon sets"
@@ -39,6 +47,10 @@
 				"name4"					: "Standard Action 4",
 				"name5"					: "Standard Action 5",
 				"name6"					: "Standard Action 6"
+			},
+			"macrobuttons" : {
+				"name"					: "Number of macro buttons",
+				"descrp"				: "The number of displayed macro buttons ((shift)right click to open macro folder, drag & drop to choose macro, shift left click to remove macro)"
 			},
 			"consumableuse" : {
 				"name"					: "Consumable click behaviour",

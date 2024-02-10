@@ -133,6 +133,22 @@ async function getTooltipDetails(item) {
 			});
 		}
 		
+		if (item.type == "shield") {
+			if (item.system.hasOwnProperty("hardness")) {
+				details.push({
+					label: game.i18n.localize("PF2E.HardnessLabel"),
+					value: item.system.hardness
+				});
+			}
+			
+			if (item.system.hp?.hasOwnProperty("brokenThreshold")) {
+				details.push({
+					label: game.i18n.localize("PF2E.Item.Physical.BrokenThreshold.Label"),
+					value: item.system.hp.brokenThreshold
+				});
+			}
+		}
+		
 		let damageentry;
 		if (item.type == "spell") {
 			let entries = [];

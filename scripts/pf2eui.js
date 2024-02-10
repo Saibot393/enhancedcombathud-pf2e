@@ -500,7 +500,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const save = saves[saveKey];
 				
 				let valueLabel = `<span style="margin: 0 1rem">+${save.mod}</span>`;
-				let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()})">${save.label}</span>`;
+				
+				let rankicon = "";
+				if (game.settings.get(ModuleName, "showtrainedrankletter")) {
+					rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank)}"></i> `;
+				}
+				
+				let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()})">${rankicon + save.label}</span>`;
 				
 				let roll = (event) => {
 					let options = {};
@@ -531,7 +537,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				if (!skill.lore) {
 					let valueLabel = `<span style="margin: 0 1rem">+${skill.mod}</span>`;
-					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${skill.label}</span>`;
+					
+					let rankicon = "";
+					if (game.settings.get(ModuleName, "showtrainedrankletter")) {
+						rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank)}"></i> `;
+					}
+					
+					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${rankicon + skill.label}</span>`;
 					
 					let roll = (event) => {
 						let options = {};
@@ -562,7 +574,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				if (lore.lore) {
 					let valueLabel = `<span style="margin: 0 1rem">+${lore.mod}</span>`;
-					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank).toLowerCase()})">${lore.label}</span>`;
+					
+					let rankicon = "";
+					if (game.settings.get(ModuleName, "showtrainedrankletter")) {
+						rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank)}"></i> `;
+					}
+					
+					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank).toLowerCase()})">${rankicon + lore.label}</span>`;
 					
 					let roll = (event) => {
 						let options = {};
@@ -631,6 +649,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					],
 					buttons: loreButtons,
 				});
+			}
+			
+			if (game.settings.get(ModuleName, "reversesaveskilllore")) {
+				returncategories.reverse();
 			}
 			
 			return returncategories;

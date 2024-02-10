@@ -6,6 +6,16 @@ const defaultECH = ["seek", "hide", "none", "none", "none", "none"];
 Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 	//Settings
 	//client
+	game.settings.register(ModuleName, "showpartybutton", {
+		name: game.i18n.localize(`${ModuleName}.Settings.showpartybutton.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.showpartybutton.descrp`),
+		scope: "client",
+		config: false,
+		type: Boolean,
+		default: true,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "shownpctraits", {
 		name: game.i18n.localize(`${ModuleName}.Settings.shownpctraits.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.shownpctraits.descrp`),
@@ -24,6 +34,26 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		type: Boolean,
 		requiresReload : true,
 		default: true
+	});
+	
+	game.settings.register(ModuleName, "reversesaveskilllore", {
+		name: game.i18n.localize(`${ModuleName}.Settings.reversesaveskilllore.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.reversesaveskilllore.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
+	game.settings.register(ModuleName, "showtrainedrankletter", {
+		name: game.i18n.localize(`${ModuleName}.Settings.showtrainedrankletter.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.showtrainedrankletter.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false,
+		onChange: () => {ui.ARGON?.render()}
 	});
 	
 	game.settings.register(ModuleName, "weaponsetscount", {
@@ -89,7 +119,7 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		name: game.i18n.localize(`${ModuleName}.Settings.macropanel.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.macropanel.descrp`),
 		scope: "client",
-		config: true,
+		config: false,
 		type: Boolean,
 		default: false,
 		onChange: () => {ui.ARGON?.render()}

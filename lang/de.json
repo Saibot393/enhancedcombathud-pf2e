@@ -16,6 +16,14 @@
 				"name"					: "Bei Doppelklick zoomen",
 				"descrp"				: "Zoomt die Kamera zur aktiven Figur wenn des Charakterportrait gedoppelklickt wird"
 			},
+			"reversesaveskilllore" : {
+				"name"					: "Rettungs-, Fähigkeits- und Geschitswürfe umdrehen",
+				"descrp"				: "Dreht die Reihenfolge der Kategorien um"
+			},
+			"showtrainedrankletter" : {
+				"name"					: "Zeige Trainingsrang Buchstaben",
+				"descrp"				: "Zeigt einen Buchstaben entsprechend des Trainingsrangs von Rettungswürfen und Fähigkeiten an"
+			},
 			"weaponsetscount" : {
 				"name"					: "Waffen Sets",
 				"descrp"				: "Anzahl der angezeigten Waffen sets"
@@ -39,6 +47,10 @@
 				"name4"					: "Standard Aktion 4",
 				"name5"					: "Standard Aktion 5",
 				"name6"					: "Standard Aktion 6"
+			},
+			"macrobuttons" : {
+				"name"					: "Macro Knopf Anzahl",
+				"descrp"				: "Anzahl der angezeigten Macro Knöpfe ((shift)right click to open macro folder, drag & drop to choose macro, shift left click to remove macro)"
 			},
 			"consumableuse" : {
 				"name"					: "Konsumierbares klick Verhalten",
