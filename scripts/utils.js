@@ -397,7 +397,7 @@ function MAPtext(item, MAP = 0) {
 
 function spelluseAction(spell, level) {
 	return () => {
-		if (spell && spellGroup) {
+		if (spell) {
 			spell.spellcasting.cast(spell, {consume : true, rank : level});
 			
 			return true;
