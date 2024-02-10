@@ -752,6 +752,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(splititems[0]), new PF2ESpecialActionButton(splititems[1])));
 			}
 			
+			for (let i = 0; i < game.settings.get(ModuleName, "macrobuttons"); i = i + 2) {
+				buttons.push(new PF2ESplitButton(new PF2EMacroButton({inActionPanel : true, index : i}), new PF2EMacroButton({inActionPanel : true, index : i+1})));
+			}
+			
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[3]), new PF2ESpecialActionButton(specialActions[4])));
 			
 			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
@@ -1796,7 +1800,137 @@ Hooks.on("argonInit", async (CoreHUD) => {
     }
 	
 	class PF2EMacroButton extends ARGON.MAIN.BUTTONS.ItemButton {
+		constructor (args) {
+			super(args);
+			
+			this._index = args.index;
+			
+			let setmacros = this.actor.getFlag(ModuleName, "setmacros");
+			
+			if (setmacros && setmacros[this.index]) {
+				this.setitem(setmacros[this.index], false);
+			}
+		}
 		
+		get index() {
+			return this._index;
+		}	
+		
+		get label() {
+			return this.item?.name;
+		}
+
+		get icon() {
+			return this.item?.img;
+		}
+		
+		get isvalid() {
+			return true;
+		}
+		
+		get visible() {
+			return true;
+		}
+
+		get hasTooltip() {
+			return false;
+		}
+
+		get colorScheme() {
+			return this.parent.colorScheme;
+		}
+		
+		get actionType() {
+			return this.parent.actionType;
+		}
+		
+		get isMacro() {
+			return true;
+		}
+		
+		get item() {
+			return this._item;
+		}
+		
+		async setitem(uuid, render = true) {
+			let item = await fromUuid(uuid);
+			
+			if (item || uuid == "") {
+				this._item = item;
+				
+				let setmacros = this.actor.getFlag(ModuleName, "setmacros") || {};
+				
+				setmacros[this.index] = uuid;
+				
+				await this.actor.setFlag(ModuleName, "setmacros", setmacros);
+			}
+			else {
+				this._item = null;
+			}
+			
+			if (render) await this.parent?.parent?.render();
+		}
+		
+		async _onDrop(event) {
+			try {      
+				event.preventDefault();
+				event.stopPropagation();
+				const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+				console.log(data);
+				if (data.type == "Macro") {
+					this.setitem(data.uuid);
+				}
+			} catch (error) {
+		  
+			}
+		}
+		
+		async _onLeftClick(event) {
+			if (event.shiftKey) {
+				console.log("delete");
+				this.setitem("");
+			}
+			else {
+				if (this.item) {
+					let result = await this.item.execute();
+					
+					if (result && result[ModuleName]) {
+						if (result.useActions) {
+							useAction(result.useActions.type, result.useActions.actions);
+						}
+					}
+				}
+			}
+		}
+		
+		async _onRightClick(event) {
+			if (!this.item || event.shiftKey) {
+				ui.macros.renderPopout(true);
+			}
+			else {
+				this.item?.sheet.render(true);
+			}
+		}
+		
+		activateListeners(html) {
+			super.activateListeners(html);
+			
+			this.element.ondrop = this._onDrop.bind(this);
+		}
+		
+		async _renderInner() {
+			await super._renderInner();
+			
+			if (!this.item && this.visible) {//fix a bug?
+				this.element.style.display = "flex";
+				this.element.style.background =  "var(--ech-mainAction-base-background) center no-repeat"
+				this.element.style.color = "var(--ech-mainAction-base-color)";
+				this.element.style.border = "1px solid var(--ech-mainAction-base-border)";
+				
+				let span = this.element.querySelector(".feature-element-title");
+				span.style.visibility = "hidden";
+			}
+		}
 	}
   
     class PF2EButtonPanelButton extends ARGON.MAIN.BUTTONS.ButtonPanelButton {
@@ -1986,8 +2120,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let spells = group.spells.filter(spell => isvalidspell(spell, i));
 					
 					spells = spells.filter(spell => !signaturespells.find(signaturespell => signaturespell.spell == spell && signaturespell.group == group));
-					
-					console.log(spells);
 					
 					spellbuttons = spellbuttons.concat(spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, i)})));
 					
@@ -2588,7 +2720,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async swapinitem(item) {
-			console.log(item);
 			if (item?.system?.usage?.type == "held") {
 				const sets = this.actor.getFlag("enhancedcombathud", "weaponSets") || {};
 				const activeset = this.actor.getFlag("enhancedcombathud", "activeWeaponSet");

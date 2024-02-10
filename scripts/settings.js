@@ -84,6 +84,31 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 			});
 		}
 	}
+	
+	game.settings.register(ModuleName, "macropanel", {
+		name: game.i18n.localize(`${ModuleName}.Settings.macropanel.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.macropanel.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false,
+		onChange: () => {ui.ARGON?.render()}
+	});	
+	
+	game.settings.register(ModuleName, "macrobuttons", {
+		name: game.i18n.localize(`${ModuleName}.Settings.macrobuttons.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.macrobuttons.descrp`),
+		scope: "client",
+		config: true,
+		type: Number,
+		range: {
+			min: 0,
+			max: 10,
+			step: 2
+		},
+		default: 0,
+		onChange: () => {ui.ARGON?.render()}
+	});
 
 	game.settings.register(ModuleName, "consumableuse", {
 		name: game.i18n.localize(`${ModuleName}.Settings.consumableuse.name`),
