@@ -1,3 +1,6 @@
+## v1.3.1
+- small bug fix
+
 ## v1.3.0
 - Added setting to show macro buttons
 - Added setting to show reload and unload as added by [PF2e Ranged Combat](https://foundryvtt.com/packages/pf2e-ranged-combat) to ranged weapons
