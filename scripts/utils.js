@@ -73,11 +73,16 @@ async function getTooltipDetails(item) {
 		
 		let range;
 		if (item.type == "weapon" || item.type == "shield") {
-			if (item.system.range) {
-				range = replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : item.system.range});
+			if (item.system.rangelabel) {
+				range = item.system.rangelabel;
 			}
 			else {
-				range = replacewords(game.i18n.localize("PF2E.Item.Weapon.NoRangeMelee"));
+				if (item.system.range) {
+					range = replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : item.system.range});
+				}
+				else {
+					range = replacewords(game.i18n.localize("PF2E.Item.Weapon.NoRangeMelee"));
+				}
 			}
 		}
 		else {
@@ -390,10 +395,10 @@ function MAPtext(item, MAP = 0) {
 	return replacewords(game.i18n.localize("PF2E.MAPAbbreviationLabel"), {penalty : penalty});
 }
 
-function spelluseAction(spell, spellGroup, level) {
+function spelluseAction(spell, level) {
 	return () => {
 		if (spell && spellGroup) {
-			spellGroup.cast(spell, {consume : true, rank : level});
+			spell.spellcasting.cast(spell, {consume : true, rank : level});
 			
 			return true;
 		}

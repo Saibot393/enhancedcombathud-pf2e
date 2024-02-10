@@ -11,8 +11,6 @@ async function elementalBlastProxy(actor, elementalID) {
 	let config = blast.configs.find(config => config.element == element);
 	
 	if (config) {
-		let actionrule = actor.rules.find(rule => rule.option == "action-cost" && rule.domain == "elemental-blast");
-		
 		let proxyFake = {};
 		
 		proxyFake.name = game.i18n.localize(config.label);
@@ -22,31 +20,64 @@ async function elementalBlastProxy(actor, elementalID) {
 		proxyFake.type = "weapon";
 		
 		proxyFake.actor = actor;
-		proxyFake.system = {};
 		proxyFake.flags = {[ModuleName] : {}};
 		
-		proxyFake.system.description = {value : config.item.system.description.value};
-		
-		proxyFake.system.actionType = {value : "action"};
-		if (actionrule) {
-			proxyFake.system.actions = {value : actionrule.suboptions.find(option => option.selected)?.value};
-		}
-		
-		proxyFake.system.traits = {};
-		proxyFake.system.traits.__defineGetter__("value", () => {return config.item.system.traits.value.concat([proxyFake.system.damage.damageType, element])});
-		
-		proxyFake.system.range = config.range.max;
-		
-		proxyFake.system.__defineGetter__("attackValue", () => {return proxyFake.flags[ModuleName].ranged ? config.maps.ranged.map0 : config.maps.melee.map0});
-		
-		proxyFake.system.damage = {};
-		proxyFake.system.damage.__defineGetter__("damageType", () => {return config.damageTypes[proxyFake.flags[ModuleName].damageType].value});
-		proxyFake.system.damage.die = "d" + config.dieFaces;
-		proxyFake.system.damage.dice = Math.floor((actor.level-1)/4) + 1;
+		proxyFake.__defineGetter__("system", () => {
+			let system = {};
+			
+			let actionrule = actor.rules.find(rule => rule.option == "action-cost" && rule.domain == "elemental-blast");
+			
+			let localconfig = (new game.pf2e.ElementalBlast(actor)).configs.find(config => config.element == element);
+			
+			system.description = {value : localconfig.item.system.description.value};
+			
+			system.actionType = {value : "action"};
+			if (actionrule) {
+				system.actions = {value : actionrule.suboptions.find(option => option.selected)?.value};
+			}
+			
+			system.traits = {};
+			system.traits.__defineGetter__("value", () => {
+				let toggletraits = [];
+				let rule;
+				
+				if (actor.items.find(item => item.system.slug == "effect-weapon-infusion")) {
+					if (proxyFake.flags[ModuleName].ranged) {
+						rule = proxyFake.actor.rules.find(rule => rule.option == "weapon-infusion:ranged");
+					}
+					else {
+						rule = proxyFake.actor.rules.find(rule => rule.option == "weapon-infusion:melee");
+					}
+				}
+				
+				if (rule) {
+					toggletraits.push(rule.suboptions.find(option => option.selected).value);
+				}
+				
+				return localconfig.item.system.traits.value.concat([/*proxyFake.system.damage.damageType,*/ element]).concat(toggletraits)}
+			);
+			
+			if (proxyFake.flags[ModuleName].ranged) {
+				system.rangelabel = localconfig.range.label;
+			}
+			else {
+				game.i18n.localize("PF2E.Item.Weapon.NoRangeMelee");
+			}
+			
+			system.__defineGetter__("attackValue", () => {return proxyFake.flags[ModuleName].ranged ? localconfig.maps.ranged.map0 : localconfig.maps.melee.map0});
+			
+			system.damage = {};
+			system.damage.__defineGetter__("damageTypes", () => {return localconfig.damageTypes});
+			system.damage.__defineGetter__("damageType", () => {return localconfig.damageTypes[proxyFake.flags[ModuleName].damageType].value});
+			system.damage.die = "d" + localconfig.dieFaces;
+			system.damage.dice = Math.floor((actor.level-1)/4) + 1;
+			
+			return system;
+		});
 		
 		proxyFake.flags[ModuleName].onclick = (options) => {
 			//game.pf2e.rollActionMacro({ actorUUID: actor.uuid, type: "blast", elementTrait: element});
-			blast.attack({ mapIncreases: options.MAP, element : element, damageType : proxyFake.system.damage.damageType, melee : !proxyFake.flags[ModuleName].ranged})
+			(new game.pf2e.ElementalBlast(actor)).attack({ mapIncreases: options.MAP, element : element, damageType : proxyFake.system.damage.damageType, melee : !proxyFake.flags[ModuleName].ranged})
 			
 			return true;
 		}
@@ -66,6 +97,10 @@ async function elementalBlastProxy(actor, elementalID) {
 			}
 			
 			proxyFake.flags[module][key] = value;
+			
+			if (key == "damageType") {
+				proxyFake.flags[module][key] = proxyFake.flags[module][key]%proxyFake.system.damage.damageTypes.length;
+			}
 		}
 		
 		proxyFake.sheet = {render : (value) => {config.item.sheet.render(value)}}

@@ -31,7 +31,5 @@ The following icons are included
 	-breaking-chain.svg
 	-drop-weapon.svg
 	-open-palm.svg
-- By [sbed](https://opengameart.org/content/95-game-icons)
-- By [DarkZaitzev](https://www.deviantart.com/darkzaitzev)
-- By [Lord Berandas](https://www.deviantart.com/berandas)
-- BY [sideswipe](https://blackdogofdoom.blogspot.com/)
+- By [ DarkZaitzev](https://www.deviantart.com/darkzaitzev)
+	- big-gear.svg

@@ -550,4 +550,8 @@ function executefunction(key, options) {
 	game.pf2e.actions[key](options);
 }
 
+function skillactionkeys(skill) {
+	return Array.from(game.pf2e.actions.keys()).filter(key => game.pf2e.actions.get(key).statistic == skill || (game.pf2e.actions.get(key).statistic?.length && game.pf2e.actions.get(key).statistic.includes(skill)))
+}
+
 export {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule, getSettingActionOptions, getSettingActionTitles}

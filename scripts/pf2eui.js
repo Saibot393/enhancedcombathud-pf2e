@@ -1077,6 +1077,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					return null;
 					break;
 				case "spell":
+					if (this.item.isCantrip) return null;
+				
 					let uses = 0;
 					let hasuses = false;
 					
@@ -1153,7 +1155,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							max : max,
 							value : value
 						}}
-						spellCategorie.buttons = spellgroup.spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, spellgroup, spell.system.level?.value)}));
+						spellCategorie.buttons = spellgroup.spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, spell.system.level?.value)}));
 						
 						return [spellCategorie];
 					}
@@ -1200,8 +1202,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase());
 							}
 							
-							if (action?.altUsages?.length && (this.item.getFlag(ModuleName, "thrown") || this.item.getFlag(ModuleName, "combination-melee"))) {
-								action = action.altUsages[0];
+							if (this.item.getFlag(ModuleName, "thrown") || this.item.getFlag(ModuleName, "combination-melee")) {
+								if (action?.altUsages?.length) {
+									action = action.altUsages[0];
+								}
+								else {
+									if (this.item.getFlag(ModuleName, "thrown")) {
+										action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase() && action.options.includes("ranged"));
+									}
+									if (this.item.getFlag(ModuleName, "combination-melee")) {
+										action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase() && action.options.includes("melee"));
+									}
+								}
 							}
 							
 							if (action) {//default actions
@@ -1539,7 +1551,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				toggleData = {
 					iconclass : damageIcon(this.item.system.damage.damageType),
-					onclick : () => {this.item.setFlag(ModuleName, "damageType", (this.item.getFlag(ModuleName, "damageType") + 1)%2); this.render();},
+					onclick : () => {this.item.setFlag(ModuleName, "damageType", (this.item.getFlag(ModuleName, "damageType") + 1)); this.render();},
 					tooltip : game.i18n.localize("PF2E.Trait" + firstUpper(this.item.system.damage.damageType))
 				};	
 
@@ -1692,14 +1704,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		get isvalid() {
 			return true;
 		}
-		
-		get quantity() {
-			if (this.item?.system.resolvePointCost) {
-				return game.user.character?.system ? game.user.character.system.attributes.rp.value : 0
-			}
-			
-			return null;
-		}
 
 		get hasTooltip() {
 			return this.enabled;
@@ -1790,6 +1794,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
     }
+	
+	class PF2EMacroButton extends ARGON.MAIN.BUTTONS.ItemButton {
+		
+	}
   
     class PF2EButtonPanelButton extends ARGON.MAIN.BUTTONS.ButtonPanelButton {
 		constructor({parent, type, color, item}) {
@@ -1873,7 +1881,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			let prepared = entries.filter(entry => entry.system.prepared.value == "prepared");
 			let spontaneous = entries.filter(entry => entry.system.prepared.value == "spontaneous");
 			let innate = entries.filter(entry => entry.system.prepared.value == "innate");
-			let focus = entries.filter(entry => entry.system.prepared.value == "focus");	
+			let focus = entries.filter(entry => entry.system.prepared.value == "focus");
 
 			let usecounts = {};
 
@@ -1881,10 +1889,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			let addcantrips = [];
 			
-			let isvalidspell = (spell, level) => {
-				
+			let isvalidspell = (spell, level, isisgnature = false) => {
 				if (actioninfo(spell).actionType.value != this.actionType) {
 					return false;
+				}
+				
+				let spelllevel = spell.system.level?.value;
+				
+				if (!isisgnature && spell.system.location.hasOwnProperty("heightenedLevel")) {
+					spelllevel = spell.system.location.heightenedLevel;
 				}
 				
 				if (level == 0) {
@@ -1895,9 +1908,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						return !spell.isCantrip
 					}
 					else {
-						if (!spell.system.level || (spell.system.level.value == undefined)) return true;
+						if (!spelllevel || (spelllevel == undefined)) return true;
 						
-						return !spell.isCantrip && spell.system.level.value == level;
+						if (isisgnature) {
+							return !spell.isCantrip && spelllevel <= level;
+						}
+						else {
+							return !spell.isCantrip && spelllevel == level;
+						}
 					}
 				}
 			}
@@ -1913,7 +1931,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let buttons = [];
 				
 				for (let group of focus) {
-					buttons = buttons.concat(group.spells.filter(spell => isvalidspell(spell)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, spell.system.level?.value)})));
+					buttons = buttons.concat(group.spells.filter(spell => isvalidspell(spell)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, spell.system.level?.value)})));
 					
 					addcantrips = addcantrips.concat(group.spells.filter(spell => isvalidspell(spell, 0)).map((spell) => {return {spell, group}}));
 				}
@@ -1929,6 +1947,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			let signaturespells = [];
+			for (let group of spontaneous) {
+				signaturespells = signaturespells.concat(group.spells.filter(spell => spell.system.location.signature).map((spell) => {return {spell, group}}));
+			}
 			
 			for (let i = 0; i <= 11; i++) {
 				usecounts = {};
@@ -1958,20 +1979,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let spellbuttons = [];
 				
 				if (i == 0) {
-					spellbuttons = spellbuttons.concat(addcantrips.map(spell => new PF2EItemButton({item : spell.spell, clickAction : spelluseAction(spell.spell, spell.group, i)})));
+					spellbuttons = spellbuttons.concat(addcantrips.map(spell => new PF2EItemButton({item : spell.spell, clickAction : spelluseAction(spell.spell, i)})));
 				}
 				
-				let addsignaturebuttons = signaturespells.map(spell => new PF2EItemButton({item : spell.spell, clickAction : spelluseAction(spell.spell, spell.group, i)}));
 				for (let group of spontaneous) {
 					let spells = group.spells.filter(spell => isvalidspell(spell, i));
 					
-					spellbuttons = spellbuttons.concat(spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, i)})));
+					spells = spells.filter(spell => !signaturespells.find(signaturespell => signaturespell.spell == spell && signaturespell.group == group));
 					
-					signaturespells = signaturespells.concat(spells.filter(spell => spell.system.location.signature).map((spell) => {return {spell, group, level : i}}));
+					console.log(spells);
+					
+					spellbuttons = spellbuttons.concat(spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, i)})));
+					
+					//signaturespells = signaturespells.concat(spells.filter(spell => spell.system.location.signature).map((spell) => {return {spell, group, level : i}}));
 				}
+				let addsignaturebuttons = signaturespells.filter(spell => isvalidspell(spell.spell, i, true)).map(spell => new PF2EItemButton({item : spell.spell, clickAction : spelluseAction(spell.spell, i)}));
 				
 				for (let group of innate) {
-					spellbuttons = spellbuttons.concat(group.spells.filter(spell => isvalidspell(spell, i)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, i)})));	
+					spellbuttons = spellbuttons.concat(group.spells.filter(spell => isvalidspell(spell, i)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, i)})));	
 				}
 				
 				for (let group of prepared) {
@@ -1985,10 +2010,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						addusecounts(usecountbuffer);
 					}
 					
-					spellbuttons = spellbuttons.concat(group.spells.filter(spell => ids.includes(spell.id)).filter(spell => isvalidspell(spell, i == 0 ? 0  : undefined)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, group, i)})));
+					spellbuttons = spellbuttons.concat(group.spells.filter(spell => ids.includes(spell.id)).filter(spell => isvalidspell(spell, i == 0 ? 0  : undefined)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, i)})));
 				}
 				
-				if (spellbuttons.length) {
+				if (spontaneous.find(group => group.highestRank >= i)) {
 					spellbuttons = spellbuttons.concat(addsignaturebuttons);
 				}	
 				
