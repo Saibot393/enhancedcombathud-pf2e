@@ -27,6 +27,7 @@ This module adjust various Argon features for the Starfinder system:
     - Toggle options can be changed from the hud
 
 The staff automation added by **[PF2e Dailies](https://foundryvtt.com/packages/pf2e-dailies)** can be directly used from staves in item sets.
+
 The reload and unload actions as added by **[PF2e Ranged Combat](https://foundryvtt.com/packages/pf2e-ranged-combat)** can be used directly from ranged weapons item buttons.
 
 ### Client Customization
