@@ -1,3 +1,9 @@
+## v1.3.0
+- Added setting to show macro buttons
+- Added setting to show reload and unload as added by [PF2e Ranged Combat](https://foundryvtt.com/packages/pf2e-ranged-combat) to ranged weapons
+- Added setting to reverse order of saves,skills,lore
+- Added setting to display a a letter indicating the training rank next to saves, skills and lore skills
+
 ## v1.2.3
 - Fixed bug that prevented spells from being cast
 
