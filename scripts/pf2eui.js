@@ -437,7 +437,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			if (game.settings.get(ModuleName, "shownpctraits")) {
+			if (game.settings.get(ModuleName, "shownpctraits") && this.actor.system.traits?.value?.length) {
 				if (this.actor.type == "npc") {
 					const height = 23;
 					let traitbox = document.createElement("div");
@@ -452,7 +452,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					traitbox.style.overflowY = "hidden";
 					traitbox.onmousewheel = (event) => {traitbox.scrollLeft = traitbox.scrollLeft + event.deltaY/3}
 					
-					let traits = this.actor.system.traits.value;
+					let traits = this.actor.system.traits.value.filter(value => CONFIG.PF2E.creatureTraits[value]);
 					
 					for (let trait of traits) {
 						let traitspan = document.createElement("span");
@@ -467,7 +467,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						traitspan.style.fontSize = "1rem";
 						traitspan.style.marginRight = "0.2rem";
 						
-						traitspan.innerHTML = trait.toUpperCase();
+						traitspan.innerHTML = game.i18n.localize(CONFIG.PF2E.creatureTraits[trait]);
 						if (CONFIG.PF2E.traitsDescriptions[trait]) {
 							traitspan.setAttribute("data-tooltip", game.i18n.localize(CONFIG.PF2E.traitsDescriptions[trait]));
 						}
@@ -1567,9 +1567,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (game.modules.get("pf2e-ranged-combat")?.active) {
 				let itemaction = itemconnectedAction(this.item);
 				
-				let reload = itemaction?.auxiliaryActions.find(action => action.action == "interact" && action.label == "Reload");
+				let reload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == "Reload");
 				
-				let unload = itemaction?.auxiliaryActions.find(action => action.action == "interact" && action.label == "Unload");
+				let unload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == "Unload");
 				
 				if (reload) {
 					let toggleData = {
