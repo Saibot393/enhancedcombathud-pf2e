@@ -157,7 +157,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						status = `(${status})`;
 					}
 				
-					return `CR ${this.actor.system.details.level.value} ${status}`;
+					return `${game.i18n.localize("PF2E.CharacterLevelLabel")} ${this.actor.system.details.level.value} ${status}`;
 					break;
 				case "familiar":
 					let master = game.actors.get(this.actor.system.master?.id);
