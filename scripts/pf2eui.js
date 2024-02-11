@@ -437,6 +437,82 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
+			const circlebuttonsize = "60";
+			
+			let circlediv = document.createElement("div");
+			circlediv.style.display = "flex";
+			circlediv.style.flexDirection = "column";
+			circlediv.style.position = "absolute";
+			circlediv.style.top = "50%";
+			circlediv.style.right = 0;
+			circlediv.style.transform = "translate(0, -50%)"
+			
+			this.element.appendChild(circlediv);
+			
+			let connected = [];
+			if (this.actor.parties.size > 0 && game.settings.get(ModuleName, "showpartybutton")) {
+				connected.push(Array.from(this.actor.parties)[0]);
+			}
+			if (game.settings.get(ModuleName, "showfamiliarmaster")) {
+				connected.push(this.actor.familiar);
+				connected.push(this.actor.master);
+			}
+			connected = connected.filter(actor => actor);
+			
+			for (let actor of connected) {
+				let connectbutton = document.createElement("div");
+				connectbutton.style.width = `${circlebuttonsize}px`;
+				connectbutton.style.height = `${circlebuttonsize}px`;
+				connectbutton.style.backgroundColor = "var(--ech-portrait-base-background)";
+				//partybutton.style.borderColor = "var(--ech-portrait-base-border)";
+				connectbutton.style.border = "solid 5px"
+				connectbutton.style.backgroundImage = `url(${actor.img})`;
+				connectbutton.style.backgroundSize = "cover"
+				connectbutton.style.borderRadius = "50%";
+				connectbutton.style.zIndex = 1;
+				
+				let title = "";
+				let tryclickswitch = false;
+				switch (actor) {
+					case this.actor.familiar:
+						tryclickswitch = true;
+						title = game.i18n.localize("PF2E.Familiar.Familiar");
+						break;
+					case this.actor.master:
+						tryclickswitch = true;
+						title = game.i18n.localize("PF2E.Familiar.Master");
+						break;
+				}
+				connectbutton.setAttribute("data-tooltip", `${title}${title ? ": " : ""}${actor.name}`);
+				
+				let openaction = () => {
+					if (actor.sheet.rendered) {
+						actor.sheet.close();
+					}
+					else {
+						actor.sheet.render(true);
+					}
+				}
+				
+				let switchaction;
+				if (tryclickswitch) {
+					switchaction = () => {
+						let token = canvas.tokens.placeables.find(token => token.isOwner && token.actor == actor);
+						if (token) {
+							canvas.tokens.selectObjects(token);
+						}
+						else {
+							openaction();
+						}
+					}
+				}
+				
+				connectbutton.onclick = (event) => {switchaction ? switchaction() : openaction()};
+				connectbutton.oncontextmenu = (event) => {event.preventDefault(); openaction()};
+				
+				circlediv.appendChild(connectbutton);
+			}
+			
 			if (game.settings.get(ModuleName, "shownpctraits") && this.actor.system.traits?.value?.length) {
 				if (this.actor.type == "npc") {
 					const height = 23;

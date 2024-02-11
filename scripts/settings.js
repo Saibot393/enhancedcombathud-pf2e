@@ -10,7 +10,17 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		name: game.i18n.localize(`${ModuleName}.Settings.showpartybutton.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.showpartybutton.descrp`),
 		scope: "client",
-		config: false,
+		config: true,
+		type: Boolean,
+		default: true,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
+	game.settings.register(ModuleName, "showfamiliarmaster", {
+		name: game.i18n.localize(`${ModuleName}.Settings.showfamiliarmaster.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.showfamiliarmaster.descrp`),
+		scope: "client",
+		config: true,
 		type: Boolean,
 		default: true,
 		onChange: () => {ui.ARGON?.render()}
