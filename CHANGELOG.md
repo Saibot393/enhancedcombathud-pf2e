@@ -1,3 +1,6 @@
+## v1.3.2
+- Added flexible spellcasting
+
 ## v1.3.1
 - small bug fix
 
