@@ -1996,6 +1996,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (render) await this.parent?.parent?.render();
 		}
 		
+		async updateItem(render = true) {
+			let item = (await fromUuid(this.actor.getFlag(ModuleName, "setmacros"))[this.index]);
+			
+			this._item = item || null;
+			
+			if (render) this.render();
+		}
+		
 		async _onDrop(event) {
 			try {      
 				event.preventDefault();
