@@ -318,11 +318,13 @@ async function registerPF2EECHSItems () {
 						
 						if (actor) {
 							if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
-								game.pf2e.actions.get("arrest-a-fall").toMessage();
+								//game.pf2e.actions.get("arrest-a-fall").toMessage();
+								game.pf2e.actions.get("arrest-a-fall").toActionVariant().use()
 								return true;
 							}
 							else {
-								game.pf2e.actions.get("grab-an-edge").toMessage();
+								//game.pf2e.actions.get("grab-an-edge").toMessage();
+								game.pf2e.actions.get("grab-an-edge").toActionVariant().use()
 								return true;
 							}
 						}
