@@ -1066,7 +1066,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			if (defaultIcons.includes(this.item.img)) {
-				
 				if (this.item?.type == "action" || this.item?.type == "feat") {
 					let replaceItem = connectedItem(this.item);
 					
@@ -1115,15 +1114,29 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		async _onSetChange({sets, active}) {
 			const activeSet = sets[active];
-
+			
 			if (activeSet) {
-				const item = this.isPrimary ? activeSet.primary : (activeSet.primary != activeSet.secondary ? activeSet.secondary : null);
+				//const item = this.isPrimary ? activeSet.primary : (activeSet.primary != activeSet.secondary ? activeSet.secondary : null);
+				
+				const item = this.isPrimary ? activeSet.primary : activeSet.secondary;
 				this.setItem(item);    
 			}
 		}
 		
 		get visible() {
-			if (this._isWeaponSet && this.actionType != "action") {
+			if (this.isWeaponSet) {
+				if (!this.isPrimary) {
+					if (this.item == this.partnerItem) {
+						return false;
+					}
+					
+					if (this.partnerItem?.system.equipped?.handsHeld == 2) {
+						return false;
+					}
+				}
+			}
+			
+			if (this.isWeaponSet && this.actionType != "action") {
 				if (this.item) {
 					if (this.item.type == "shield") {
 						return /*hasSB(this.actor) ||*/ hasAoO(this.actor);
@@ -1140,6 +1153,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		
 			return super.visible;
+		}
+		
+		get partnerItem() {
+			if (this.isWeaponSet) {
+				return this.parent?.buttons.find(button => button != this && button.isWeaponSet)?.item;
+			}
+			
+			return null;
 		}
 		
 		get quantity() {
@@ -1223,6 +1244,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async getTooltipData() {
 			const tooltipData = await getTooltipDetails(this.item);
 			return tooltipData;
+		}
+		
+		updatePartnerButton() {
+			if (this.isWeaponSet) {
+				return this.parent?.buttons.find(button => button != this && button.isWeaponSet)?.render();
+			}
 		}
 		
 		//staves pannel, requires PF2E dailies
@@ -2935,6 +2962,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let item;
 					
 					if (slots[key] && (typeof slots[key] == "string")) {
+						let infos;
+						
 						switch (slots[key].split(".")[0]) {
 							case "Actor":
 							case "Scene":
@@ -2945,7 +2974,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								}
 								break;
 							case "ActorAction":
-								item = this.actor.system.actions?.find(action => action.item.uuid == slots[key].replace("ActorAction", "Actor"))?.item;
+								infos = slots[key + "-infos"];
+								
+								if (infos?.slug) {
+									item = this.actor.system.actions?.find(action => action.slug == infos.slug && action.item.uuid == slots[key].replace("ActorAction", "Actor"))?.item;
+								}
+								else {
+									item = this.actor.system.actions?.find(action => action.item.uuid == slots[key].replace("ActorAction", "Actor"))?.item;
+								}
 								break;
 							case "ElementalBlast":
 								//the misery begins
@@ -3013,11 +3049,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 				else {
 					if (data.uuid) {
-						sets[set][slot] = data.uuid
+						sets[set][slot] = data.uuid;
 					}
 					else {
 						if (data.hasOwnProperty("index")) {
 							sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid.replace("Actor", "ActorAction") || null;
+							sets[set][slot + "-infos"] = {slug : this.actor.system.actions[data.index]?.slug, index : data.index};
 						}
 						else {
 							

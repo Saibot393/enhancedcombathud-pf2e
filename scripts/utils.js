@@ -515,4 +515,14 @@ function connectedsettingAction(item) {
 	return action;
 }
 
-export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction}
+function itemcanbetwoHanded(item) {
+	let action = connectedsettingAction(item);
+	
+	if (action?.auxiliaryActions?.find(action => action.annotation == "grip") {
+		return true;
+	}
+	
+	return false;
+}
+
+export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded}
