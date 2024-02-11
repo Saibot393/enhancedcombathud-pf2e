@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded} from "./utils.js";
 import {openNewInput} from "./popupInput.js";
 import {elementalBlastProxy} from "./proxyfake.js";
 
@@ -1627,6 +1627,52 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					toggles.push(toggleData);
 				}
 				
+				if (game.modules.get("pf2e-ranged-combat")?.active) {
+					let itemaction = itemconnectedAction(this.item);
+					
+					let reload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == "Reload");
+					
+					let unload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == "Unload");
+					
+					if (reload) {
+						let toggleData = {
+							iconclass : ["fa-solid", "fa-rotate-right"],
+							onclick : () => {reload.execute(); useAction("action", reload.actions)},
+							tooltip : game.i18n.localize(reload.label)
+						};	
+
+						toggles.push(toggleData);
+					}
+					
+					if (unload) {
+						let toggleData = {
+							iconclass : ["fa-solid", "fa-arrow-up-from-bracket"],
+							onclick : () => {unload.execute(); useAction("action", unload.actions)},
+							tooltip : game.i18n.localize(unload.label)
+						};	
+
+						toggles.push(toggleData);
+					}
+				}
+				
+				if (this.isPrimary && itemcanbetwoHanded(this.item) && this.actionType == "action") {
+					let changegripaction = connectedsettingAction(this.item)?.auxiliaryActions?.find(action => action.annotation == "grip");
+					
+					let toggleData = {
+						iconclass : ["fa-solid", `fa-${this.item.system.equipped.handsHeld}`],
+						onclick : async () => {
+							useAction(this.actionType, changegripaction.actions);
+							
+							await changegripaction?.execute();
+							
+							this.updatePartnerButton();
+						},
+						tooltip : changegripaction?.label || ""
+					};	
+
+					toggles.push(toggleData);
+				}
+				
 				if (this.panel) {
 					if (!game.settings.get(ModuleName, "directStaffuse")) {
 						let toggleData = {
@@ -1648,34 +1694,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				};	
 
 				toggles.push(toggleData);
-			}
-			
-			if (game.modules.get("pf2e-ranged-combat")?.active) {
-				let itemaction = itemconnectedAction(this.item);
-				
-				let reload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == "Reload");
-				
-				let unload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == "Unload");
-				
-				if (reload) {
-					let toggleData = {
-						iconclass : ["fa-solid", "fa-rotate-right"],
-						onclick : () => {reload.execute(); useAction("action", reload.actions)},
-						tooltip : game.i18n.localize(reload.label)
-					};	
-
-					toggles.push(toggleData);
-				}
-				
-				if (unload) {
-					let toggleData = {
-						iconclass : ["fa-solid", "fa-arrow-up-from-bracket"],
-						onclick : () => {unload.execute(); useAction("action", unload.actions)},
-						tooltip : game.i18n.localize(unload.label)
-					};	
-
-					toggles.push(toggleData);
-				}
 			}
 			
 			if (this.item.isElementalBlast) {

@@ -484,30 +484,32 @@ function connectedItem(action) {
 
 function connectedsettingAction(item) {
 	let action;
-	let actor = item.actor;
-	
-	if (item.system.slug) {
-		action = actor.system.actions.find(action => action.slug == item.system.slug);
-	}
-	
-	if (!action) {
-		action = actor.system.actions.find(action => action.item == item);
-	}
-	
-	if (!action && item.type == "melee") {
-		action = actor.system.actions.find(action => action.slug == item.name.toLowerCase());
-	}
-	
-	if (item.getFlag(ModuleName, "thrown") || item.getFlag(ModuleName, "combination-melee")) {
-		if (action?.altUsages?.length) {
-			action = action.altUsages[0];
+	if (item) {
+		let actor = item.actor;
+		
+		if (item.system.slug) {
+			action = actor.system.actions.find(action => action.item == item);
 		}
-		else {
-			if (item.getFlag(ModuleName, "thrown")) {
-				action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("ranged"));
+		
+		if (!action) {
+			action = actor.system.actions.find(action => action.slug == item.system.slug);
+		}
+		
+		if (!action && item.type == "melee") {
+			action = actor.system.actions.find(action => action.slug == item.name.toLowerCase());
+		}
+		
+		if (item.getFlag(ModuleName, "thrown") || item.getFlag(ModuleName, "combination-melee")) {
+			if (action?.altUsages?.length) {
+				action = action.altUsages[0];
 			}
-			if (item.getFlag(ModuleName, "combination-melee")) {
-				action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("melee"));
+			else {
+				if (item.getFlag(ModuleName, "thrown")) {
+					action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("ranged"));
+				}
+				if (item.getFlag(ModuleName, "combination-melee")) {
+					action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("melee"));
+				}
 			}
 		}
 	}
@@ -516,10 +518,12 @@ function connectedsettingAction(item) {
 }
 
 function itemcanbetwoHanded(item) {
-	let action = connectedsettingAction(item);
-	
-	if (action?.auxiliaryActions?.find(action => action.annotation == "grip") {
-		return true;
+	if (item) {
+		let action = connectedsettingAction(item);
+		
+		if (action?.auxiliaryActions?.find(action => action.annotation == "grip")) {
+			return true;
+		}
 	}
 	
 	return false;
