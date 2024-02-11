@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedAction} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction} from "./utils.js";
 import {openNewInput} from "./popupInput.js";
 import {elementalBlastProxy} from "./proxyfake.js";
 
@@ -583,7 +583,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank)}"></i> `;
 				}
 				
-				let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()})">${rankicon + save.label}</span>`;
+				let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()})">${save.label} ${rankicon}</span>`;
 				
 				let roll = (event) => {
 					let options = {};
@@ -620,7 +620,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank)}"></i> `;
 					}
 					
-					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${rankicon + skill.label}</span>`;
+					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${skill.label} ${rankicon}</span>`;
 					
 					let roll = (event) => {
 						let options = {};
@@ -657,7 +657,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank)}"></i> `;
 					}
 					
-					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank).toLowerCase()})">${rankicon + lore.label}</span>`;
+					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank).toLowerCase()})">${lore.label} ${rankicon}</span>`;
 					
 					let roll = (event) => {
 						let options = {};
@@ -1299,7 +1299,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							this.panel.toggle()
 						}
 						else {
-							let action = connectedAction(this.item);
+							let action = connectedsettingAction(this.item);
 							
 							if (action) {//default actions
 								let variant = action.variants[options.MAP];

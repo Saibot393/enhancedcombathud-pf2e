@@ -482,7 +482,7 @@ function connectedItem(action) {
 	return null;
 }
 
-function connectedAction(item) {
+function connectedsettingAction(item) {
 	let action;
 	let actor = item.actor;
 	
@@ -515,4 +515,4 @@ function connectedAction(item) {
 	return action;
 }
 
-export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedAction}
+export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction}
