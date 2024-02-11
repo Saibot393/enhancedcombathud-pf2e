@@ -27,8 +27,8 @@ async function getTooltipDetails(item) {
 	const actor = item.actor;
 			
 	if (item.system.identification?.status == "unidentified" && game.user.isGM) {
-		title = this.item.system.identification.unidentified.name;
-		description = this.item.system.identification.unidentified.data.description.value;
+		title = item.system.identification.unidentified.name;
+		description = item.system.identification.unidentified.data.description.value;
 		subtitle = game.i18n.localize("PF2E.identification.Unidentified");
 	}
 	else {
@@ -482,4 +482,37 @@ function connectedItem(action) {
 	return null;
 }
 
-export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem}
+function connectedAction(item) {
+	let action;
+	let actor = item.actor;
+	
+	if (item.system.slug) {
+		action = actor.system.actions.find(action => action.slug == item.system.slug);
+	}
+	
+	if (!action) {
+		action = actor.system.actions.find(action => action.item == item);
+	}
+	
+	if (!action && item.type == "melee") {
+		action = actor.system.actions.find(action => action.slug == item.name.toLowerCase());
+	}
+	
+	if (item.getFlag(ModuleName, "thrown") || item.getFlag(ModuleName, "combination-melee")) {
+		if (action?.altUsages?.length) {
+			action = action.altUsages[0];
+		}
+		else {
+			if (item.getFlag(ModuleName, "thrown")) {
+				action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("ranged"));
+			}
+			if (item.getFlag(ModuleName, "combination-melee")) {
+				action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("melee"));
+			}
+		}
+	}
+	
+	return action;
+}
+
+export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedAction}

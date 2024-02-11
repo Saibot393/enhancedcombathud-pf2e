@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedAction} from "./utils.js";
 import {openNewInput} from "./popupInput.js";
 import {elementalBlastProxy} from "./proxyfake.js";
 
@@ -390,6 +390,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					initiativeBox.style.alignItems = "center";
 					initiativeBox.style.justifyContent = "center";
 					initiativeBox.style.backgroundColor = "rgb(0,0,0,0.5)";
+					initiativeBox.style.zIndex = 100;
 					
 					let initiativedice = document.createElement("i");
 					initiativedice.classList.add("fa-solid", "fa-dice-d20");
@@ -1298,25 +1299,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							this.panel.toggle()
 						}
 						else {
-							let action = this.actor.system.actions.find(action => action.slug == this.item.system.slug);
-							
-							if (!action && this.item.type == "melee") {
-								action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase());
-							}
-							
-							if (this.item.getFlag(ModuleName, "thrown") || this.item.getFlag(ModuleName, "combination-melee")) {
-								if (action?.altUsages?.length) {
-									action = action.altUsages[0];
-								}
-								else {
-									if (this.item.getFlag(ModuleName, "thrown")) {
-										action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase() && action.options.includes("ranged"));
-									}
-									if (this.item.getFlag(ModuleName, "combination-melee")) {
-										action = this.actor.system.actions.find(action => action.slug == this.item.name.toLowerCase() && action.options.includes("melee"));
-									}
-								}
-							}
+							let action = connectedAction(this.item);
 							
 							if (action) {//default actions
 								let variant = action.variants[options.MAP];
