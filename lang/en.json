@@ -8,6 +8,14 @@
 		},
 		
 		"Settings" : {
+			"showpartybutton" : {
+				"name"					: "Show Party button",
+				"descrp"				: "Shows a button linking to the characters party in the portrait"
+			},
+			"showfamiliarmaster" : {
+				"name"					: "Show Familiar/Master button",
+				"descrp"				: "Shows a button linking to the characters Familiar/Master in the portrait"
+			},
 			"shownpctraits" : {
 				"name"					: "Show NPC traits",
 				"descrp"				: "If NPC triats should be displayed in the character portrait"

@@ -8,6 +8,14 @@
 		},
 		
 		"Settings" : {
+			"showpartybutton" : {
+				"name"					: "Zeige Party Knopf",
+				"descrp"				: "Zeigt einen Knopf mit Verlinkung zur Party des Characters im Portrait"
+			},
+			"showfamiliarmaster" : {
+				"name"					: "Zeige Vertrauten/Meister Knopf",
+				"descrp"				: "Zeigt einen Knopf mit Verlinkung zum Vertrauten/Meister des Characters im Portrait"
+			},
 			"shownpctraits" : {
 				"name"					: "Zeige NPC Traits",
 				"descrp"				: "Ob NPC Traits im Portrait angezeigt werden sollen"
