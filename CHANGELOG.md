@@ -1,3 +1,6 @@
+## v1.4.2
+- fixed icon path typo
+
 ## v1.4.1
 - Fixed bug related to action recognition in npcs
 
