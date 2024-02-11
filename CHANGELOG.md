@@ -1,3 +1,12 @@
+## v1.4.0
+- Added change grip button to weapon set items that can be held in two hands
+- Added optional party button to portrait, linking to a characters party
+- Added optional familiar/master button to portrait, linking to a characters familiar/master
+- Added autoroll for "Grab an egde" and "Arest a fall"
+- Changed training rank icon of skills/saves
+- Added filter for valid NPC tags in portrait
+- Fixed portrait title section for NPCs
+
 ## v1.3.2
 - Added flexible spellcasting
 
