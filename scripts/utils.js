@@ -488,11 +488,14 @@ function connectedsettingAction(item) {
 		let actor = item.actor;
 		
 		if (item.system.slug) {
-			action = actor.system.actions.find(action => action.item == item);
+			action = actor.system.actions.find(action => action.slug == item.system.slug && action.item == item);
+			
+			if (!action) {
+				action = actor.system.actions.find(action => action.slug == item.system.slug);
+			}
 		}
-		
-		if (!action) {
-			action = actor.system.actions.find(action => action.slug == item.system.slug);
+		else {
+			action = actor.system.actions.find(action => action.item == item);
 		}
 		
 		if (!action && item.type == "melee") {
