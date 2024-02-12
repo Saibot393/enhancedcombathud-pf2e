@@ -45,7 +45,7 @@ const settingActionIMGs = {
 		"disableDevice"			: `modules/${ModuleName}/icons/tinker.svg`,
 		"disarm"				: `modules/${ModuleName}/icons/drop-weapon.svg`,
 		//"escape"				: "SkZAQRkLLkmBQNB9",
-		"feint"					: `modules/${ModuleName}/icons/fence.svg`,
+		"feint"					: `modules/${ModuleName}/icons/fencer.svg`,
 		"forceOpen"				: `modules/${ModuleName}/icons/crowbar.svg`,
 		"grapple"				: `modules/${ModuleName}/icons/grab.svg`,
 		"hide"					: `modules/enhancedcombathud/icons/cloak-dagger.webp`,

@@ -1,3 +1,9 @@
+## v1.4.2
+- fixed icon path typo
+
+## v1.4.1
+- Fixed bug related to action recognition in npcs
+
 ## v1.4.0
 - Added change grip button to weapon set items that can be held in two hands
 - Added optional party button to portrait, linking to a characters party
