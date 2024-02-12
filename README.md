@@ -8,7 +8,7 @@ An implementation of the [Argon - Combat HUD](https://foundryvtt.com/packages/en
 
 ### The documentation for the core argon features can be found [here](https://api.theripper93.com/modulewiki/enhancedcombathud/free)
 
-This module adjust various Argon features for the Starfinder system:
+This module adjust various Argon features for the Pathfinder 2e system:
 - **Portrait**
     - The hero points are displayed and can be adjusted via left- and rightclick
     - The character sheet can be opened via rightclick
