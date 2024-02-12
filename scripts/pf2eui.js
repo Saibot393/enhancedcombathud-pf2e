@@ -776,7 +776,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get label() {
-			return "PF2E.ActionTypeAction";
+			return "PF2E.ActionsActionsHeader";
 		}
 		
 		get maxActions() {
@@ -916,7 +916,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get label() {
-			return "PF2E.ActionTypeReaction";
+			return "PF2E.ActionsReactionsHeader";
 		}
 		
 		get maxActions() {
@@ -995,8 +995,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get label() {
-			//return "PF2E.ActionTypeFree";
-			return game.i18n.localize("PF2E.ActionTypeFree")//.split(" ")[0];
+			return "PF2E.ActionsFreeActionsHeader";
 		}
 		
 		get actionType() {
@@ -1029,8 +1028,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		get label() {
-			//return "PF2E.ActionTypeFree";
-			return game.i18n.localize("PF2E.ActionTypePassive")//.split(" ")[0];
+			return "PF2E.NPC.PassivesLabel";
 		}
 		
 		get actionType() {
@@ -2162,12 +2160,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			switch (this.type) {
-				case "feat": return game.i18n.localize("TYPES.Item.feat").split("/")[1];
-				case "toggle": return game.i18n.localize("PF2E.TogglesLabel");
-				default : return game.i18n.localize("TYPES.Item." + this.type);
+				case "feat": return "PF2E.Item.Action.Plural";
+				case "toggle": return "PF2E.TogglesLabel";
+				default : return "TYPES.Item." + firstUpper(this.type) + ".Plural";
 			}
-			
-			return game.i18n.localize("TYPES.Item." + this.type);
 		}
 		
 		get hasTooltip() {
