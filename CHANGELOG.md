@@ -1,3 +1,6 @@
+## v1.5.1
+- Small bug fix regarding macro lock
+
 ## v1.5.0
 - Added standard actions to sva/skill/lore drawer (right click a skill to see all options)
 - Added macro lock to lock macro and use them for all actors
