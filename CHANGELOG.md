@@ -1,3 +1,6 @@
+## v1.5.2
+- Added Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
+
 ## v1.5.1
 - Small bug fix regarding macro lock
 
