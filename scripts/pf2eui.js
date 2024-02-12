@@ -1367,7 +1367,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 									variant = action.variants[0];
 								}
 								
-								if (await variant?.roll()) {
+								if (await variant?.roll({event : event})) {
 									used = true;
 								}
 							}
