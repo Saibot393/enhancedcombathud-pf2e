@@ -13,6 +13,10 @@
 		},
 		
 		"Settings" : {
+			"sheetbuttontab" : {
+				"name"					: "Bogenknopf Tab",
+				"descrp"				: "Der Tab welcher geöffnet wird wenn der Bogenknopf über dem Portrait gedrückt wird"
+			},
 			"showpartybutton" : {
 				"name"					: "Zeige Party Knopf",
 				"descrp"				: "Zeigt einen Knopf mit Verlinkung zur Party des Characters im Portrait"
@@ -36,6 +40,10 @@
 			"showtrainedrankletter" : {
 				"name"					: "Zeige Trainingsrang Buchstaben",
 				"descrp"				: "Zeigt einen Buchstaben entsprechend des Trainingsrangs von Rettungswürfen und Fähigkeiten an"
+			},
+			"onlyonespellrank" : {
+				"name"					: "Nur ein Zauberrang",
+				"descrp"				: "Schließt alle Zauberrang Panele wen ein neuer Zauberrang geöffnet wird" 
 			},
 			"weaponsetscount" : {
 				"name"					: "Waffen Sets",

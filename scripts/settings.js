@@ -92,6 +92,15 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "onlyonespellrank", {
+		name: game.i18n.localize(`${ModuleName}.Settings.onlyonespellrank.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.onlyonespellrank.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false
+	});
+	
 	game.settings.register(ModuleName, "directStaffuse", {
 		name: game.i18n.localize(`${ModuleName}.Settings.directStaffuse.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.directStaffuse.descrp`),

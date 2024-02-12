@@ -13,6 +13,10 @@
 		},
 		
 		"Settings" : {
+			"sheetbuttontab" : {
+				"name"					: "Sheet button tab",
+				"descrp"				: "The tab opended when the sheet tab above the portrait is clicked"
+			},
 			"showpartybutton" : {
 				"name"					: "Show Party button",
 				"descrp"				: "Shows a button linking to the characters party in the portrait"
@@ -36,6 +40,10 @@
 			"showtrainedrankletter" : {
 				"name"					: "Show trained rank latter",
 				"descrp"				: "Shows a letter next to saves & skills to indicate the training rank"
+			},
+			"onlyonespellrank" : {
+				"name"					: "Only one spell rank open",
+				"descrp"				: "Closes all other spell rank panels when a spell rank is opened" 
 			},
 			"weaponsetscount" : {
 				"name"					: "Weapon sets",

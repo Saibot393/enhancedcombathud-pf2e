@@ -2457,6 +2457,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get actionType() {
 			return this.parent?.actionType;
+		}		
+		
+		closesubpanels(exception = [], noTransition = false) {
+			let openpanels = this._subPanels.filter(panel => panel.visible && !exception.includes(panel));
+			
+			openpanels.forEach(panel => panel.toggle(false, noTransition));
 		}
 	}
 	
@@ -2467,6 +2473,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			this._level = level;
 			
 			this._usecounts = usecounts;
+		}
+		
+		toggle(toggle, noTransition = false) {
+			if (game.settings.get(ModuleName, "onlyonespellrank")) {
+				this.parent?.closesubpanels([this], noTransition);
+			}
+			
+			super.toggle(toggle, noTransition);
 		}
 		
 		get buttonMultipliers() {
