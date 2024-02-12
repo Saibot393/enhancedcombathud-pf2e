@@ -6,7 +6,8 @@
 			"abbort"					: "Abbort",
 			"swapin"					: "Swap in",
 			"macrolocked"				: "Macro is locked",
-			"macrounlocked"				: "Macro is unlocked"
+			"macrounlocked"				: "Macro is unlocked",
+			"regainedfocus"				: "{Actor} regained <b>{n}</b> focus point"
 		},
 		
 		"Settings" : {

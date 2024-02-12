@@ -6,7 +6,8 @@
 			"abbort"					: "Abbrechen",
 			"swapin"					: "In die hand",
 			"macrolocked"				: "Macro ist gesperrt",
-			"macrounlocked"				: "Macro ist frei"
+			"macrounlocked"				: "Macro ist frei",
+			"regainedfocus"				: "{Actor} hat <b>{n}</b> Fokuspunkt wieder hergestellt"
 		},
 		
 		"Settings" : {

@@ -193,7 +193,7 @@ async function registerPF2EECHSItems () {
 						
 						if (actor) {
 							if (game.settings.get(ModuleName, "usetakecover")) {
-								game.pf2e.actions.get("take-cover").toActionVariant({actors : actor}).use();
+								game.pf2e.actions.get("take-cover").toActionVariant({actors : actor}).use({event : options.event});
 							}
 							else {
 								game.pf2e.actions.get("take-cover").toActionVariant({actors : actor}).toMessage()
@@ -261,7 +261,7 @@ async function registerPF2EECHSItems () {
 							let skill = await openNewInput("choice", game.i18n.localize(game.pf2e.actions.get("aid").name), `${game.i18n.localize("PF2E.SkillLabel")}: `, {defaultValue : "perception", options : skilloptions});
 							
 							if (skill) {
-								game.pf2e.actions.get("aid").toActionVariant({actors : actor}).use({statistic : skill});
+								game.pf2e.actions.get("aid").toActionVariant({actors : actor}).use({statistic : skill, event : event});
 								
 								return true;
 							}
@@ -319,12 +319,12 @@ async function registerPF2EECHSItems () {
 						if (actor) {
 							if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
 								//game.pf2e.actions.get("arrest-a-fall").toMessage();
-								game.pf2e.actions.get("arrest-a-fall").toActionVariant().use()
+								game.pf2e.actions.get("arrest-a-fall").toActionVariant().use({event : options.event})
 								return true;
 							}
 							else {
 								//game.pf2e.actions.get("grab-an-edge").toMessage();
-								game.pf2e.actions.get("grab-an-edge").toActionVariant().use()
+								game.pf2e.actions.get("grab-an-edge").toActionVariant().use({event : options.event})
 								return true;
 							}
 						}
@@ -421,7 +421,9 @@ async function registerPF2EECHSItems () {
 										let variant = await openNewInput("choice", name, `${name}: `, {defaultValue : options[0], options : optionsinfo});
 										
 										if (!variant) return;
-										settings.variant = variant; 	
+										settings.variant = variant; 
+
+										settings.event = options.event;
 									}
 									
 									game.pf2e.actions[itemkey](settings);

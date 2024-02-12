@@ -1889,7 +1889,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				let onclick = item.getFlag(ModuleName, "onclick");
 				if (onclick) {
-					used = await onclick({actor : this.actor});
+					used = await onclick({actor : this.actor, event : event});
 				}
 				else {
 					used = true;
@@ -2944,7 +2944,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (this.actor.system.resources?.focus?.max) {
 				buttons.push({
 					label: ModuleName + ".Titles.refocus",
-					onClick: (event) => this.actor.update({system : {resources : {focus : {value : Math.min(this.actor.system.resources.focus.value + 1, this.actor.system.resources.focus.max)}}}}),
+					onClick: (event) => {
+						let value = Math.min(this.actor.system.resources.focus.max - this.actor.system.resources.focus.value, 1);
+						
+						if (value > 0) {
+							this.actor.update({system : {resources : {focus : {value : Math.min(this.actor.system.resources.focus.value + value, this.actor.system.resources.focus.max)}}}});
+							
+							ChatMessage.create({content : replacewords(game.i18n.localize(ModuleName + ".Titles.regainedfocus"), {Actor : this.actor.name, n : value})})
+						}
+					},
 					icon: "fa-solid fa-book-open-reader"
 				});
 			}
