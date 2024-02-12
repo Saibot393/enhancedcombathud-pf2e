@@ -618,13 +618,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()})">${save.label} ${rankicon}</span>`;
 				
 				let roll = (event) => {
-					let options = {};
-					
-					if (event.ctrlKey) {
-						options.rollMode = game.user.isGM ? "gmroll" : "blindroll";
-					}
-					
-					save.check.roll(options)
+					save.check.roll({event : event})
 				}
 					
 				return new ARGON.DRAWER.DrawerButton([
@@ -655,13 +649,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${skill.label} ${rankicon}</span>`;
 					
 					let roll = (event) => {
-						let options = {};
-						
-						if (event.ctrlKey) {
-							options.rollMode = game.user.isGM ? "gmroll" : "blindroll";
-						}
-						
-						skill.check.roll(options)
+						skill.check.roll({event : event})
 					}
 					
 					return new ARGON.DRAWER.DrawerButton([
@@ -692,13 +680,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + lore.rank).toLowerCase()})">${lore.label} ${rankicon}</span>`;
 					
 					let roll = (event) => {
-						let options = {};
-						
-						if (event.ctrlKey) {
-							options.rollMode = game.user.isGM ? "gmroll" : "blindroll";
-						}
-						
-						lore.check.roll(options)
+						lore.check.roll({event : event})
 					}
 					
 					return new ARGON.DRAWER.DrawerButton([
