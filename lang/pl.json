@@ -1,0 +1,104 @@
+{
+	"enhancedcombathud-pf2e" : {
+		"Titles" : {
+			"refocus"					: "ponowne skupienie",
+			"accept"					: "Akceptuj",
+			"abbort"					: "Wycofaj",
+			"swapin"					: "Zamiana",
+			"macrolocked"				: "Makro jest zablokowane",
+			"macrounlocked"				: "Makro jest odblokowane",
+			"regainedfocus"				: "{Actor} odzyskuje <b>{n}</b> punktów skupienia",
+			
+			"opensheetat"				: "Otwórz kartę postaci za pomocą {tab}"
+		},
+		
+		"Settings" : {
+			"sheetbuttontab" : {
+				"name"					: "Przycisk karty postaci",
+				"descrp"				: "Zakładka otwierana po kliknięciu zakładki kartty postaci nad portretem"
+			},
+			"showpartybutton" : {
+				"name"					: "Pokaż przycisk drużyny",
+				"descrp"				: "Wyświetla przycisk łączący z drużyną postaci na portrecie."
+			},
+			"showfamiliarmaster" : {
+				"name"					: "Przycisk pokaż chowańca/mistrza",
+				"descrp"				: "Wyświetla przycisk łączący się z postaciami Chowańca/Mistrza na portrecie."
+			},
+			"shownpctraits" : {
+				"name"					: "Pokaż cechy BNów",
+				"descrp"				: "Wyświetla cechy BNów na portrecie postaci"
+			},
+			"panondblclick" : {
+				"name"					: "Centrowanie po dwukrotnym kliknięciu portretu",
+				"descrp"				: "Kamera przesuwa się do bieżącego tokena po dwukrotnym kliknięciu obrazu portretowego"
+			},
+			"reversesaveskilllore" : {
+				"name"					: "Odwrócony rzut obronny, umiejętności, wiedza",
+				"descrp"				: "Odwraca kolejność rzutów obronnych umiejętności wiedzy"
+			},
+			"showtrainedrankletter" : {
+				"name"					: "Pokaż wytrenowaną rangę jako ostatnią",
+				"descrp"				: "Pokazuje literę obok rzutów obronnych i umiejętności, aby wskazać rangę treningu."
+			},
+			"onlyonespellrank" : {
+				"name"					: "Otwarta tylko jedna ranga zaklęcia",
+				"descrp"				: "Zamyka wszystkie inne panele rang zaklęć po otwarciu danej rangi zaklęcia." 
+			},
+			"weaponsetscount" : {
+				"name"					: "Zestawy broni",
+				"descrp"				: "cIlość wyświetlanych zestawów broni"
+			},
+			"directStaffuse" : {
+				"name"					: "Bezpośrednie użycie Kosturów",
+				"descrp"				: "Magiczne Kostury powinny być domyślnie używane jako przedmioty do rzucania zaklęć zamiast broni."
+			},
+			"consumableswap" : {
+				"name"					: "Zamienne materiały eksploatacyjne",
+				"descrp"				: "Materiały eksploatacyjne, które można trzymać, powinny mieć ikonę akcji, aby zamienić je na aktywny zestaw broni."	
+			},
+			"usetakecover": {
+				"name"					: "Korzystanie z osłony",
+				"descrp"				: "Akcja Znajdź Osłonę powinna być używana (zamiast wysyłania na czat)."	
+			},
+			"ECHAction" : {
+				"name1"					: "Standardowa akcja 1",
+				"name2"					: "Standardowa akcja 2",
+				"name3"					: "Standardowa akcja 3",
+				"name4"					: "Standardowa akcja 4",
+				"name5"					: "Standardowa akcja 5",
+				"name6"					: "Standardowa akcja 6"
+			},
+			"macrobuttons" : {
+				"name"					: "Liczba przycisków makr",
+				"descrp"				: "Liczba wyświetlanych przycisków makr ((shift) prawy przycisk myszy, aby otworzyć folder makr, przeciągnij i upuść, aby wybrać makro, przesunięcie lewym przyciskiem myszy, aby usunąć makro)"
+			},
+			"consumableuse" : {
+				"name"					: "Zachowanie podczas klikania materiałów eksploatacyjnych",
+				"descrp"				: "Co powinno się stać po kliknięciu przedmiotu zużywalnego?:",
+				"options" : {
+					"consume"			: "Zużycie przedmiotu",
+					"chat"				: "Wysłanie przedmiotu na czat",
+					"consumechat"		: "Zużycie przedmiotu i wysłanie na czat"
+				}
+			},
+			"onitemiconscale" : {
+				"name"					: "Rozmiar ikon informacyjnych",
+				"descrp"				: "Skala ikon informacyjnych na przyciskach przedmiotów"
+			},
+			"iconshadow" : {
+				"name"					: "Intensywność cienia ikon informacyjnych",
+				"descrp"				: "Intensywność kontrastowego cienia ikony informacyjnej na przyciskach elementów"
+			},
+			"showpassives" : {
+				"name"					: "Pokaż pasywne BN",
+				"descrp"				: "Pasywność BN powinna być wyświetlana"
+			}
+		}
+	},
+	
+    "enhancedcombathud.themeOptions.mainAction" : "Kolory akcji standardowych",
+    "enhancedcombathud.themeOptions.bonusAction" : "Kolory reakcji",
+    "enhancedcombathud.themeOptions.freeAction" : "Kolory akcji darmowych",
+    "enhancedcombathud.themeOptions.reaction" : "Kolory zdolności pasywnych"
+}
