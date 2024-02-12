@@ -203,4 +203,13 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		default: true,
 		onChange: () => {ui.ARGON?.render()}
 	});
+	
+	//internal saves
+	game.settings.register(ModuleName, "lockedmacros", {
+		scope: "client",
+		config: false,
+		type: Object,
+		default: {}
+		//onChange: () => {ui.ARGON?.render()}
+	});
 });

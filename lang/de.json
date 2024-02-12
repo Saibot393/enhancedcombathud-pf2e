@@ -4,7 +4,9 @@
 			"refocus"					: "neu fokussieren",
 			"accept"					: "Akzeptieren",
 			"abbort"					: "Abbrechen",
-			"swapin"					: "In die hand"
+			"swapin"					: "In die hand",
+			"macrolocked"				: "Macro ist gesperrt",
+			"macrounlocked"				: "Macro ist frei"
 		},
 		
 		"Settings" : {

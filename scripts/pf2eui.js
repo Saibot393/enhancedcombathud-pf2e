@@ -5,32 +5,6 @@ import {elementalBlastProxy} from "./proxyfake.js";
 
 const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2e/icons/actions/OneAction.webp", "systems/pf2e/icons/actions/OneThreeActions.webp", "systems/pf2e/icons/actions/OneTwoActions.webp", "systems/pf2e/icons/actions/Passive.webp", "systems/pf2e/icons/actions/Reaction.webp", "systems/pf2e/icons/actions/ThreeActions.webp", "systems/pf2e/icons/actions/TwoActions.webp", "systems/pf2e/icons/actions/TwoThreeActions.webp", "icons/sundries/books/book-red-exclamation.webp"]
 
-const systemicons = {
-	lifeSupport : "fa-heart-pulse",
-	sensors : "fa-satellite-dish",
-	engines : "fa-rocket",
-	powerCore : "fa-bolt",
-
-	weaponsArrayForward : "fa-up-long",
-	weaponsArrayAft : "fa-down-long",
-	weaponsArrayStarboard : "fa-right-long",
-	weaponsArrayPort : "fa-left-long"
-}
-
-const systemconditionicons = {
-	nominal : "fa-check",
-	glitching : "fa-bug",
-	malfunctioning : "fa-exclamation",
-	wrecked : "fa-xmark"
-}
-
-const systemconditioncolor = {
-	nominal : "green",
-	glitching : "yellow",
-	malfunctioning : "orange",
-	wrecked : "red"
-}
-
 /* EXPERIMENTAL code to add custom colors
 Hooks.once("argonDefaultColor", (defaultColors) => {
 	defaultColors.colors.movement.test123 = { background: "#c85f5aFF", boxShadow: "#dc736eCC" };
@@ -49,6 +23,64 @@ Hooks.once("init", () => {
 	Hooks.call("argonDefaultColor", defaultTheme);
 });
 */
+
+function createToggleIcons(toggles, options = {}) {
+	const iconsize = options.hasOwnProperty("iconsize") ? options.iconsize : 30;
+	
+	const iconpanel = document.createElement("div");
+	for (let direction of ["top", "bottom", "left", "right"]) {
+		if (options.hasOwnProperty(direction + "offset")) iconpanel.style[direction] = `${options[direction + "offset"]}px`;
+	}
+	iconpanel.style.position = "absolute";
+	iconpanel.style.width = `${iconsize}px`;
+	iconpanel.style.height = `${toggles.length * iconsize}px`;
+	iconpanel.style.backgroundColor = `rgba(0, 0, 0, ${game.settings.get(ModuleName, "iconshadow")})`;
+	iconpanel.style.display = "flex";
+	iconpanel.style.flexDirection = "column";
+	iconpanel.style.alignItems = "center";
+	iconpanel.style.justifyContent = "center";
+	if (toggles.find(toggle => !toggle.showalways)) {
+		iconpanel.classList.add("specialAction");
+		iconpanel.style.visibility = "hidden";
+	}
+	
+	for (let toggle of toggles) {
+		let icon;
+		if (toggle.iconclass) {
+			icon = document.createElement("i");
+			icon.classList.add("icon", ...toggle.iconclass);
+			icon.style.fontSize = `${iconsize*0.75}px`;
+			if (toggle.greyed) {
+				icon.style.filter = "invert(0.6)"; //for white icon
+			}
+		}
+		if (toggle.iconsource) {
+			icon = document.createElement("div");
+			icon.style.backgroundImage = `url(${toggle.iconsource})`;
+			icon.style.backgroundSize = "cover";
+			icon.style.filter = "invert(1)"; //for white icon
+			if (toggle.greyed) {
+				icon.style.filter = "invert(0.4)"; //for white icon
+			}
+		}
+		
+		if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
+		
+		if (!toggle.showalways) {
+			icon.classList.add("specialAction");
+			icon.style.visibility = "hidden";
+		}
+		icon.onclick = toggle.onclick;
+		icon.style.height = `${iconsize}px`;
+		icon.style.width = `${iconsize}px`;
+		icon.style.textShadow = "0 0 10px rgba(0,0,0,0)";
+		icon.style.textAlign = "center";
+		
+		iconpanel.appendChild(icon);
+	}
+	
+	return iconpanel;	
+}
 
 //ammend Hooks
 Hooks.on("updateItem", (item) => {
@@ -1391,7 +1423,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 		
-		async _onTooltipMouseEnter(event, locked = false) {
+		async _onMouseEnter(event, locked = false) {
 			await super._onTooltipMouseEnter(event, locked);
 			if (this.element.querySelector(".specialAction")) {
 				if (this.element.querySelector(".titleoverride")) {
@@ -1405,7 +1437,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 
-		async _onTooltipMouseLeave(event) {
+		async _onMouseLeave(event) {
 			await super._onTooltipMouseLeave(event);
 			
 			if (this.element.querySelector(".specialAction")) {
@@ -1751,67 +1783,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			const rightoffset = this.inActionPanel ? 0 : 0; 
-			
-			let iconpanel = document.createElement("div");
-			iconpanel.style.top = `${topoffset}px`;
-			topoffset = 0;
-			iconpanel.style.position = "absolute";
-			iconpanel.style.right = 0;
-			iconpanel.style.width = `${iconsize}px`;
-			iconpanel.style.height = `${toggles.length * iconsize}px`;
-			iconpanel.style.backgroundColor = `rgba(0, 0, 0, ${game.settings.get(ModuleName, "iconshadow")})`;
-			iconpanel.style.display = "flex";
-			iconpanel.style.flexDirection = "column";
-			iconpanel.style.alignItems = "center";
-			iconpanel.style.justifyContent = "center";
-			if (toggles.find(toggle => !toggle.showalways)) {
-				iconpanel.classList.add("specialAction");
-				iconpanel.style.visibility = "hidden";
-			}
-			
-			for (let toggle of toggles) {
-				let icon;
-				if (toggle.iconclass) {
-					icon = document.createElement("i");
-					icon.classList.add("icon", ...toggle.iconclass);
-					icon.style.fontSize = `${iconsize*0.75}px`;
-					if (toggle.greyed) {
-						icon.style.filter = "invert(0.6)"; //for white icon
-					}
-					//icon.style.right = `${1 + rightoffset}px`;
-				}
-				if (toggle.iconsource) {
-					icon = document.createElement("div");
-					icon.style.backgroundImage = `url(${toggle.iconsource})`;
-					icon.style.backgroundSize = "cover";
-					icon.style.filter = "invert(1)"; //for white icon
-					if (toggle.greyed) {
-						icon.style.filter = "invert(0.4)"; //for white icon
-					}
-					//icon.style.right = `${5 + rightoffset}px`;
-				}
-				
-				if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
-				
-				if (!toggle.showalways) {
-					icon.classList.add("specialAction");
-					icon.style.visibility = "hidden";
-				}
-				icon.onclick = toggle.onclick;
-				//icon.style.position = "absolute";
-				//icon.style.top = `${topoffset}px`;
-				icon.style.height = `${iconsize}px`;
-				icon.style.width = `${iconsize}px`;
-				icon.style.textShadow = "0 0 10px rgba(0,0,0,0)";
-				icon.style.textAlign = "center";
-				
-				iconpanel.appendChild(icon);
-				
-				topoffset = topoffset + iconsize;
-			}
-			
-			this.element.appendChild(iconpanel);
+			this.element.appendChild(createToggleIcons(toggles, {iconsize : iconsize, rightoffset : 0, topoffset : topoffset}));
 		}
 	}
 	
@@ -1958,11 +1930,19 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			super(args);
 			this._index = args.index;
 			
-			let setmacros = this.actor.getFlag(ModuleName, "setmacros");
-			
-			if (setmacros && setmacros[this.index]) {
-				this.setitem(setmacros[this.index], false);
+			/*
+			if (!this.macroLocked) {
+				let setmacros = this.actor.getFlag(ModuleName, "setmacros");
+				
+				if (setmacros && setmacros[this.index]) {
+					this.setitem(setmacros[this.index], false);
+				}
 			}
+			else {
+				
+			}
+			*/
+			this.updateItem(false);
 		}
 		
 		get index() {
@@ -2005,17 +1985,62 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			return this._item;
 		}
 		
+		get macroUuid() {
+			if (this.macroLocked) {
+				return this.lockedMacro;
+			}
+			else {
+				return (this.actor.getFlag(ModuleName, "setmacros") || {})[this.index];
+			}
+		}
+		
+		get lockedMacro() {
+			return game.settings.get(ModuleName, "lockedmacros")[this.index];
+		}
+		
+		get macroLocked() {
+			return Boolean(this.lockedMacro)
+		}
+		
+		async unlockMacro(render = true) {
+			game.settings.set(ModuleName, "lockedmacros", {[this.index] : ""});
+			
+			this.updateItem(render);
+		}
+		
+		async lockMacro(render = true) {
+			game.settings.set(ModuleName, "lockedmacros", {[this.index] : this.macroUuid});
+			
+			this.updateItem(render);
+		}
+		
+		async toggleMacroLock(render = true) {
+			if (this.macroLocked) {
+				await this.unlockMacro(render);
+			}
+			else {
+				await this.lockMacro(render);
+			}
+		}
+		
 		async setitem(uuid, render = true) {
 			let item = await fromUuid(uuid);
 			
 			if (item || uuid == "") {
 				this._item = item;
 				
-				let setmacros = this.actor.getFlag(ModuleName, "setmacros") || {};
-				
-				setmacros[this.index] = uuid;
-				
-				await this.actor.setFlag(ModuleName, "setmacros", setmacros);
+				if (this.macroLocked) {
+					await game.settings.set(ModuleName, "lockedmacros", {[this.index] : uuid})
+				}
+				else {
+					/*
+					let setmacros = this.actor.getFlag(ModuleName, "setmacros") || {};
+					
+					setmacros[this.index] = uuid;
+					*/
+					
+					await this.actor.setFlag(ModuleName, "setmacros", {[this.index] : uuid});
+				}
 			}
 			else {
 				this._item = null;
@@ -2025,11 +2050,39 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async updateItem(render = true) {
-			let item = (await fromUuid(this.actor.getFlag(ModuleName, "setmacros"))[this.index]);
-			
-			this._item = item || null;
+			this._item = (await fromUuid(this.macroUuid)) || null;
 			
 			if (render) this.render();
+		}
+		
+		async _onMouseEnter(event, locked = false) {
+			await super._onTooltipMouseEnter(event, locked);
+			
+			if (this.element.querySelector(".specialAction")) {
+				if (this.element.querySelector(".titleoverride")) {
+					let element = this.element.querySelector("span.action-element-title") || this.element.querySelector("span.feature-element-title");
+					
+					if (element) element.style.visibility = "hidden"; 
+				}
+				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
+					specialelement.style.visibility = "";
+				}
+			}
+		}
+
+		async _onMouseLeave(event) {
+			await super._onTooltipMouseLeave(event);
+			
+			if (this.element.querySelector(".specialAction")) {
+				if (this.element.querySelector(".titleoverride")) {
+					let element = this.element.querySelector("span.action-element-title") || this.element.querySelector("span.feature-element-title");
+					
+					if (element) element.style.visibility = ""; 
+				}
+				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
+					specialelement.style.visibility = "hidden";
+				}
+			}
 		}
 		
 		async _onDrop(event) {
@@ -2080,6 +2133,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _renderInner() {
 			await super._renderInner();
 			
+			const iconsize = 30 * game.settings.get(ModuleName, "onitemiconscale");
+			
 			if (!this.item && this.visible) {//fix a bug?
 				this.element.style.display = "flex";
 				this.element.style.background =  "var(--ech-mainAction-base-background) center no-repeat"
@@ -2089,6 +2144,20 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let span = this.element.querySelector(".feature-element-title");
 				span.style.visibility = "hidden";
 			}
+			
+			let toggles = [];
+			
+			let toggleData = {
+				iconclass : this.macroLocked ? ["fa-solid", "fa-lock"] : ["fa-solid", "fa-lock-open"],
+				tooltip : this.macroLocked ? game.i18n.localize(ModuleName + ".Titles.macrolocked") : game.i18n.localize(ModuleName + ".Titles.macrounlocked"),
+				onclick : async () => {
+					this.toggleMacroLock();
+				}
+			};	
+
+			toggles.push(toggleData);
+			
+			this.element.appendChild(createToggleIcons(toggles, {iconsize : iconsize, rightoffset : 0, topoffset : 0}));
 		}
 	}
   
