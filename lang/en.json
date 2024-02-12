@@ -90,5 +90,5 @@
     "enhancedcombathud.themeOptions.mainAction" : "Standard Action Colors",
     "enhancedcombathud.themeOptions.bonusAction" : "Reaction Colors",
     "enhancedcombathud.themeOptions.freeAction" : "Free Action Colors",
-    "enhancedcombathud.themeOptions.reaction" : "Unused by Argon PF2E"
+    "enhancedcombathud.themeOptions.reaction" : "Passive abilities Colors"
 }
