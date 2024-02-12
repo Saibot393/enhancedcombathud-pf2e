@@ -3099,6 +3099,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								
 								if (infos?.slug) {
 									item = this.actor.system.actions?.find(action => action.slug == infos.slug && action.item.uuid == slots[key].replace("ActorAction", "Actor"))?.item;
+									
+									if (!item) {
+										item = this.actor.system.actions?.find(action => action.slug == infos.slug)?.item;
+									}
 								}
 								else {
 									item = this.actor.system.actions?.find(action => action.item.uuid == slots[key].replace("ActorAction", "Actor"))?.item;
