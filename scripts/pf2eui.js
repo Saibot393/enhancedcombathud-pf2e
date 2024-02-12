@@ -1405,7 +1405,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 		
-		async _onMouseEnter(event, locked = false) {
+		async _onTooltipMouseEnter(event, locked = false) {
 			await super._onTooltipMouseEnter(event, locked);
 			if (this.element.querySelector(".specialAction")) {
 				if (this.element.querySelector(".titleoverride")) {
@@ -1419,7 +1419,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 
-		async _onMouseLeave(event) {
+		async _onTooltipMouseLeave(event) {
 			await super._onTooltipMouseLeave(event);
 			
 			if (this.element.querySelector(".specialAction")) {
