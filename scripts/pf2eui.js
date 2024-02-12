@@ -71,7 +71,9 @@ function createToggleIcons(toggles, options = {}) {
 			icon.classList.add("specialAction");
 			icon.style.visibility = "hidden";
 		}
-		icon.onclick = toggle.onclick;
+		icon.onclick = (event) => {
+			toggle.onclick(event);
+		}
 		icon.style.height = `${iconsize}px`;
 		icon.style.width = `${iconsize}px`;
 		icon.style.textShadow = "0 0 10px rgba(0,0,0,0)";
@@ -2210,6 +2212,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _onLeftClick(event) {
+			if (event.target.classList.contains("specialAction")) return;
+			
 			if (event.shiftKey) {
 				this.setitem("");
 			}
