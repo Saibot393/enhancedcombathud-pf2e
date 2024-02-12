@@ -1,3 +1,14 @@
+## v1.5.0
+- Added standard actions to sva/skill/lore drawer (right click a skill to see all options)
+- Added macro lock to lock macro and use them for all actors
+- Added quick and secret roll to save/skill/lore drawer
+- Added setting to choose which tab is opened when the button above the portrait is used to open the character sheet
+- Added setting to close all other spell subpanels when a new one is opened
+- Added fallback to recognise attacks gained from effects that were removed and regained
+- Improved the refocus action
+- Improved localisation
+- Improved reactive strike recognition
+
 ## v1.4.2
 - fixed icon path typo
 
