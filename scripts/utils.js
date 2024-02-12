@@ -8,6 +8,18 @@ const settingActionSpace = {
 	PF2EECHReActionItems : 0
 };
 
+const tabnames = {
+	character : "PF2E.TabCharacterLabel",
+	actions : "PF2E.TabActionsLabel",
+	inventory : "PF2E.TabInventoryLabel",
+	spellcasting : "PF2E.TabSpellbookLabel",
+	crafting : "PF2E.TabCraftingLabel",
+	proficiencies : "PF2E.TabSkillsLabel",
+	feats : "PF2E.Item.Feat.Plural",
+	effects : "PF2E.Item.Effect.Plural",
+	biography : "PF2E.Biography"
+}
+
 const AoOids = ["NMWXHGWUcZGoLDKb", "hmShTfPOcTaKgbf4", "OqU6QXkMrZqToEEi"]; //id of Attack of Opportunity id
 const SBid = "jM72TjJ965jocBV8"; //id of Shield Block
 
@@ -285,6 +297,29 @@ function categoryIcon(category) {
 	}
 }
 
+function sheettabbutton(tab) {
+	switch (tab) {
+		case "character":
+			return ["fa-solid", "fa-address-card"];
+		case "actions":
+			return ["fa-solid", "fa-diamond"];
+		case "inventory":
+			return ["fa-solid", "fa-box-open"];
+		case "spellcasting":
+			return ["fa-solid", "fa-wand-magic-sparkles"];
+		case "crafting":
+			return ["fa-solid", "fa-hammer"];
+		case "proficiencies":
+			return ["fa-solid", "fa-hand-paper"];
+		case "feats":
+			return ["fa-solid", "fa-medal"];
+		case "effects":
+			return ["fa-solid", "fa-person-rays"];
+		case "biography":
+			return ["fa-solid", "fa-book-reader"];
+	}	
+}
+
 function damagecategoryIcon(category) {
 	switch (category) {
 		case "persistent": return `<i class="fa-solid fa-hourglass"></i>`;
@@ -532,4 +567,4 @@ function itemcanbetwoHanded(item) {
 	return false;
 }
 
-export { ModuleName, settingActionSpace, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded}
+export { ModuleName, settingActionSpace, tabnames, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded}

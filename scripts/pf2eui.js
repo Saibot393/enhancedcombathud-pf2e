@@ -1,7 +1,7 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded} from "./utils.js";
-import {openNewInput} from "./popupInput.js";
-import {elementalBlastProxy} from "./proxyfake.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton} from "./utils.js";
+import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
+import {elementalBlastProxy} from "./proxyfake.js";                                                                                                                                                                              
 
 const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2e/icons/actions/OneAction.webp", "systems/pf2e/icons/actions/OneThreeActions.webp", "systems/pf2e/icons/actions/OneTwoActions.webp", "systems/pf2e/icons/actions/Passive.webp", "systems/pf2e/icons/actions/Reaction.webp", "systems/pf2e/icons/actions/ThreeActions.webp", "systems/pf2e/icons/actions/TwoActions.webp", "systems/pf2e/icons/actions/TwoThreeActions.webp", "icons/sundries/books/book-red-exclamation.webp"]
 
@@ -23,6 +23,7 @@ Hooks.once("init", () => {
 	Hooks.call("argonDefaultColor", defaultTheme);
 });
 */
+const timeout = async ms => new Promise(res => setTimeout(res, ms));
 
 function createToggleIcons(toggles, options = {}) {
 	const iconsize = options.hasOwnProperty("iconsize") ? options.iconsize : 30;
@@ -211,6 +212,39 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		async _onDeathSave(event) {
 			this.actor.rollRecovery();
+		}
+		
+		async _getButtons() {
+			return [
+				{
+					id: "roll-initiative",
+					icon: "fas fa-dice-d20",
+					label: "Roll Initiative",
+					onClick: (e) => this.actor.rollInitiative({ rerollInitiative: true, createCombatants: true })
+				},
+				{
+					id: "open-sheet",
+					icon: sheettabbutton(game.settings.get(ModuleName, "sheetbuttontab")).join(" "),
+					label: replacewords(game.i18n.localize(ModuleName + ".Titles.opensheetat"), {tab : game.i18n.localize(tabnames[game.settings.get(ModuleName, "sheetbuttontab")])}),
+					onClick: async (e) => {
+						await this.actor.sheet.render(true);
+						
+						if (!this.actor.sheet.rendered) {
+							await timeout(50); //give time to render
+						}
+						
+						if (this.actor.sheet.rendered) {
+							this.actor.sheet.activateTab(game.settings.get(ModuleName, "sheetbuttontab"))
+						}
+					}
+				},
+				{
+					id: "toggle-minimize",
+					icon: "fas fa-caret-down",
+					label: "Minimize",
+					onClick: (e) => ui.ARGON.toggleMinimize()
+				}
+			];
 		}
 
 		async getStatBlocks() {
@@ -2084,7 +2118,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			else {
 				if (this.item) {
-					let result = await this.item.execute();
+					let result = await this.item.execute({actor : this.actor});
 					
 					if (result && result[ModuleName]) {
 						if (result.useActions) {
@@ -2162,7 +2196,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			switch (this.type) {
 				case "feat": return "PF2E.Item.Action.Plural";
 				case "toggle": return "PF2E.TogglesLabel";
-				default : return "TYPES.Item." + firstUpper(this.type) + ".Plural";
+				default : return "PF2E.Item." + firstUpper(this.type) + ".Plural";
 			}
 		}
 		

@@ -7,7 +7,9 @@
 			"swapin"					: "In die hand",
 			"macrolocked"				: "Macro ist gesperrt",
 			"macrounlocked"				: "Macro ist frei",
-			"regainedfocus"				: "{Actor} hat <b>{n}</b> Fokuspunkt wieder hergestellt"
+			"regainedfocus"				: "{Actor} hat <b>{n}</b> Fokuspunkt wieder hergestellt",
+			
+			"opensheetat"				: "Öffne Charakterbogen bei {tab}"
 		},
 		
 		"Settings" : {

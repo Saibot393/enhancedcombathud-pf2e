@@ -1,4 +1,4 @@
-import { ModuleName, settingActionSpace, replacewords } from "./utils.js";
+import { ModuleName, settingActionSpace, tabnames, replacewords } from "./utils.js";
 import { getSettingActionTitles } from "./specialItems.js";
 
 const defaultECH = ["seek", "hide", "none", "none", "none", "none"];
@@ -6,6 +6,17 @@ const defaultECH = ["seek", "hide", "none", "none", "none", "none"];
 Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 	//Settings
 	//client
+	game.settings.register(ModuleName, "sheetbuttontab", {
+		name: game.i18n.localize(`${ModuleName}.Settings.sheetbuttontab.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.sheetbuttontab.descrp`),
+		scope: "client",
+		config: true,
+		type: String,
+		choices: tabnames,
+		default: Object.keys(tabnames)[0],
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "showpartybutton", {
 		name: game.i18n.localize(`${ModuleName}.Settings.showpartybutton.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.showpartybutton.descrp`),

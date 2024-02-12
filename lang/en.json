@@ -7,7 +7,9 @@
 			"swapin"					: "Swap in",
 			"macrolocked"				: "Macro is locked",
 			"macrounlocked"				: "Macro is unlocked",
-			"regainedfocus"				: "{Actor} regained <b>{n}</b> focus point"
+			"regainedfocus"				: "{Actor} regained <b>{n}</b> focus point",
+			
+			"opensheetat"				: "Open character sheet at {tab}"
 		},
 		
 		"Settings" : {
