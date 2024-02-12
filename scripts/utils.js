@@ -439,7 +439,7 @@ function hasSB(actor) {
 function MAPtext(item, MAP = 0) {
 	let penaltyLevel = 5;
 	
-	if (item?.system.traits?.value?.includes("agile")) {
+	if (item?.system?.traits?.value?.includes("agile")) {
 		penaltyLevel = 4;
 	}
 	

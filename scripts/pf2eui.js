@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";                                                                                                                                                                              
 
@@ -628,6 +628,47 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 	}
 	
+	class PF2EDrawerButton extends ARGON.DRAWER.DrawerButton {
+		constructor (buttons, starthidden = false) {
+			super(buttons);
+			this._starthidden = starthidden;
+		}
+		
+		get starthidden() {
+			return this._starthidden;
+		}
+		
+		async activateListeners(html) {
+			await super.activateListeners(html);
+			for (const button of this._buttons) {
+				if (!button.interactive) continue;
+				const index = this._buttons.indexOf(button);
+				const el = this.element.querySelector(`span[data-index="${index}"]`);
+				if (!el) continue;
+				el.onclick = (e) => {
+					if (this.interceptDialogs) ui.ARGON.interceptNextDialog(e.currentTarget.closest(".ability"))
+					button.onClick(e);
+				}
+				if (button.onRClick) {
+					el.oncontextmenu = (e) => {
+						e.preventDefault();
+						if (this.interceptDialogs) ui.ARGON.interceptNextDialog(e.currentTarget.closest(".ability"))
+						button.onRClick(e);
+					}
+				}
+			}
+			this.setTextAlign();
+		}
+		
+		async _renderInner() {
+			await super._renderInner();
+			
+			if (this.starthidden) {
+				this.element.style.display = "none";
+			}
+		}
+	}
+	
 	class PF2EDrawerPanel extends ARGON.DRAWER.DrawerPanel {
 		constructor(...args) {
 			super(...args);
@@ -638,6 +679,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			const saves = this.actor.saves;
 			const skills = {perception : this.actor.perception, ...this.actor.skills};
+			const skillactions = /*Array.from(game.pf2e.actions).concat(*/Array.from(game.pf2e.actions.entries()).map(entry => entry[1]);
 			
 			const savesButtons = Object.keys(saves).map(saveKey => {
 				const save = saves[saveKey];
@@ -669,7 +711,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			});
 			
 			
-			let skillsButtons = Object.keys(skills).map(skillKey => {
+			let skillsButtons = []; 
+			Object.keys(skills).forEach(skillKey => {
 				const skill = skills[skillKey];
 				
 				if (!skill.lore) {
@@ -686,19 +729,70 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						skill.check.roll({event : event})
 					}
 					
-					return new ARGON.DRAWER.DrawerButton([
+					let skillentries = [new PF2EDrawerButton([
 						{
 							label: nameLabel,
-							onClick: roll
+							onClick: roll,
+							onRClick : (event) => {
+								this.element.querySelectorAll(`.${skillKey}-skill`).forEach(element => {
+									let actionelement = element.parentElement.parentElement;
+									
+									if (actionelement.style.display == "none") {
+										actionelement.style.display = "grid"
+									}
+									else {
+										actionelement.style.display = "none"
+									}
+								})
+							}
+						},
+						{
+							style: "display: flex; justify-content: flex-end;"
 						},
 						{
 							label: valueLabel,
 							onClick: roll,
 							style: "display: flex; justify-content: flex-end;"
 						},
-					]);
+					])];
+					
+					skillactions.filter(action => action.statistic?.includes(skillKey)).forEach(action => {
+						let actiontitle = `<span class="${skillKey}-skill">${game.i18n.localize(action.name)}</span>`;
+						
+						let actionGlyph = actionGlyphs("action", action.cost);
+						if (actionGlyph) {
+							actiontitle = `${actiontitle} <span class=\"action-glyph\">${actionGlyph}</span>`;
+						}
+						
+						let roll = (map, event) => {
+							action.use({multipleAttackPenalty : map, event : event, statistic : skillKey})
+						}
+						
+						let hasMAP = action.traits?.includes("attack");
+						
+						skillentries.push(new PF2EDrawerButton([
+							{
+								label: actiontitle,
+								onClick: (event) => {roll(0, event)},
+								style: "display: flex; justify-content: center"
+							},
+							{
+								label: hasMAP ? `<span>${MAPtext(action, 1)}</span>` : "",
+								onClick: hasMAP ? (event) => {roll(1, event)} : undefined,
+								style: hasMAP ? "display: flex; justify-content: center;border: var(--color-text-trait) solid 2px; color: var(--color-text-trait); background-color: var(--color-pf-secondary)" : ""
+							},
+							{
+								label: hasMAP ? `<span>${MAPtext(action, 2)}</span>` : "",
+								onClick: hasMAP ? (event) => {roll(2, event)} : undefined,
+								style: hasMAP ? "display: flex; justify-content: center;border: var(--color-text-trait) solid 2px; color: var(--color-text-trait); background-color: var(--color-pf-secondary)" : ""
+							}
+						], true));
+					});
+					
+					skillsButtons.push(...skillentries);
 				}
-			}).filter(button => button);
+			});
+			skillsButtons = skillsButtons.filter(button => button);
 			
 			let loreButtons = Object.keys(skills).map(skillKey => {
 				const lore = skills[skillKey];
@@ -748,7 +842,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (skillsButtons.length) {
 				returncategories.push({
-					gridCols: "7fr 2fr",
+					gridCols: "7fr 3fr 3fr",
 					captions: [
 						{
 							label: game.i18n.localize("PF2E.CoreSkillsHeader"),
@@ -756,6 +850,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						{
 							label: "",
 						},
+						{
+							label: "",
+						}
 					],
 					buttons: skillsButtons
 				});
