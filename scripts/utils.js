@@ -8,7 +8,7 @@ const settingActionSpace = {
 	PF2EECHReActionItems : 0
 };
 
-const AoOids = ["NMWXHGWUcZGoLDKb", "hmShTfPOcTaKgbf4", "hmShTfPOcTaKgbf4"]; //id of Attack of Opportunity id
+const AoOids = ["NMWXHGWUcZGoLDKb", "hmShTfPOcTaKgbf4", "OqU6QXkMrZqToEEi"]; //id of Attack of Opportunity id
 const SBid = "jM72TjJ965jocBV8"; //id of Shield Block
 
 function replacewords(text, words = {}){
