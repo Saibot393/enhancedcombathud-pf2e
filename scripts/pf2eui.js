@@ -1,7 +1,8 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
 import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
-import {elementalBlastProxy} from "./proxyfake.js";                                                                                                                                                                              
+import {elementalBlastProxy} from "./proxyfake.js";  
+import {MacroButton} from "/modules/enhancedcombathud/scripts/core/components/main/buttons/macroButton.js"                                                                                                                                                                            
 
 const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2e/icons/actions/OneAction.webp", "systems/pf2e/icons/actions/OneThreeActions.webp", "systems/pf2e/icons/actions/OneTwoActions.webp", "systems/pf2e/icons/actions/Passive.webp", "systems/pf2e/icons/actions/Reaction.webp", "systems/pf2e/icons/actions/ThreeActions.webp", "systems/pf2e/icons/actions/TwoActions.webp", "systems/pf2e/icons/actions/TwoThreeActions.webp", "icons/sundries/books/book-red-exclamation.webp"]
 
@@ -2194,7 +2195,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
     }
 	
-	class PF2EMacroButton extends ARGON.MAIN.BUTTONS.MacroButton {
+	//class PF2EMacroButton extends ARGON.MAIN.BUTTONS.MacroButton {
+	class PF2EMacroButton extends MacroButton {
 		constructor (args) {
 			super(args);
 			this._index = args.index;
