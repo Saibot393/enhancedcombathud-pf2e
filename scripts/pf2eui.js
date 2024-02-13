@@ -835,9 +835,33 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							actiontitle = `${actiontitle} <span class=\"action-glyph\">${actionGlyph}</span>`;
 						}
 						
-						let roll = (map, event) => {
+						let roll = async (map, event) => {
+							let settings = {actors : this.actor, multipleAttackPenalty : map, event : event, statistic : skillKey};
+									
+							let options;
+									
+							switch (action.slug) {
+								case "perform" :
+									options = ["acting", "comedy", "dance", "keyboards", "oratory", "percussion", "singing", "strings", "winds"];
+									break;
+								case "administer-first-aid":
+									options = ["stabilize", "stop-bleeding"];
+									break;
+							}
+									
+							if (options) {
+								let optionsinfo = {};
+								for (let key of options) {
+									optionsinfo[key] = {label : key};
+								}
+								let variant = await openNewInput("choice", game.i18n.localize(action.name), `${actiontitle}: `, {defaultValue : options[0], options : optionsinfo});
+								
+								if (!variant) return;
+								settings.variant = variant; 
+							}
+							
+							action.use(settings);
 							useAction("action", action.cost);
-							action.use({multipleAttackPenalty : map, event : event, statistic : skillKey})
 						}
 						
 						let hasMAP = action.traits?.includes("attack");
