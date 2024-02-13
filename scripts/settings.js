@@ -236,7 +236,17 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		config: true,
 		type: Boolean,
 		default: true,
-		onChange: () => {ui.ARGON?.render()}
+		requiresReload : true
+	});
+	
+	game.settings.register(ModuleName, "showmacrocategory", {
+		name: game.i18n.localize(`${ModuleName}.Settings.showmacrocategory.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.showmacrocategory.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false,
+		requiresReload : true
 	});
 	
 	//internal saves

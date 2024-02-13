@@ -131,6 +131,7 @@ Hooks.on("createCombatant", (combatant) => {
 Hooks.on("argonInit", async (CoreHUD) => {
     const ARGON = CoreHUD.ARGON;
   
+	console.log(ARGON);
 	await registerPF2EECHSItems();
 	
 	CoreHUD._movementSave = {};
@@ -254,7 +255,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			const ACText = game.i18n.localize("PF2E.ArmorClassShortLabel");
 			
-			const ClassDC = game.i18n.localize("PF2E.Check.DC.Unspecific");
+			const DCText = game.i18n.localize("PF2E.Check.DC.Unspecific");
 
 			const hppercent = this.actor.system.attributes.hp.value/this.actor.system.attributes.hp.max;
 			const hpColor = this.actor.system.attributes.hp.temp ? "#6698f3" : (hppercent <= 0.5 ? (hppercent <= 0.1 ?  "rgb(255 10 10)" : "rgb(255 127 0)") : "rgb(0 255 170)");
@@ -291,16 +292,45 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				]
 			];
 			
-			if (this.actor.system.attributes.classDC?.dc) {
-				blocks.push([
-					{
-						text: ClassDC,
-					},
-					{
-						text: this.actor.system.attributes.classDC?.dc,
-						color: "var(--ech-movement-baseMovement-background)",
-					}
-				]);
+			const spellDC = Math.max(...(await Promise.all(this.actor.items.filter(item => item.type == 'spellcastingEntry').map(group => group.getSpellData()))).map(info => info.statistic.dc.value));
+			
+			/*
+			for (let spellgroup of this.actor.items.filter(item => item.type == 'spellcastingEntry')) {
+				let info = await spellgroup.getSpellData();
+				
+				if (info.statistic.dc.value > spellDC) {
+					spellDC = info.statistic.dc.value;
+				}
+			}
+			*/
+			
+			if (spellDC > 0 && (!this.actor.system.attributes.classDC?.dc || (spellDC >= this.actor.system.attributes.classDC?.dc))) {
+				if (this.actor.system.attributes.classDC?.dc) {
+					blocks.push([
+						{
+							text: DCText,
+						},
+						{
+							text: spellDC,
+							color: "var(--ech-movement-baseMovement-background)",
+							id: "SpellDCvalue"
+						}
+					]);
+				}
+			}
+			else {
+				if (this.actor.system.attributes.classDC?.dc) {
+					blocks.push([
+						{
+							text: DCText,
+						},
+						{
+							text: this.actor.system.attributes.classDC?.dc,
+							color: "var(--ech-movement-baseMovement-background)",
+							id: "ClassDCvalue"
+						}
+					]);
+				}
 			}
 			
 			return blocks;
@@ -443,6 +473,20 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				shieldIcon.setAttribute("data-tooltip", game.i18n.localize("TYPES.Item.shield"));
 				
 				this.element.querySelector("#ACvalue").appendChild(shieldIcon);
+			}
+			
+			const spellDCElement = this.element.querySelector("#SpellDCvalue")
+			if (spellDCElement) {
+				let description = (await Promise.all(this.actor.items.filter(item => item.type == 'spellcastingEntry').map(group => group.getSpellData()))).find(info => info.statistic.dc.value == spellDCElement.innerHTML)?.statistic.dc.breakdown;
+				
+				let spellicon = document.createElement("i");
+				spellicon.classList.add("fa-solid", "fa-book");
+				if (description) {
+					spellicon.setAttribute("data-tooltip", description);
+				}
+				
+				spellDCElement.innerHTML = spellDCElement.innerHTML + " ";
+				spellDCElement.appendChild(spellicon);
 			}
 			
 			if (!this.isDying && !this.isDead) {
@@ -2039,7 +2083,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
     }
 	
-	class PF2EMacroButton extends ARGON.MAIN.BUTTONS.ItemButton {
+	class PF2EMacroButton extends ARGON.MAIN.BUTTONS.MacroButton {
 		constructor (args) {
 			super(args);
 			this._index = args.index;
@@ -2056,26 +2100,31 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 			}
 			*/
-			this.updateItem(false);
+			//this.updateItem(false);
+			this.updateMacro();
 		}
 		
 		get index() {
 			return this._index;
 		}	
 		
+		get macro() {
+			return this._macro;
+		}
+		
 		get label() {
-			return this.item?.name;
+			return this.macro?.name || "";
 		}
 
 		get icon() {
-			return this.item?.img;
-		}
-		
-		get isvalid() {
-			return true;
+			return this.macro?.img ?? `modules/${ModuleName}/icons/square.svg`;
 		}
 		
 		get visible() {
+			return true;
+		}
+		
+		get isvalid() {
 			return true;
 		}
 
@@ -2089,14 +2138,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get actionType() {
 			return this.parent.actionType;
-		}
-		
-		get isMacro() {
-			return true;
-		}
-		
-		get item() {
-			return this._item;
 		}
 		
 		get macroUuid() {
@@ -2119,13 +2160,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async unlockMacro(render = true) {
 			game.settings.set(ModuleName, "lockedmacros", {[this.index] : ""});
 			
-			this.updateItem(render);
+			this.updateMacro(render);
 		}
 		
 		async lockMacro(render = true) {
 			game.settings.set(ModuleName, "lockedmacros", {[this.index] : this.macroUuid});
 			
-			this.updateItem(render);
+			this.updateMacro(render);
 		}
 		
 		async toggleMacroLock(render = true) {
@@ -2137,11 +2178,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 		
-		async setitem(uuid, render = true) {
-			let item = await fromUuid(uuid);
+		async setMacro(uuid, render = true) {
+			let macro = await fromUuid(uuid);
 			
-			if (item || uuid == "") {
-				this._item = item;
+			if (macro || uuid == "") {
+				this._macro = macro;
 				
 				if (this.macroLocked) {
 					await game.settings.set(ModuleName, "lockedmacros", {[this.index] : uuid})
@@ -2157,14 +2198,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			else {
-				this._item = null;
+				this._macro = null;
 			}
 			
 			if (render) await this.parent?.parent?.render();
 		}
 		
-		async updateItem(render = true) {
-			this._item = (await fromUuid(this.macroUuid)) || null;
+		async updateMacro(render = true) {
+			this._macro = (await fromUuid(this.macroUuid)) || null;
 			
 			if (render) this.render();
 		}
@@ -2205,7 +2246,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				event.stopPropagation();
 				const data = JSON.parse(event.dataTransfer.getData("text/plain"));
 				if (data.type == "Macro") {
-					this.setitem(data.uuid);
+					this.setMacro(data.uuid);
 				}
 			} catch (error) {
 		  
@@ -2216,11 +2257,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (event.target.classList.contains("specialAction")) return;
 			
 			if (event.shiftKey) {
-				this.setitem("");
+				this.setMacro("");
 			}
 			else {
-				if (this.item) {
-					let result = await this.item.execute({actor : this.actor});
+				if (this.macro) {
+					let result = await this.macro.execute();
 					
 					if (result && result[ModuleName]) {
 						if (result.useActions) {
@@ -2232,11 +2273,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _onRightClick(event) {
-			if (!this.item || event.shiftKey) {
+			if (!this.macro || event.shiftKey) {
 				ui.macros.renderPopout(true);
 			}
 			else {
-				this.item?.sheet.render(true);
+				this.macro?.sheet.render(true);
 			}
 		}
 		
@@ -2251,14 +2292,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			const iconsize = 30 * game.settings.get(ModuleName, "onitemiconscale");
 			
-			if (!this.item && this.visible) {//fix a bug?
+			if (!this.macro && this.visible) {//fix a bug?
 				this.element.style.display = "flex";
 				this.element.style.background =  "var(--ech-mainAction-base-background) center no-repeat"
 				this.element.style.color = "var(--ech-mainAction-base-color)";
 				this.element.style.border = "1px solid var(--ech-mainAction-base-border)";
 				
 				let span = this.element.querySelector(".feature-element-title");
-				span.style.visibility = "hidden";
+				if (span) span.style.visibility = "hidden";
 			}
 			
 			let toggles = [];
@@ -3317,6 +3358,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	
 	if (game.settings.get(ModuleName, "showpassives")) {
 		panels.push(PF2EPassiveActionPanel);
+	}
+	
+	if (game.settings.get(ModuleName, "showmacrocategory")) {
+		panels.push(ARGON.PREFAB.MacroPanel);
 	}
 	
 	panels.push(ARGON.PREFAB.PassTurnPanel);

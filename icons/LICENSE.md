@@ -27,6 +27,7 @@ The following icons are included
 	-lockpicks.svg
 	-fencer.svg
 	-magic-hat.svg
+	-square.svg
 - By [Skoll](https://game-icons.net/)
 	-breaking-chain.svg
 	-drop-weapon.svg
