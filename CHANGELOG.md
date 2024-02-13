@@ -1,3 +1,14 @@
+## v1.6.0
+- Added macro panel to access the macros stored on the macro bar (which is a new [CORE](https://foundryvtt.com/packages/enhancedcombathud) base feature)
+- Improved the macro buttons
+- Added icon to indicate signature spells
+- Added buttons to select the initiative skill from the save/skill/lore drawer
+- Added setting to choose the behaviour of the initiative button
+- Added mouse over tooltips for the traits in Argon tooltips
+- Added a setting to scale the training rank icon scale
+- CTRL+Z now works with the movement tracker (ony the current segment can be reversed)
+- Skill actions now use action points
+
 ## v1.5.2
 - Added Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
 
