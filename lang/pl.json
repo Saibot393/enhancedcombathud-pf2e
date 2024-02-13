@@ -9,20 +9,20 @@
 			"macrounlocked"				: "Makro jest odblokowane",
 			"regainedfocus"				: "{Actor} odzyskuje <b>{n}</b> punktów skupienia",
 			
-			"opensheetat"				: "Otwórz kartę postaci za pomocą {tab}"
+			"opensheetat"				: "Otwórz kartę postaci na zakładce {tab}"
 		},
 		
 		"Settings" : {
 			"sheetbuttontab" : {
 				"name"					: "Przycisk karty postaci",
-				"descrp"				: "Zakładka otwierana po kliknięciu zakładki kartty postaci nad portretem"
+				"descrp"				: "Zakładka otwierana po kliknięciu zakładki karty postaci nad portretem"
 			},
 			"showpartybutton" : {
 				"name"					: "Pokaż przycisk drużyny",
 				"descrp"				: "Wyświetla przycisk łączący z drużyną postaci na portrecie."
 			},
 			"showfamiliarmaster" : {
-				"name"					: "Przycisk pokaż chowańca/mistrza",
+				"name"					: "Pokaż przycisk Chowańca/Mistrza",
 				"descrp"				: "Wyświetla przycisk łączący się z postaciami Chowańca/Mistrza na portrecie."
 			},
 			"shownpctraits" : {
@@ -34,12 +34,16 @@
 				"descrp"				: "Kamera przesuwa się do bieżącego tokena po dwukrotnym kliknięciu obrazu portretowego"
 			},
 			"reversesaveskilllore" : {
-				"name"					: "Odwrócony rzut obronny, umiejętności, wiedza",
-				"descrp"				: "Odwraca kolejność rzutów obronnych umiejętności wiedzy"
+				"name"					: "Odwrócenie rzutów obronnych, umiejętności, wiedzy",
+				"descrp"				: "Odwraca kolejność rzutów obronnych, umiejętności i wiedzy"
 			},
 			"showtrainedrankletter" : {
-				"name"					: "Pokaż wytrenowaną rangę jako ostatnią",
+				"name"					: "Pokaż wytrenowaną rangę jako literę na końcu",
 				"descrp"				: "Pokazuje literę obok rzutów obronnych i umiejętności, aby wskazać rangę treningu."
+			},
+			"skillrankiconscale" : {
+				"name"					: "Skala litery rangi",
+				"descrp"				: "Skala liter rang dla rzutów obronnych i umiejętności"
 			},
 			"onlyonespellrank" : {
 				"name"					: "Otwarta tylko jedna ranga zaklęcia",
@@ -47,7 +51,7 @@
 			},
 			"weaponsetscount" : {
 				"name"					: "Zestawy broni",
-				"descrp"				: "cIlość wyświetlanych zestawów broni"
+				"descrp"				: "Ilość wyświetlanych zestawów broni"
 			},
 			"directStaffuse" : {
 				"name"					: "Bezpośrednie użycie Kosturów",
@@ -91,8 +95,12 @@
 				"descrp"				: "Intensywność kontrastowego cienia ikony informacyjnej na przyciskach elementów"
 			},
 			"showpassives" : {
-				"name"					: "Pokaż pasywne BN",
-				"descrp"				: "Pasywność BN powinna być wyświetlana"
+				"name"					: "Pokaż pasywne zdolności BNów",
+				"descrp"				: "Pasywne zdolności BNów powinny być wyświetlane"
+			},
+			"showmacrocategory" : {
+				"name"					: "Pokaż kategorię makro",
+				"descrp"				: "Jeśli zaznaczone. kategoria makro powinna być pokazana w HUD (na podstawie makr w pasku makr Foundry)"
 			}
 		}
 	},
