@@ -8,6 +8,7 @@
 - Added a setting to scale the training rank icon scale
 - CTRL+Z now works with the movement tracker (ony the current segment can be reversed)
 - Skill actions now use action points
+- For spell users, the spell (highest) DC will now be displayed instead of the class DC
 - Perform and Administer first aid now request the variant before being rolled
 - Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
 
