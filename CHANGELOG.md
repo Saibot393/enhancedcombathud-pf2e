@@ -8,6 +8,7 @@
 - Added a setting to scale the training rank icon scale
 - CTRL+Z now works with the movement tracker (ony the current segment can be reversed)
 - Skill actions now use action points
+- Perform and Administer first aid now request the variant before being rolled
 
 ## v1.5.2
 - Added Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
