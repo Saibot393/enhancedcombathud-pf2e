@@ -768,7 +768,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank)}" style="font-size:${game.settings.get(ModuleName, "skillrankiconscale")}rem"></i> `;
 					}
 					
-					let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${skill.label} ${rankicon}</span>`;
+					let nameLabel = `<span class="${skillKey}-skill" style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${skill.label} ${rankicon}</span>`;
 					
 					let roll = (event) => {
 						skill.check.roll({event : event})
@@ -779,7 +779,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							label: nameLabel,
 							onClick: roll,
 							onRClick : (event) => {
-								this.element.querySelectorAll(`.${skillKey}-skill`).forEach(element => {
+								this.element.querySelectorAll(`.${skillKey}-action`).forEach(element => {
 									let actionelement = element.parentElement.parentElement;
 									
 									if (actionelement.style.display == "none") {
@@ -792,7 +792,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							}
 						},
 						{
-							style: "display: flex; justify-content: flex-end;"
+							label: this.actor.system.initiative.statistic == skillKey ? `<i class="fa-solid fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>` : `<i class="fa-regular fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>`,
+							onClick: async () => {
+								this.actor.update({system : {initiative : {statistic : skillKey}}});
+								console.log(this.element.querySelector(".fa-solid.fa-circle"));
+								this.element.querySelector(".fa-solid.fa-circle")?.classList.replace("fa-solid", "fa-regular");
+								console.log(this.element.querySelector(`.${skillKey}-skill`));
+								this.element.querySelector(`.${skillKey}-skill`)?.parentElement.querySelector(".fa-circle.fa-circle")?.classList.replace("fa-regular", "fa-solid");
+							},
+							style: "display: flex; justify-content: flex-start;"
 						},
 						{
 							label: valueLabel,
@@ -802,7 +810,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					])];
 					
 					skillactions.filter(action => action.statistic?.includes(skillKey)).forEach(action => {
-						let actiontitle = `<span class="${skillKey}-skill">${game.i18n.localize(action.name)}</span>`;
+						let actiontitle = `<span class="${skillKey}-action">${game.i18n.localize(action.name)}</span>`;
 						
 						let actionGlyph = actionGlyphs("action", action.cost);
 						if (actionGlyph) {
@@ -1905,14 +1913,26 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				toggles.push(toggleData);
 			}
 			
-			if (this.item.type == "spell" && this.item.system.duration?.sustained) {
-				let toggleData = {
-					iconclass : ["fa-solid", "fa-s"],
-					tooltip : game.i18n.localize("PF2E.Item.Spell.Sustained.Label"),
-					showalways : true
-				};	
+			if (this.item.type == "spell") {
+				if (this.item.system.duration?.sustained) {
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-s"],
+						tooltip : game.i18n.localize("PF2E.Item.Spell.Sustained.Label"),
+						showalways : true
+					};	
 
-				toggles.push(toggleData);
+					toggles.push(toggleData);
+				}
+				
+				if (this.item.system.location?.signature && !this.item.spellcasting?.system.prepared?.flexible) {
+					let toggleData = {
+						iconclass : ["fa-solid", "fa-star"],
+						tooltip : game.i18n.localize("PF2E.ToggleSignatureSpellTitle").split(" ").slice(1).join(" "),
+						showalways : true
+					};	
+
+					toggles.push(toggleData);
+				}
 			}
 			
 			if (this.item.isInvested) {
