@@ -17,6 +17,14 @@
 				"name"					: "Bogenknopf Tab",
 				"descrp"				: "Der Tab welcher geöffnet wird wenn der Bogenknopf über dem Portrait gedrückt wird"
 			},
+			"rollinitiative" : {
+				"name"					: "Initiative Modus",
+				"descrp"				: "Das Verhalten wenn der Initiative Knopf über dem Portrait geklickt wird",
+				"options" : {
+					"choiceroll"		: "Fähigkeit wählen",
+					"quickroll"			: "Schnellwurf"
+				}
+			},
 			"showpartybutton" : {
 				"name"					: "Zeige Party Knopf",
 				"descrp"				: "Zeigt einen Knopf mit Verlinkung zur Party des Characters im Portrait"

@@ -17,6 +17,14 @@
 				"name"					: "Sheet button tab",
 				"descrp"				: "The tab opended when the sheet tab above the portrait is clicked"
 			},
+			"rollinitiative" : {
+				"name"					: "Initiative mode",
+				"descrp"				: "The behaviour when the initiative button above the portrait is clicked",
+				"options" : {
+					"choiceroll"		: "Choose skill",
+					"quickroll"			: "Quick roll"
+				}
+			},
 			"showpartybutton" : {
 				"name"					: "Show Party button",
 				"descrp"				: "Shows a button linking to the characters party in the portrait"
