@@ -796,6 +796,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					
 					let skillentries = [new PF2EDrawerButton([
 						{
+							label: this.actor.system.initiative.statistic == skillKey ? `<i class="fa-solid fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>` : `<i class="fa-regular fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>`,
+							onClick: async () => {
+								this.actor.update({system : {initiative : {statistic : skillKey}}});
+								this.element.querySelector(".fa-solid.fa-circle")?.classList.replace("fa-solid", "fa-regular");
+								this.element.querySelector(`.${skillKey}-skill`)?.parentElement.parentElement.querySelector(".fa-circle.fa-circle")?.classList.replace("fa-regular", "fa-solid");
+							},
+							style: "display: flex; justify-content: flex-start;"
+						},
+						{
 							label: nameLabel,
 							onClick: roll,
 							onRClick : (event) => {
@@ -812,13 +821,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							}
 						},
 						{
-							label: this.actor.system.initiative.statistic == skillKey ? `<i class="fa-solid fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>` : `<i class="fa-regular fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>`,
-							onClick: async () => {
-								this.actor.update({system : {initiative : {statistic : skillKey}}});
-								this.element.querySelector(".fa-solid.fa-circle")?.classList.replace("fa-solid", "fa-regular");
-								this.element.querySelector(`.${skillKey}-skill`)?.parentElement.parentElement.querySelector(".fa-circle.fa-circle")?.classList.replace("fa-regular", "fa-solid");
-							},
-							style: "display: flex; justify-content: flex-start;"
 						},
 						{
 							label: valueLabel,
@@ -867,6 +869,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						let hasMAP = action.traits?.includes("attack");
 						
 						skillentries.push(new PF2EDrawerButton([
+							{
+							},
 							{
 								label: actiontitle,
 								onClick: (event) => {roll(0, event)},
@@ -938,7 +942,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (skillsButtons.length) {
 				returncategories.push({
-					gridCols: "7fr 3fr 3fr",
+					gridCols: "1fr 7fr 3fr 3fr",
 					captions: [
 						{
 							label: game.i18n.localize("PF2E.CoreSkillsHeader"),
