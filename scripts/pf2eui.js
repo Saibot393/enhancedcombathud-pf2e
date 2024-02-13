@@ -767,6 +767,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						}
 						
 						let roll = (map, event) => {
+							useAction("action", action.cost);
 							action.use({multipleAttackPenalty : map, event : event, statistic : skillKey})
 						}
 						
