@@ -2261,11 +2261,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			else {
 				if (this.macro) {
-					let result = await this.macro.execute();
+					let result = await this.macro.execute({actor : this.actor});
 					
 					if (result && result[ModuleName]) {
-						if (result.useActions) {
-							useAction(result.useActions.type, result.useActions.actions);
+						if (result[ModuleName].useActions) {
+							useAction(result[ModuleName].useActions.type, result[ModuleName].useActions.actions);
 						}
 					}
 				}
