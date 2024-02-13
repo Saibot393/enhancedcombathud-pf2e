@@ -1430,7 +1430,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (this.item.reload && this.item.reload != "-") {
 						if (this.item.ammo) {
 							if (this.item.ammo.system.uses?.max) {
-								return this.item.ammo.system.uses.value + (this.item.ammo.system.quantity - 1) * this.item.ammo.system.uses.max;
+								if (this.item.ammo.system.uses.autoDestroy) {
+									return this.item.ammo.system.uses.value + (this.item.ammo.system.quantity - 1) * this.item.ammo.system.uses.max;
+								}
+								else {
+									return Math.max(this.item.ammo.system.uses.value, 1) + (this.item.ammo.system.quantity - 1) * this.item.ammo.system.uses.max;
+								}
 							}
 							else {
 								return this.item.ammo.system.quantity;
