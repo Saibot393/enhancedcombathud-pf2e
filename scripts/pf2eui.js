@@ -795,10 +795,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							label: this.actor.system.initiative.statistic == skillKey ? `<i class="fa-solid fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>` : `<i class="fa-regular fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>`,
 							onClick: async () => {
 								this.actor.update({system : {initiative : {statistic : skillKey}}});
-								console.log(this.element.querySelector(".fa-solid.fa-circle"));
 								this.element.querySelector(".fa-solid.fa-circle")?.classList.replace("fa-solid", "fa-regular");
-								console.log(this.element.querySelector(`.${skillKey}-skill`));
-								this.element.querySelector(`.${skillKey}-skill`)?.parentElement.querySelector(".fa-circle.fa-circle")?.classList.replace("fa-regular", "fa-solid");
+								this.element.querySelector(`.${skillKey}-skill`)?.parentElement.parentElement.querySelector(".fa-circle.fa-circle")?.classList.replace("fa-regular", "fa-solid");
 							},
 							style: "display: flex; justify-content: flex-start;"
 						},
