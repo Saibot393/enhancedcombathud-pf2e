@@ -38,8 +38,12 @@
 				"descrp"				: "Reverses the order to lore skill saves"
 			},
 			"showtrainedrankletter" : {
-				"name"					: "Show trained rank latter",
+				"name"					: "Show trained rank letter",
 				"descrp"				: "Shows a letter next to saves & skills to indicate the training rank"
+			},
+			"skillrankiconscale" : {
+				"name"					: "Trained rank letter scale",
+				"descrp"				: "The scale of the rank letter for saves & skills"
 			},
 			"onlyonespellrank" : {
 				"name"					: "Only one spell rank open",
@@ -93,6 +97,10 @@
 			"showpassives" : {
 				"name"					: "Show NPC passives",
 				"descrp"				: "If the passives of NPCs should be shown"
+			},
+			"showmacrocategory" : {
+				"name"					: "Show macro category",
+				"descrp"				: "If a macro category should be shown in the HUD (based on the macros in the Foundry macro bar)"
 			}
 		}
 	},

@@ -130,8 +130,7 @@ Hooks.on("createCombatant", (combatant) => {
 
 Hooks.on("argonInit", async (CoreHUD) => {
     const ARGON = CoreHUD.ARGON;
-  
-	console.log(ARGON);
+
 	await registerPF2EECHSItems();
 	
 	CoreHUD._movementSave = {};
@@ -2735,14 +2734,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		set movementUsed(value) {
-			if (value > 0) {
-				const prevUsed = this._movementUsed;
-				
-				this._movementUsed = value;
-				
+			if (value >= 0) {
 				let max = this.movementMax;
 				
 				if (max > 0) {
+					const prevUsed = this._movementUsed;
+					
+					this._movementUsed = value;
+					
 					let usedactions = Math.ceil((this._movementUsed-this._prevUsepoint)/max) - Math.ceil((prevUsed-this._prevUsepoint)/max);
 					
 					this.useActions(usedactions);
@@ -2752,11 +2751,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						
 						this._prevUsepoint = this._movementUsed - ((this._movementUsed - this._prevUsepoint)%max);
 					}
+					else {
+						if (this._movementUsed <= this._prevUsepoint) {
+							this._movementUsed = this._prevUsepoint;
+							
+							if (prevUsed > this._prevUsepoint) {
+								//don't consume action twice, give free action
+								this._freeAction = 1;
+							}
+						}
+					}
 					
-					this.updateMovement();
-				}
-				else {//movement was invalid
-					this._movementUsed = prevUsed;
+					//this.updateMovement();
 				}
 			}
 		}
@@ -3017,6 +3023,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			this.element.querySelector(".movement-current").innerText = barsNumber;
 			this.element.querySelector(".movement-max").innerText = (this._prevUsepoint + this.movementMax);
 			barsContainer.innerHTML = newHtml;
+		}
+		
+		onTokenUpdate(updates, context) {
+			if (updates.x === undefined && updates.y === undefined) return;
+			const ray = new Ray({ x: this.token.x, y: this.token.y }, { x: updates.x ?? this.token.x, y: updates.y ?? this.token.y });
+			const segments = [{ ray }];
+			const distance = Math.floor(
+				canvas.grid.measureDistances(segments, { gridSpaces: true }) /
+				canvas.dimensions.distance
+			);
+			console.log(context);
+			if (context?.isUndo) {
+				this.movementUsed -= distance;
+			}
+			else {
+				this.movementUsed += distance;
+			}
+			this.updateMovement();
 		}
 		
 		async _renderInner() {

@@ -39,7 +39,11 @@
 			},
 			"showtrainedrankletter" : {
 				"name"					: "Zeige Trainingsrang Buchstaben",
-				"descrp"				: "Zeigt einen Buchstaben entsprechend des Trainingsrangs von Rettungswürfen und Fähigkeiten an"
+				"descrp"				: "Zeigt einen Buchstaben entsprechend des Trainingsrangs von Rettungswürfen & Fähigkeiten an"
+			},
+			"skillrankiconscale" : {
+				"name"					: "Trainingsrang Buchstaben Skalierung",
+				"descrp"				: "Die Skalierung der Info Icons für Rettungswürfen & Fähigkeiten"
 			},
 			"onlyonespellrank" : {
 				"name"					: "Nur ein Zauberrang",
@@ -93,6 +97,10 @@
 			"showpassives" : {
 				"name"					: "Zeige NPC Passiven",
 				"descrp"				: "Ob die Passiven von NPCs angezeigt werden sollen"
+			},
+			"showmacrocategory" : {
+				"name"					: "Zeige Macro Kategorie",
+				"descrp"				: "Ob eine Macro Sektion im HUD angezeigt werden soll (basiert auf Macros in der Foundry Macro Leiste)"
 			}
 		}
 	},
