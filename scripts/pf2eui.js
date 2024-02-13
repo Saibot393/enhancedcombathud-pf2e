@@ -222,13 +222,31 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					id: "roll-initiative",
 					icon: "fas fa-dice-d20",
 					label: "Roll Initiative",
-					onClick: (e) => this.actor.rollInitiative({ rerollInitiative: true, createCombatants: true })
+					onClick: (event) => {
+						if (this.actor.combatant) {
+							this.actor.rollInitiative({ rerollInitiative: true, createCombatants: true });
+						}
+						else {
+							switch(game.settings.get(ModuleName, "rollinitiative")) {
+								case "choiceroll":
+									let tokens = this.actor.getActiveTokens();
+									
+									if (tokens.length) {
+										canvas.tokens.toggleCombat(!Boolean(this.actor.combatant), null, {token : tokens[0]})
+									}
+									break;
+								case "quickroll":
+									this.actor.rollInitiative({ rerollInitiative: true, createCombatants: true });
+									break;
+							}
+						}
+					}
 				},
 				{
 					id: "open-sheet",
 					icon: sheettabbutton(game.settings.get(ModuleName, "sheetbuttontab")).join(" "),
 					label: replacewords(game.i18n.localize(ModuleName + ".Titles.opensheetat"), {tab : game.i18n.localize(tabnames[game.settings.get(ModuleName, "sheetbuttontab")])}),
-					onClick: async (e) => {
+					onClick: async (event) => {
 						await this.actor.sheet.render(true);
 						
 						if (!this.actor.sheet.rendered) {
@@ -244,7 +262,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					id: "toggle-minimize",
 					icon: "fas fa-caret-down",
 					label: "Minimize",
-					onClick: (e) => ui.ARGON.toggleMinimize()
+					onClick: (event) => ui.ARGON.toggleMinimize()
 				}
 			];
 		}
@@ -488,64 +506,66 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				spellDCElement.appendChild(spellicon);
 			}
 			
-			if (!this.isDying && !this.isDead) {
-				if (this.actor.inCombat && this.actor.combatant && (this.actor.combatant.initiative == null)) {
-					let initiativeBox = document.createElement("div");
-					initiativeBox.style.position = "absolute";
-					initiativeBox.style.width = "100%";
-					initiativeBox.style.height = "60%";
-					initiativeBox.style.left = "0";
-					initiativeBox.style.top = "20%";
-					initiativeBox.style.display = "flex";
-					initiativeBox.style.flexDirection = "column";
-					initiativeBox.style.alignItems = "center";
-					initiativeBox.style.justifyContent = "center";
-					initiativeBox.style.backgroundColor = "rgb(0,0,0,0.5)";
-					initiativeBox.style.zIndex = 100;
-					
-					let initiativedice = document.createElement("i");
-					initiativedice.classList.add("fa-solid", "fa-dice-d20");
-					initiativedice.style.fontSize = "100px";
-					initiativedice.setAttribute("data-tooltip", game.i18n.localize("PF2E.InitiativeLabel"));
-					initiativedice.onclick = async () => {
-						await this.actor.rollInitiative();
-						this.render();
-					}
-					
-					let skillselect = document.createElement("select");
-					skillselect.style.width = "50%";
-					skillselect.style.height = "40px";
-					skillselect.style.color = "white";
-					skillselect.style.fontSize = "25px";
-					skillselect.style.backdropFilter = "var(--ech-blur-amount)";
-					skillselect.style.backgroundColor = "rgba(0,0,0,.3)";
-					skillselect.style.marginTop = "30px";
-					skillselect.onchange = (value) => {
-						this.actor.update({system : {initiative : {statistic : value.srcElement.value}}});
-					}
-					
-					const skills = {perception : this.actor.perception, ...this.actor.skills};
-					for (let key of Object.keys(skills)) {
-						if (!skills[key].lore) {
-							let skilloption = document.createElement("option");
-							skilloption.text = skills[key].label;
-							skilloption.value = key;
-
-							skilloption.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
-							skilloption.style.width = "100%";
-							skilloption.style.height = "20px";
-							skilloption.style.backgroundColor = "grey";
-							//skilloption.style.fontSize = "25px";
-							skilloption.selected = key == this.actor.system.initiative.statistic;
-							
-							skillselect.appendChild(skilloption);
+			if (game.settings.get(ModuleName, "rollinitiative") == "choiceroll") {
+				if (!this.isDying && !this.isDead) {
+					if (this.actor.inCombat && this.actor.combatant && (this.actor.combatant.initiative == null)) {
+						let initiativeBox = document.createElement("div");
+						initiativeBox.style.position = "absolute";
+						initiativeBox.style.width = "100%";
+						initiativeBox.style.height = "60%";
+						initiativeBox.style.left = "0";
+						initiativeBox.style.top = "20%";
+						initiativeBox.style.display = "flex";
+						initiativeBox.style.flexDirection = "column";
+						initiativeBox.style.alignItems = "center";
+						initiativeBox.style.justifyContent = "center";
+						initiativeBox.style.backgroundColor = "rgb(0,0,0,0.5)";
+						initiativeBox.style.zIndex = 100;
+						
+						let initiativedice = document.createElement("i");
+						initiativedice.classList.add("fa-solid", "fa-dice-d20");
+						initiativedice.style.fontSize = "100px";
+						initiativedice.setAttribute("data-tooltip", game.i18n.localize("PF2E.InitiativeLabel"));
+						initiativedice.onclick = async () => {
+							await this.actor.rollInitiative();
+							this.render();
 						}
+						
+						let skillselect = document.createElement("select");
+						skillselect.style.width = "50%";
+						skillselect.style.height = "40px";
+						skillselect.style.color = "white";
+						skillselect.style.fontSize = "25px";
+						skillselect.style.backdropFilter = "var(--ech-blur-amount)";
+						skillselect.style.backgroundColor = "rgba(0,0,0,.3)";
+						skillselect.style.marginTop = "30px";
+						skillselect.onchange = (value) => {
+							this.actor.update({system : {initiative : {statistic : value.srcElement.value}}});
+						}
+						
+						const skills = {perception : this.actor.perception, ...this.actor.skills};
+						for (let key of Object.keys(skills)) {
+							if (!skills[key].lore) {
+								let skilloption = document.createElement("option");
+								skilloption.text = skills[key].label;
+								skilloption.value = key;
+
+								skilloption.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
+								skilloption.style.width = "100%";
+								skilloption.style.height = "20px";
+								skilloption.style.backgroundColor = "grey";
+								//skilloption.style.fontSize = "25px";
+								skilloption.selected = key == this.actor.system.initiative.statistic;
+								
+								skillselect.appendChild(skilloption);
+							}
+						}
+						
+						initiativeBox.appendChild(initiativedice);
+						initiativeBox.appendChild(skillselect);
+						
+						this.element.appendChild(initiativeBox);
 					}
-					
-					initiativeBox.appendChild(initiativedice);
-					initiativeBox.appendChild(skillselect);
-					
-					this.element.appendChild(initiativeBox);
 				}
 			}
 			

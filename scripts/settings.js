@@ -17,6 +17,20 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "rollinitiative", {
+		name: game.i18n.localize(`${ModuleName}.Settings.rollinitiative.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.rollinitiative.descrp`),
+		scope: "client",
+		config: true,
+		type: String,
+		choices: {
+			"choiceroll": game.i18n.localize(`${ModuleName}.Settings.rollinitiative.options.choiceroll`),
+			"quickroll": game.i18n.localize(`${ModuleName}.Settings.rollinitiative.options.quickroll`)
+		},
+		default: "choiceroll",
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "showpartybutton", {
 		name: game.i18n.localize(`${ModuleName}.Settings.showpartybutton.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.showpartybutton.descrp`),
