@@ -956,6 +956,39 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			return `${game.i18n.localize("PF2E.SavesHeader")}, ${game.i18n.localize("PF2E.CoreSkillsHeader")} & ${game.i18n.localize("PF2E.LoreSkillsHeader")}`;
 		}
 	}
+	
+	class PF2ETooltips extends ARGON.CORE.Tooltip {
+		constructor(...args) {
+			super(...args);
+			
+			this.prepareTraithints();
+		}
+		
+		get template() {
+			return `/modules/${ModuleName}/templates/Tooltip.hbs`;
+		}
+		
+		prepareTraithints() {
+			let traits = this._tooltipData.properties;
+			
+			for(let trait of traits) {
+				let localizationstring = trait.label?.split("-").map(string => firstUpper(string?.toLowerCase()));
+				if (localizationstring?.length > 1) localizationstring.pop();
+				let hintlocalization = "PF2E.TraitDescription" + localizationstring.join("");
+				let hint = game.i18n.localize(hintlocalization);
+				
+				if (hintlocalization != hint) {
+					trait.hint = hint;
+				}
+			}
+		}
+		
+		async _renderInner() {
+			await super._renderInner();
+			
+			this.element.style.zIndex = 9998;
+		}
+	}
   
     class PF2EActionPanel extends ARGON.MAIN.ActionPanel {
 		constructor(...args) {
@@ -1269,6 +1302,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				//hide mystified items from non GMs
 				return this.item.system.identification.status == "identified" || game.user.isGM;
 			}
+		}
+		
+		get tooltipCls() {
+			return PF2ETooltips;
 		}
 
 		get targets() {
@@ -2033,6 +2070,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		get hasTooltip() {
 			return this.enabled;
 		}
+		
+		get tooltipCls() {
+			return PF2ETooltips;
+		}
 
 		get colorScheme() {
 			return this.parent.colorScheme;
@@ -2382,6 +2423,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get hasTooltip() {
 			return this.replacementItem;
+		}
+		
+		get tooltipCls() {
+			return PF2ETooltips;
 		}
 
 		async getTooltipData() {
@@ -3071,7 +3116,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				canvas.grid.measureDistances(segments, { gridSpaces: true }) /
 				canvas.dimensions.distance
 			);
-			console.log(context);
 			if (context?.isUndo) {
 				this.movementUsed -= distance;
 			}

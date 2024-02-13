@@ -330,7 +330,7 @@ function damagecategoryIcon(category) {
 }
 
 function firstUpper(string) {
-	if (string.length == 0) return string;
+	if (!string.length) return string;
 	
 	return string[0].toUpperCase() + string.substr(1);
 }
