@@ -77,6 +77,21 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "skillrankiconscale", {
+		name: game.i18n.localize(`${ModuleName}.Settings.skillrankiconscale.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.skillrankiconscale.descrp`),
+		scope: "client",
+		config: true,
+		type: Number,
+		range: {
+			min: 0.5,
+			max: 2,
+			step: 0.05
+		},
+		default: 1,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "weaponsetscount", {
 		name: game.i18n.localize(`${ModuleName}.Settings.weaponsetscount.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.weaponsetscount.descrp`),
