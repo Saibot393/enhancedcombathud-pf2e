@@ -9,6 +9,7 @@
 - CTRL+Z now works with the movement tracker (ony the current segment can be reversed)
 - Skill actions now use action points
 - Perform and Administer first aid now request the variant before being rolled
+- Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
 
 ## v1.5.2
 - Added Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
