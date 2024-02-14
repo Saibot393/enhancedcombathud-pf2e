@@ -309,6 +309,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					},
 					{
 						text: HPText,
+						id: "HPtext"
 					},
 				],
 				[
@@ -397,6 +398,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			};
 			
+			//armor open
 			let acBlock = this.element.querySelector("#ac")?.parentElement;
 			
 			if (acBlock) {
@@ -409,7 +411,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			if (this.actor.system.resources.heroPoints?.max) {
+			if (this.actor.system.resources.heroPoints?.max) {//Hero Points
 				let max = this.actor.system.resources.heroPoints.max;
 				let value = this.actor.system.resources.heroPoints.value;
 				
@@ -452,7 +454,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				this.element.appendChild(heroPoints);
 			}
 			
-			if (this.isDying) {
+			if (this.isDying) {//death overlay
 				let max = this.actor.system.attributes?.dying?.max;
 				let value = this.actor.system.attributes?.dying?.value;
 				
@@ -499,7 +501,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				dying.appendChild(dyingcount);
 			}
 			
-			if (this.actor.system.attributes.shield?.raised) {
+			if (this.actor.system.attributes.shield?.raised) {//raised shield
 				let shieldIcon = document.createElement("i");
 				shieldIcon.classList.add("fa-solid", "fa-shield");
 				shieldIcon.setAttribute("data-tooltip", game.i18n.localize("TYPES.Item.shield"));
@@ -507,8 +509,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				this.element.querySelector("#ACvalue").appendChild(shieldIcon);
 			}
 			
+			let hpbox = this.element.querySelector("#HPtext").parent;
+			if (hpbox) {
+				let tempHPbox = document.createElement("div");
+				tempHPbox.classList.add("portrait-stat-block")
+			}
+			
 			const spellDCElement = this.element.querySelector("#SpellDCvalue")
-			if (spellDCElement) {
+			if (spellDCElement) {//spell DC
 				let description = (await Promise.all(this.actor.items.filter(item => item.type == 'spellcastingEntry').map(group => group.getSpellData()))).find(info => info.statistic.dc.value == spellDCElement.innerHTML)?.statistic.dc.breakdown;
 				
 				let spellicon = document.createElement("i");
@@ -521,7 +529,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				spellDCElement.appendChild(spellicon);
 			}
 			
-			if (game.settings.get(ModuleName, "rollinitiative") == "choiceroll") {
+			if (game.settings.get(ModuleName, "rollinitiative") == "choiceroll") {//initiative
 				if (!this.isDying && !this.isDead) {
 					if (this.actor.inCombat && this.actor.combatant && (this.actor.combatant.initiative == null)) {
 						let initiativeBox = document.createElement("div");
@@ -584,6 +592,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
+			//circle buttons
 			const circlebuttonsize = "60";
 			
 			let circlediv = document.createElement("div");
@@ -660,7 +669,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				circlediv.appendChild(connectbutton);
 			}
 			
-			if (game.settings.get(ModuleName, "shownpctraits") && this.actor.system.traits?.value?.length) {
+			if (game.settings.get(ModuleName, "shownpctraits") && this.actor.system.traits?.value?.length) {//traits
 				if (this.actor.type == "npc") {
 					const height = 23;
 					let traitbox = document.createElement("div");
@@ -764,7 +773,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const savesButtons = Object.keys(saves).map(saveKey => {
 				const save = saves[saveKey];
 				
-				let valueLabel = `<span style="margin: 0 1rem">+${save.mod}</span>`;
+				let valueLabel = `<span style="margin: 0 1rem">${save.mod >= 0 ? "+" : ""}${save.mod}</span>`;
 				
 				let rankicon = "";
 				if (game.settings.get(ModuleName, "showtrainedrankletter")) {
@@ -796,7 +805,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const skill = skills[skillKey];
 				
 				if (!skill.lore) {
-					let valueLabel = `<span style="margin: 0 1rem">+${skill.mod}</span>`;
+					let valueLabel = `<span style="margin: 0 1rem">${skill.mod >= 0 ? "+" : ""}${skill.mod}</span>`;
 					
 					let rankicon = "";
 					if (game.settings.get(ModuleName, "showtrainedrankletter")) {
@@ -924,7 +933,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const lore = skills[skillKey];
 				
 				if (lore.lore) {
-					let valueLabel = `<span style="margin: 0 1rem">+${lore.mod}</span>`;
+					let valueLabel = `<span style="margin: 0 1rem">${lore.mod >= 0 ? "+" : ""}${lore.mod}</span>`;
 					
 					let rankicon = "";
 					if (game.settings.get(ModuleName, "showtrainedrankletter")) {
@@ -1959,9 +1968,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (game.modules.get("pf2e-ranged-combat")?.active) {
 					let itemaction = itemconnectedAction(this.item);
 					
-					let reload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == "Reload");
+					let reload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == game.i18n.localize("pf2e-ranged-combat.ammunitionSystem.actions.names.reload"));
 					
-					let unload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == "Unload");
+					let unload = itemaction?.auxiliaryActions?.find(action => action.action == "interact" && action.label == game.i18n.localize("pf2e-ranged-combat.ammunitionSystem.actions.names.unload"));
 					
 					if (reload) {
 						let toggleData = {
