@@ -45,6 +45,10 @@
 				"name"					: "Rettungs-, Fähigkeits- und Geschitswürfe umdrehen",
 				"descrp"				: "Dreht die Reihenfolge der Kategorien um"
 			},
+			"filtertrainedactions" : {
+				"name"					: "Filtere Trainierte Aktionen",
+				"descrp"				: "Ob Aktionen welche nicht ausgeführt werden können da der Character nicht in der entsprchenden Fertigkeit trainiert ist versteckt werden sollen"
+			},
 			"showtrainedrankletter" : {
 				"name"					: "Zeige Trainingsrang Buchstaben",
 				"descrp"				: "Zeigt einen Buchstaben entsprechend des Trainingsrangs von Rettungswürfen & Fähigkeiten an"
@@ -68,6 +72,10 @@
 			"consumableswap" : {
 				"name"					: "Konsumierbare tauschbar",
 				"descrp"				: "Ob konsumierbare Gegenstände wleche gehalten werden können ein Aktionsicon zum in die hand nehmen haben sollen"	
+			},
+			"reduceAoO" : {
+				"name"					: "Reduziere Gelegenheitsangriff Knöpfe",
+				"descrp"				: "Ob Knöpfe welche mit Gelegenheitsangriffen im Zusammenhang stehen verkleinert/versteckt werden sollen"	
 			},
 			"usetakecover": {
 				"name"					: "Nutze In Deckung gehen",

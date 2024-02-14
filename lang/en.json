@@ -45,6 +45,10 @@
 				"name"					: "Reverse save, skill, lore",
 				"descrp"				: "Reverses the order to lore skill saves"
 			},
+			"filtertrainedactions" : {
+				"name"					: "Filter trained actions",
+				"descrp"				: "If the actions that can not be used due to the character not being trained in the appropiate skill should be hidden"
+			},
 			"showtrainedrankletter" : {
 				"name"					: "Show trained rank letter",
 				"descrp"				: "Shows a letter next to saves & skills to indicate the training rank"
@@ -68,6 +72,10 @@
 			"consumableswap" : {
 				"name"					: "Consumeables swapable",
 				"descrp"				: "If consumables that can be held should have an action icon to swap them into the active weapon set"	
+			},
+			"reduceAoO" : {
+				"name"					: "Reduce Attack of Opportunity buttons",
+				"descrp"				: "If buttons connected to Attack of Opportunity should be reduced in size/hidden"	
 			},
 			"usetakecover": {
 				"name"					: "Use take cover",

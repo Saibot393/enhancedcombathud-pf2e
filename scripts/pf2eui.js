@@ -858,10 +858,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				let labelcolornumber = save.rank;
 				if (this.actor.type == "npc") {
-					console.log(save);
-					console.log(save.attribute);
-					console.log(this.actor.system.abilities);
-					let cleanedvalue = save.mod - this.actor.system.abilities[save.attribute].mod;
+					let cleanedvalue = save.mod - this.actor.system.abilities[this.actor.system?.saves[saveKey]?.attribute]?.mod;
 					if (!game.settings.get("pf2e", "proficiencyVariant")) {
 						cleanedvalue = cleanedvalue - this.actor.level;
 					}

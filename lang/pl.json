@@ -17,6 +17,14 @@
 				"name"					: "Przycisk karty postaci",
 				"descrp"				: "Zakładka otwierana po kliknięciu zakładki karty postaci nad portretem"
 			},
+			"rollinitiative" : {
+				"name"					: "Tryb inicjatywy",
+				"descrp"				: "Zachowanie po kliknięciu przycisku inicjatywy powyżej portretu.",
+				"options" : {
+					"choiceroll"		: "Wybierz umiejętność",
+					"quickroll"			: "Szybki rzut"
+				}
+			},
 			"showpartybutton" : {
 				"name"					: "Pokaż przycisk drużyny",
 				"descrp"				: "Wyświetla przycisk łączący z drużyną postaci na portrecie."
