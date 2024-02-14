@@ -148,6 +148,35 @@ Hooks.on("createCombatant", (combatant) => {
 	}
 });
 
+function useAction(actionType, actions = 1) {
+	if (!ui?.ARGON?.components) return false;
+	
+	let used = actions;
+	
+	if (isNaN(used)) {
+		used = 1;
+	}
+	
+	switch (actionType) {
+		case "action":
+			ui.ARGON.components.main[0].currentActions = ui.ARGON.components.main[0].currentActions - used;
+			break;
+		case "free":
+			break;
+		case "reaction":
+			ui.ARGON.components.main[1].currentActions = ui.ARGON.components.main[2].currentActions - used;
+			break;
+	}
+	
+	return used;
+}
+
+Hooks.once("init", () => {
+	game.modules.get(ModuleName).api = {
+		useAction
+	}
+});
+
 Hooks.on("argonInit", async (CoreHUD) => {
     const ARGON = CoreHUD.ARGON;
 
@@ -155,29 +184,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	
 	CoreHUD._movementSave = {};
 	CoreHUD._actionSave = {action : {}, reaction : {}};
-	
-	function useAction(actionType, actions = 1) {
-		if (!ui?.ARGON?.components) return false;
-		
-		let used = actions;
-		
-		if (isNaN(used)) {
-			used = 1;
-		}
-		
-		switch (actionType) {
-			case "action":
-				ui.ARGON.components.main[0].currentActions = ui.ARGON.components.main[0].currentActions - used;
-				break;
-			case "free":
-				break;
-			case "reaction":
-				ui.ARGON.components.main[1].currentActions = ui.ARGON.components.main[2].currentActions - used;
-				break;
-		}
-		
-		return used;
-	}
   
     class PF2EPortraitPanel extends ARGON.PORTRAIT.PortraitPanel {
 		constructor(...args) {
@@ -852,6 +858,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				let labelcolornumber = save.rank;
 				if (this.actor.type == "npc") {
+					console.log(save);
+					console.log(save.attribute);
+					console.log(this.actor.system.abilities);
 					let cleanedvalue = save.mod - this.actor.system.abilities[save.attribute].mod;
 					if (!game.settings.get("pf2e", "proficiencyVariant")) {
 						cleanedvalue = cleanedvalue - this.actor.level;
@@ -897,7 +906,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					
 					let labelcolornumber = skill.rank;
 					if (this.actor.type == "npc") {
-						let cleanedvalue = skill.mod - this.actor.system.abilities[skill.attribute].mod;
+						let cleanedvalue = skill.mod - this.actor.system.abilities[skill.attribute]?.mod;
 						if (!game.settings.get("pf2e", "proficiencyVariant")) {
 							cleanedvalue = cleanedvalue - this.actor.level;
 						}
