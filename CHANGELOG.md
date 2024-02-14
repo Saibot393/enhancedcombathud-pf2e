@@ -1,3 +1,14 @@
+## v1.7.0
+- Added setting to hide actions that can not be performed due to the character not being traine in the connected skill
+- Added option to reduce the attack of opportunity buttons
+- Added item/spell level to subtitle
+- Added menu to change hp/temp hp (open by hovering over the hp display)
+- Added filter to only show available npc skills
+- Added "pseudo rank color" to npc skills & saves
+- Added api to use argon hud actions (`game.modules.get("enhancedcombathud-pf2e").api.useAction(actiontype, actionamount)`)
+- Fixed bug that could prevent the pf2e [PF2e Ranged Combat](https://foundryvtt.com/packages/pf2e-ranged-combat) reload/unload options from showing up 
+- Fixed bug that could prevent the HUD from opening when selecting familiars
+
 ## v1.6.1
 - Small improvements and bug fixes
 
