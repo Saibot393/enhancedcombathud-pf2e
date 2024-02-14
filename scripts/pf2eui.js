@@ -811,7 +811,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					
 					let skillentries = [new PF2EDrawerButton([
 						{
-							label: this.actor.system.initiative.statistic == skillKey ? `<i class="fa-solid fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>` : `<i class="fa-regular fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>`,
+							label: this.actor.system.initiative?.statistic == skillKey ? `<i class="fa-solid fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>` : `<i class="fa-regular fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>`,
 							onClick: async () => {
 								this.actor.update({system : {initiative : {statistic : skillKey}}});
 								this.element.querySelector(".fa-solid.fa-circle")?.classList.replace("fa-solid", "fa-regular");

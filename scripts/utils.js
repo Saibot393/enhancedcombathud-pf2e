@@ -570,4 +570,29 @@ function itemcanbetwoHanded(item) {
 	return false;
 }
 
-export { ModuleName, settingActionSpace, tabnames, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded}
+function itemuseable(item, inCombat) {
+	if (item) {
+		if (["consumable", "equipment"].includes(item.type)) {
+			switch (item.system?.usage?.type) {
+				case "worn":
+				case "attached":
+					return (item.system.equipped?.inSlot || item.system.equipped?.handsHeld > 0);
+					break;
+				case "carried":
+					return true;
+					break;
+				case "held":
+					return true;
+					break;
+			}
+		}
+	}
+	
+	return true;
+}
+
+function autoset(item) {
+	
+}
+
+export { ModuleName, settingActionSpace, tabnames, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemuseable}
