@@ -88,6 +88,18 @@ function createToggleIcons(toggles, options = {}) {
 	return iconpanel;	
 }
 
+Hooks.once("ready", async () => {
+	if (game.settings.get(ModuleName, "lockedmacros")) {//remove in later version
+		await game.user.setFlag(ModuleName, "lockedmacros", game.settings.get(ModuleName, "lockedmacros"));
+		
+		game.settings.set(ModuleName, "lockedmacros", null)
+	}
+	
+	if (!game.user.getFlag(ModuleName, "lockedmacros")) {
+		game.user.setFlag(ModuleName, "lockedmacros", {});
+	}
+});
+
 //ammend Hooks
 Hooks.on("updateItem", (item) => {
 	const PF2EDailies = "pf2e-dailies";
@@ -1034,10 +1046,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			this.__defineGetter__("_currentActions", () => {
-				return CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions;
+				return CoreHUD._actionSave[this.actionType][this.actor.id]?._currentActions || 0;
 			});
 			
 			this.__defineSetter__("_currentActions", (value) => {
+				if (!CoreHUD._actionSave[this.actionType][this.actor.id]) {
+					CoreHUD._actionSave[this.actionType][this.actor.id] = {};
+				}
+				
 				CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions = value;
 			})
 		}
@@ -2265,7 +2281,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get lockedMacro() {
-			return game.settings.get(ModuleName, "lockedmacros")[this.index];
+			return game.user.getFlag(ModuleName, "lockedmacros")[this.index];
 		}
 		
 		get macroLocked() {
@@ -2273,13 +2289,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async unlockMacro(render = true) {
-			game.settings.set(ModuleName, "lockedmacros", {[this.index] : ""});
+			await game.user.setFlag(ModuleName, "lockedmacros", {[this.index] : ""});
 			
 			this.updateMacro(render);
 		}
 		
 		async lockMacro(render = true) {
-			game.settings.set(ModuleName, "lockedmacros", {[this.index] : this.macroUuid});
+			await game.user.setFlag(ModuleName, "lockedmacros", {[this.index] : this.macroUuid});
 			
 			this.updateMacro(render);
 		}
@@ -2300,7 +2316,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				this._macro = macro;
 				
 				if (this.macroLocked) {
-					await game.settings.set(ModuleName, "lockedmacros", {[this.index] : uuid})
+					await game.user.setFlag(ModuleName, "lockedmacros", {[this.index] : uuid})
 				}
 				else {
 					/*
