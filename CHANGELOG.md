@@ -1,3 +1,6 @@
+## v1.6.1
+- Small improvements and bug fixes
+
 ## v1.6.0
 - Added macro panel to access the macros stored on the macro bar (which is a new [CORE](https://foundryvtt.com/packages/enhancedcombathud) base feature)
 - Improved the macro buttons
