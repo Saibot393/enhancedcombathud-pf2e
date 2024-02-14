@@ -81,6 +81,16 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "filtertrainedactions", {
+		name: game.i18n.localize(`${ModuleName}.Settings.filtertrainedactions.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.filtertrainedactions.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: true,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "showtrainedrankletter", {
 		name: game.i18n.localize(`${ModuleName}.Settings.showtrainedrankletter.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.showtrainedrankletter.descrp`),

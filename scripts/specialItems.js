@@ -65,6 +65,8 @@ const settingActionIMGs = {
 	}
 }
 
+const trainedactions = ["maneuver-in-flight", "squeeze", "decipher-writing", "identify-magic", "learn-a-spell", "disarm", "identify-alchemy", "feint", "treat-disease", "treat-poison", "create-forgery", "track", "disable-device", "pick-a-lock"]
+
 var defaultActions = {};
 
 var PF2EECHActionItems = {};
@@ -558,4 +560,4 @@ function skillactionkeys(skill) {
 	return Array.from(game.pf2e.actions.keys()).filter(key => game.pf2e.actions.get(key).statistic == skill || (game.pf2e.actions.get(key).statistic?.length && game.pf2e.actions.get(key).statistic.includes(skill)))
 }
 
-export {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule, getSettingActionOptions, getSettingActionTitles}
+export {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule, getSettingActionOptions, getSettingActionTitles}

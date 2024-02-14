@@ -1,4 +1,4 @@
-import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, itemfromRule} from "./specialItems.js";
+import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
 import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";                                                                                                                                                                        
@@ -844,10 +844,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						},
 					])];
 					
-					skillactions.filter(action => action.statistic?.includes(skillKey)).forEach(action => {
+					let localskillactions = skillactions.filter(action => action.statistic?.includes(skillKey));
+					
+					if (game.settings.get(ModuleName, "filtertrainedactions")) {
+						localskillactions = localskillactions.filter(action => skill.rank > 0 || !trainedactions.includes(action.slug));
+					}
+					
+					localskillactions.forEach(action => {
 						let actiontitle = `<span class="${skillKey}-action">${game.i18n.localize(action.name)}</span>`;
 						
-						let actionGlyph = actionGlyphs("action", action.cost);
+						let actionGlyph = actionGlyphs("action", action.cost) || actionGlyphs(action.cost);
 						if (actionGlyph) {
 							actiontitle = `${actiontitle} <span class=\"action-glyph\">${actionGlyph}</span>`;
 						}
@@ -878,7 +884,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							}
 							
 							action.use(settings);
-							useAction("action", action.cost);
+							if (Number.isNumeric(action.cost)) {
+								useAction("action", action.cost);
+							}
+							else {
+								useAction(action.cost);
+							}
 						}
 						
 						let hasMAP = action.traits?.includes("attack");
@@ -1345,11 +1356,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 		get hasTooltip() {
 			return true;
-			
-			if (this.item?.system.identification) {
-				//hide mystified items from non GMs
-				return this.item.system.identification.status == "identified" || game.user.isGM;
-			}
 		}
 		
 		get tooltipCls() {
@@ -1547,8 +1553,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async getTooltipData() {
+			if (this.panel?.visible) return null;
 			const tooltipData = await getTooltipDetails(this.item);
 			return tooltipData;
+		}
+		
+		async hidetooltip() {
+			if (!this._tooltip) return;
+			this._tooltip._destroy();
+			this._tooltip = null;
 		}
 		
 		updatePartnerButton() {
@@ -1964,7 +1977,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (!game.settings.get(ModuleName, "directStaffuse")) {
 						let toggleData = {
 							iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
-							onclick : () => {this.panel.toggle()},
+							onclick : async () => {await this.hidetooltip(); this.panel.toggle()},
 							tooltip : game.i18n.localize("PF2E.Item.Spell.Plural")
 						};	
 
