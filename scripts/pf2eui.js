@@ -846,11 +846,20 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let valueLabel = `<span style="margin: 0 1rem">${save.mod >= 0 ? "+" : ""}${save.mod}</span>`;
 				
 				let rankicon = "";
-				if (game.settings.get(ModuleName, "showtrainedrankletter")) {
+				if (!this.actor.type == "npc" && game.settings.get(ModuleName, "showtrainedrankletter")) {
 					rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank)}" style="font-size:${game.settings.get(ModuleName, "skillrankiconscale")}rem"></i> `;
 				}
 				
-				let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + save.rank).toLowerCase()})">${save.label} ${rankicon}</span>`;
+				let labelcolornumber = save.rank;
+				if (this.actor.type == "npc") {
+					let cleanedvalue = save.mod - this.actor.system.abilities[save.attribute].mod;
+					if (!game.settings.get("pf2e", "proficiencyVariant")) {
+						cleanedvalue = cleanedvalue - this.actor.level;
+					}
+					labelcolornumber = Math.min(Math.max(Math.floor(cleanedvalue/2),0), 4);
+				}
+				
+				let nameLabel = `<span style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + labelcolornumber).toLowerCase()})">${save.label} ${rankicon}</span>`;
 				
 				let roll = (event) => {
 					save.check.roll({event : event})
@@ -892,12 +901,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						if (!game.settings.get("pf2e", "proficiencyVariant")) {
 							cleanedvalue = cleanedvalue - this.actor.level;
 						}
-						console.log(this.actor.system.abilities[skill.attribute].mod);
-						console.log(this.actor.level);
-						console.log(cleanedvalue);
 						labelcolornumber = Math.min(Math.max(Math.floor(cleanedvalue/2),0), 4);
 					}
-					console.log(labelcolornumber);
 					
 					let nameLabel = `<span class="${skillKey}-skill" style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + labelcolornumber).toLowerCase()})">${skill.label} ${rankicon}</span>`;
 					
