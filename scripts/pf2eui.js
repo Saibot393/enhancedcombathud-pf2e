@@ -701,6 +701,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				connectbutton.style.backgroundImage = `url(${actor.img})`;
 				connectbutton.style.backgroundSize = "cover"
 				connectbutton.style.borderRadius = "50%";
+				connectbutton.style.backgroundPosition = "center";
 				connectbutton.style.zIndex = 1;
 				
 				let title = "";
