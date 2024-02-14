@@ -8,6 +8,11 @@ const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2
 const maxactions = 3;
 const maxreactions = 1;
 
+const hpblue = "rgb(10, 200, 255)";
+const hpred = "rgb(255 10 10)";
+const hporange = "rgb(255 127 0)";
+const hpgreen = "rgb(0 255 100)";
+
 /* EXPERIMENTAL code to add custom colors
 Hooks.once("argonDefaultColor", (defaultColors) => {
 	defaultColors.colors.movement.test123 = { background: "#c85f5aFF", boxShadow: "#dc736eCC" };
@@ -152,6 +157,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	CoreHUD._actionSave = {action : {}, reaction : {}};
 	
 	function useAction(actionType, actions = 1) {
+		if (!ui?.ARGON?.components) return false;
+		
 		let used = actions;
 		
 		if (isNaN(used)) {
@@ -168,6 +175,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				ui.ARGON.components.main[1].currentActions = ui.ARGON.components.main[2].currentActions - used;
 				break;
 		}
+		
+		return used;
 	}
   
     class PF2EPortraitPanel extends ARGON.PORTRAIT.PortraitPanel {
@@ -290,7 +299,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const DCText = game.i18n.localize("PF2E.Check.DC.Unspecific");
 
 			const hppercent = this.actor.system.attributes.hp.value/this.actor.system.attributes.hp.max;
-			const hpColor = this.actor.system.attributes.hp.temp ? "#6698f3" : (hppercent <= 0.5 ? (hppercent <= 0.1 ?  "rgb(255 10 10)" : "rgb(255 127 0)") : "rgb(0 255 170)");
+			const hpColor = this.actor.system.attributes.hp.temp ? hpblue : (hppercent <= 0.5 ? (hppercent <= 0.1 ?  hpred : hporange) : hpgreen);
 			const tempMax = this.actor.system.attributes.hp.tempmax;
 			const hpMaxColor = tempMax ? (tempMax > 0 ? "rgb(222 91 255)" : "#ffb000") : "rgb(255 255 255)";
 
@@ -299,6 +308,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					{
 						text: `${this.actor.system.attributes.hp.value + (this.actor.system.attributes.hp.temp ?? 0)}`,
 						color: hpColor,
+						id: "HPvalue"
 					},
 					{
 						text: `/`,
@@ -509,13 +519,73 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				this.element.querySelector("#ACvalue").appendChild(shieldIcon);
 			}
 			
-			let hpbox = this.element.querySelector("#HPtext").parent;
+			//hp and temp hp box
+			let hpbox = this.element.querySelector("#HPtext").parentElement;
+			let mainHPbox;
 			if (hpbox) {
+				let hpvaluebox = hpbox.querySelector("#HPvalue");
+				
+				let mainHPbox = document.createElement("div");
+				
 				let tempHPbox = document.createElement("div");
-				tempHPbox.classList.add("portrait-stat-block")
+				tempHPbox.classList.add("portrait-stat-block");
+				tempHPbox.style.display = "none";
+				
+				let tempHPvalue = document.createElement("input");
+				tempHPvalue.type = "number";
+				tempHPvalue.style.color = hpblue;
+				tempHPvalue.style.width = "30px";
+				tempHPvalue.onfocus = () => {tempHPvalue.select()};
+				
+				let tempHPtext = document.createElement("span");
+				tempHPtext.innerText = game.i18n.localize("PF2E.TempHitPointsShortLabel");
+				
+				tempHPbox.appendChild(tempHPvalue);
+				tempHPbox.appendChild(tempHPtext);
+				
+				let currentHPvalue = document.createElement("input");
+				currentHPvalue.type = "number";
+				currentHPvalue.style.display = "none";
+				currentHPvalue.style.width = "30px";
+				currentHPvalue.onfocus = () => {currentHPvalue.select()};
+				currentHPvalue.onchange = () => {
+					const hppercent = currentHPvalue.value/this.actor.system.attributes.hp.max;
+					
+					currentHPvalue.style.color = hppercent <= 0.5 ? (hppercent <= 0.1 ?  hpred : hporange) : hpgreen;
+				}
+				
+				hpbox.prepend(currentHPvalue);
+				
+				mainHPbox.onmouseenter = () => {
+					tempHPbox.style.display = "";
+					currentHPvalue.style.display = "";
+					hpvaluebox.style.display = "none";
+					
+					tempHPvalue.value = this.actor.system.attributes.hp.temp;
+					currentHPvalue.value = this.actor.system.attributes.hp.value;
+					
+					currentHPvalue.onchange();
+				}
+				
+				mainHPbox.onmouseleave = () => {
+					tempHPbox.style.display = "none";
+					currentHPvalue.style.display = "none";
+					hpvaluebox.style.display = "";
+					
+					if (tempHPvalue.value != this.actor.system.attributes.hp.temp || currentHPvalue.value != this.actor.system.attributes.hp.value) {
+						let update = {system : {attributes : {hp : {temp : tempHPvalue.value, value : currentHPvalue.value}}}};
+						
+						this.actor.update(update);
+					}
+				}
+				
+				mainHPbox.appendChild(tempHPbox);
+				mainHPbox.appendChild(hpbox);
+				this.element.prepend(mainHPbox);
 			}
 			
-			const spellDCElement = this.element.querySelector("#SpellDCvalue")
+			const spellDCElement = this.element.querySelector("#SpellDCvalue");
+			
 			if (spellDCElement) {//spell DC
 				let description = (await Promise.all(this.actor.items.filter(item => item.type == 'spellcastingEntry').map(group => group.getSpellData()))).find(info => info.statistic.dc.value == spellDCElement.innerHTML)?.statistic.dc.breakdown;
 				
@@ -804,15 +874,32 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			Object.keys(skills).forEach(skillKey => {
 				const skill = skills[skillKey];
 				
+				if (this.actor.type == "npc") {
+					if (!this.actor.system.skills[skill.slug]) return; //this skill has not been set for this npcs
+				}
+				
 				if (!skill.lore) {
 					let valueLabel = `<span style="margin: 0 1rem">${skill.mod >= 0 ? "+" : ""}${skill.mod}</span>`;
 					
 					let rankicon = "";
-					if (game.settings.get(ModuleName, "showtrainedrankletter")) {
+					if (!this.actor.type == "npc" && game.settings.get(ModuleName, "showtrainedrankletter")) {
 						rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank)}" style="font-size:${game.settings.get(ModuleName, "skillrankiconscale")}rem"></i> `;
 					}
 					
-					let nameLabel = `<span class="${skillKey}-skill" style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()})">${skill.label} ${rankicon}</span>`;
+					let labelcolornumber = skill.rank;
+					if (this.actor.type == "npc") {
+						let cleanedvalue = skill.mod - this.actor.system.abilities[skill.attribute].mod;
+						if (!game.settings.get("pf2e", "proficiencyVariant")) {
+							cleanedvalue = cleanedvalue - this.actor.level;
+						}
+						console.log(this.actor.system.abilities[skill.attribute].mod);
+						console.log(this.actor.level);
+						console.log(cleanedvalue);
+						labelcolornumber = Math.min(Math.max(Math.floor(cleanedvalue/2),0), 4);
+					}
+					console.log(labelcolornumber);
+					
+					let nameLabel = `<span class="${skillKey}-skill" style="padding-left : 5px;padding-right : 5px;text-align: center; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 2px;background-color: var(--color-proficiency-${game.i18n.localize("PF2E.ProficiencyLevel" + labelcolornumber).toLowerCase()})">${skill.label} ${rankicon}</span>`;
 					
 					let roll = (event) => {
 						skill.check.roll({event : event})
