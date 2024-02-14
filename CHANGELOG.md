@@ -7,6 +7,7 @@
 - Added "pseudo rank color" to npc skills & saves
 - Added api to use argon hud actions (`game.modules.get("enhancedcombathud-pf2e").api.useAction(actiontype, actionamount)`)
 - Staff tooltips will now close when the staff spell panel is open(ed)
+- Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
 - Fixed bug that could prevent the pf2e [PF2e Ranged Combat](https://foundryvtt.com/packages/pf2e-ranged-combat) reload/unload options from showing up 
 - Fixed bug that could prevent the HUD from opening when selecting familiars
 
