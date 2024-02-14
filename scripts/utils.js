@@ -570,7 +570,11 @@ function itemcanbetwoHanded(item) {
 	return false;
 }
 
-function itemuseable(item, inCombat) {
+function itemfilter(item, settings = {}) {
+	if (Array.isArray(item)) {
+		return item.filter(item => itemfilter(item, settings));
+	}
+	
 	if (item) {
 		if (["consumable", "equipment"].includes(item.type)) {
 			switch (item.system?.usage?.type) {
@@ -591,8 +595,35 @@ function itemuseable(item, inCombat) {
 	return true;
 }
 
+function actionfilter(action, settings = {actiontype : "", classonly : false, notclass : false, notAoO : false}) {
+	if (!action) return;
+	
+	if (action.filter) {
+		return action.filter(action => actionfilter(action, settings));
+	}
+	
+	if (action.type != "action") {
+		return false;
+	}
+	if (settings.actiontype) {
+		if (action.system.actionType?.value != settings.actiontype) {return false;}
+	}
+	if (settings.classonly) {
+		if (!isClassFeature(action)) {return false;}
+	}
+	if (settings.notclass) {
+		if (isClassFeature(action)) {return false;}
+	}
+	if (settings.notAoO) {
+		let sourceID = connectedItem(action)?.getFlag("core", "sourceId");
+		if (AoOids.find(id => sourceID?.includes(id))) {return false;}
+	}
+	
+	return true;
+}
+
 function autoset(item) {
 	
 }
 
-export { ModuleName, settingActionSpace, tabnames, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemuseable}
+export { ModuleName, settingActionSpace, tabnames, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter}

@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";                                                                                                                                                                        
 
@@ -1166,7 +1166,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[3]), new PF2ESpecialActionButton(specialActions[4])));
 			
-			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			
 			return buttons.filter(button => button.isvalid);
 		}
@@ -1253,6 +1254,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			buttons.push(new PF2EItemButton({ parent : this, item: null, isWeaponSet : true, isPrimary: true}));
 			buttons.push(new PF2EItemButton({ parent : this, item: null, isWeaponSet : true, isPrimary: false}));
+			if (game.settings.get(ModuleName, "reduceAoO")) {
+				buttons = [new PF2ESplitButton(buttons[0], buttons[1])];
+			}
 			
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[0]), new PF2ESpecialActionButton(specialActions[1])));
 			
@@ -1260,7 +1264,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
-			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, notAoO : game.settings.get(ModuleName, "reduceAoO")}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			
 			return buttons.filter(button => button.isvalid);
 		}
@@ -1311,7 +1316,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
-			buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			 
 			return buttons.filter(button => button.isvalid);
 		}
@@ -1463,7 +1469,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get partnerItem() {
 			if (this.isWeaponSet) {
-				return this.parent?.buttons.find(button => button != this && button.isWeaponSet)?.item;
+				if (this.parent?.button1 || this.parent?.button2) {
+					return [this.parent.button1, this.parent.button2].find(button => button != this)?.item;
+				}
+				else {
+					return this.parent?.buttons.find(button => button.isWeaponSet && button != this)?.item;
+				}
 			}
 			
 			return null;
