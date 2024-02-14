@@ -51,6 +51,9 @@ async function getTooltipDetails(item) {
 		title = dynamicstate ? dynamicstate.name({actor}) : item.name;
 		description = await TextEditor.enrichHTML(system.description.value);
 		subtitle = system.traits.rarity ? game.i18n.localize("PF2E.Trait" + firstUpper(system.traits.rarity)) : "";
+		if (item.system?.level?.hasOwnProperty("value")) {
+			subtitle = subtitle + ` ${replacewords(game.i18n.localize("PF2E.LevelN"), {level : item.system.level.value})}`;
+		}
 		subtitlecolor = system.traits.rarity ? `var(--color-rarity-${system.traits.rarity})` : "";
 		properties = system.traits.value?.map((trait) => {return {label : trait.toUpperCase()}});
 		propertiesLabel = properties?.length ? game.i18n.localize("PF2E.TraitsLabel") : "";
