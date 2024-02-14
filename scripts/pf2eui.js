@@ -5,6 +5,9 @@ import {elementalBlastProxy} from "./proxyfake.js";
 
 const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2e/icons/actions/OneAction.webp", "systems/pf2e/icons/actions/OneThreeActions.webp", "systems/pf2e/icons/actions/OneTwoActions.webp", "systems/pf2e/icons/actions/Passive.webp", "systems/pf2e/icons/actions/Reaction.webp", "systems/pf2e/icons/actions/ThreeActions.webp", "systems/pf2e/icons/actions/TwoActions.webp", "systems/pf2e/icons/actions/TwoThreeActions.webp", "icons/sundries/books/book-red-exclamation.webp"]
 
+const maxactions = 3;
+const maxreactions = 1;
+
 /* EXPERIMENTAL code to add custom colors
 Hooks.once("argonDefaultColor", (defaultColors) => {
 	defaultColors.colors.movement.test123 = { background: "#c85f5aFF", boxShadow: "#dc736eCC" };
@@ -1044,12 +1047,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get maxActions() {
-			if (this.actor.inCombat) {
+			if (this.actor?.inCombat) {
 				if (this.actor.hasCondition("quickened")) {
-					return 4;
+					return maxactions + 1;
 				}
 				else {
-					return 3;
+					return maxactions;
 				}
 			}
 			else {
@@ -1076,18 +1079,19 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		_onNewRound(combat) {
 			for (let key of Object.keys(CoreHUD._actionSave[this.actionType])) {
-				let reduction = 0;
+				let change = 0;
 				
 				let actor = game.actors.get(key);
 				
 				if (actor) {
 					let stunned = actor.items.find(i => i.system.slug == "stunned")?.system.value?.value || 0;
 					let slowed = actor.items.find(i => i.system.slug == "slowed")?.system.value?.value || 0;
+					let quickened = actor.hasCondition("quickened") ? 1 : 0;
 					
-					reduction = Math.min(Math.max(stunned, slowed), this.maxActions);
+					change = -Math.min(Math.max(stunned, slowed), maxactions + quickened) + quickened;
 				}
 				
-				CoreHUD._actionSave[this.actionType][key]._currentActions = this.maxActions - reduction;
+				CoreHUD._actionSave[this.actionType][key]._currentActions = maxactions + change;
 			}
 			
 			this.updateActionUse();
@@ -1185,7 +1189,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get maxActions() {
 			if (this.actor.inCombat) {
-				return 1;
+				return maxreactions;
 			}
 			else {
 				return null;
@@ -1211,7 +1215,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		_onNewRound(combat) {
 			for (let key of Object.keys(CoreHUD._actionSave[this.actionType])) {
-				CoreHUD._actionSave[this.actionType][key]._currentActions = this.maxActions;
+				CoreHUD._actionSave[this.actionType][key]._currentActions = maxreactions;
 			}
 			this.updateActionUse();
 		}
@@ -1940,6 +1944,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 				
+				if (this.panel) {
+					if (!game.settings.get(ModuleName, "directStaffuse")) {
+						let toggleData = {
+							iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
+							onclick : () => {this.panel.toggle()},
+							tooltip : game.i18n.localize("PF2E.Item.Spell.Plural")
+						};	
+
+						toggles.push(toggleData);
+					}
+				}
+				
 				if (this.isPrimary && itemcanbetwoHanded(this.item) && this.actionType == "action") {
 					let changegripaction = connectedsettingAction(this.item)?.auxiliaryActions?.find(action => action.annotation == "grip");
 					
@@ -1956,18 +1972,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					};	
 
 					toggles.push(toggleData);
-				}
-				
-				if (this.panel) {
-					if (!game.settings.get(ModuleName, "directStaffuse")) {
-						let toggleData = {
-							iconclass : ["fa-solid", "fa-wand-magic-sparkles"],
-							onclick : () => {this.panel.toggle()},
-							tooltip : game.i18n.localize("PF2E.Item.Spell.Plural")
-						};	
-
-						toggles.push(toggleData);
-					}
 				}
 			}
 			
