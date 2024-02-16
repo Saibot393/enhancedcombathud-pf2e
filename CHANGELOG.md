@@ -1,3 +1,7 @@
+## v1.7.1
+- Improved party and familiar/master buttons
+- Improved staff spell casting (thanks to [Codas](https://github.com/Codas))
+
 ## v1.7.0
 - Added setting to hide actions that can not be performed due to the character not being traine in the connected skill
 - Added option to reduce the attack of opportunity buttons
