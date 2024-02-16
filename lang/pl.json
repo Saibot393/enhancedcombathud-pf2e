@@ -45,6 +45,10 @@
 				"name"					: "Odwrócenie rzutów obronnych, umiejętności, wiedzy",
 				"descrp"				: "Odwraca kolejność rzutów obronnych, umiejętności i wiedzy"
 			},
+			"filtertrainedactions" : {
+				"name"					: "Filtruj wytrenowane akcje",
+				"descrp"				: "Akcje, których nie można użyć, ponieważ postać nie jest wyszkolona w odpowiedniej umiejętności, powinny zostać ukryte."
+			},
 			"showtrainedrankletter" : {
 				"name"					: "Pokaż wytrenowaną rangę jako literę na końcu",
 				"descrp"				: "Pokazuje literę obok rzutów obronnych i umiejętności, aby wskazać rangę treningu."
@@ -68,6 +72,10 @@
 			"consumableswap" : {
 				"name"					: "Zamienne materiały eksploatacyjne",
 				"descrp"				: "Materiały eksploatacyjne, które można trzymać, powinny mieć ikonę akcji, aby zamienić je na aktywny zestaw broni."	
+			},
+			"reduceAoO" : {
+				"name"					: "Zmniejszenie przycisków Ataku Okazyjnyjnego",
+				"descrp"				: "Przyciski związane z Atakiem Okazyjnym zostaną zmniejszone/ukryte."	
 			},
 			"usetakecover": {
 				"name"					: "Korzystanie z osłony",
