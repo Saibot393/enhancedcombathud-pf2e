@@ -1,3 +1,6 @@
+## v1.7.2
+- Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
+
 ## v1.7.1
 - Improved party and familiar/master buttons
 - Improved staff spell casting (thanks to [Codas](https://github.com/Codas))
