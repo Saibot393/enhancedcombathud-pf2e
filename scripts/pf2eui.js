@@ -1722,7 +1722,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							max : max,
 							value : value
 						}}
-						spellCategorie.buttons = spellgroup.spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, spell.system.level?.value)}));
+						spellCategorie.buttons = spellgroup.spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, spell.level)}));
 						
 						return [spellCategorie];
 					}
