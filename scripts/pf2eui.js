@@ -1,7 +1,9 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
 import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
-import {elementalBlastProxy} from "./proxyfake.js";                                                                                                                                                                        
+import {elementalBlastProxy} from "./proxyfake.js";  
+
+import {updateActionEffect} from "./compatibility/effects.js";                                                                                                                                                                      
 
 const defaultIcons = ["systems/pf2e/icons/actions/FreeAction.webp", "systems/pf2e/icons/actions/OneAction.webp", "systems/pf2e/icons/actions/OneThreeActions.webp", "systems/pf2e/icons/actions/OneTwoActions.webp", "systems/pf2e/icons/actions/Passive.webp", "systems/pf2e/icons/actions/Reaction.webp", "systems/pf2e/icons/actions/ThreeActions.webp", "systems/pf2e/icons/actions/TwoActions.webp", "systems/pf2e/icons/actions/TwoThreeActions.webp", "icons/sundries/books/book-red-exclamation.webp"]
 
@@ -1165,15 +1167,28 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			this.__defineGetter__("_currentActions", () => {
+				if (CoreHUD._actionSave[this.actionType].hasOwnProperty(this.actor.token?.id)) {
+					return CoreHUD._actionSave[this.actionType][this.actor.token.id]?._currentActions || 0
+				}
+				
 				return CoreHUD._actionSave[this.actionType][this.actor.id]?._currentActions || 0;
 			});
 			
 			this.__defineSetter__("_currentActions", (value) => {
+				if (this.actor.token) {
+					if (!CoreHUD._actionSave[this.actionType][this.actor.token.id]) {
+						CoreHUD._actionSave[this.actionType][this.actor.token.id] = {};
+					}
+					
+					CoreHUD._actionSave[this.actionType][this.actor.token.id]._currentActions = value;
+				}
+
 				if (!CoreHUD._actionSave[this.actionType][this.actor.id]) {
 					CoreHUD._actionSave[this.actionType][this.actor.id] = {};
 				}
 				
 				CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions = value;
+				//updateActionEffect(this.actor, value);
 			})
 		}
 
