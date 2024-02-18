@@ -670,6 +670,51 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
+			if (game.settings.get(ModuleName, "showquicksaves")) {
+				let savesdiv = document.createElement("div");
+				savesdiv.style.display = "flex";
+				savesdiv.style.flexDirection = "column";
+				savesdiv.style.position = "absolute";
+				savesdiv.style.top = "50%";
+				savesdiv.style.left = 0;
+				savesdiv.style.transform = "translate(0, -50%)";
+				
+				const savesbuttonsize = "30";
+				
+				let savefortitude = document.createElement("i");
+				savefortitude.classList.add("fa-solid", "fa-heart");
+				savefortitude.style.fontSize = `${savesbuttonsize}px`;
+				savefortitude.style.color = "red";
+				savefortitude.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
+				savefortitude.style.zIndex = 1;
+				savefortitude.setAttribute("data-tooltip", this.actor.saves.fortitude.label)
+				savefortitude.onclick = (event) => {this.actor.saves.fortitude.check.roll(event)};
+				
+				let savereflex = document.createElement("i");
+				savereflex.classList.add("fa-solid", "fa-bolt");
+				savereflex.style.fontSize = `${savesbuttonsize}px`;
+				savereflex.style.color = "gold";
+				savereflex.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
+				savereflex.style.zIndex = 1;
+				savereflex.setAttribute("data-tooltip", this.actor.saves.reflex.label)
+				savereflex.onclick = (event) => {this.actor.saves.reflex.check.roll(event)};
+				
+				let savewill = document.createElement("i");
+				savewill.classList.add("fa-solid", "fa-brain");
+				savewill.style.fontSize = `${savesbuttonsize}px`;
+				savewill.style.color = "royalblue";
+				savewill.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
+				savewill.style.zIndex = 1;
+				savewill.setAttribute("data-tooltip", this.actor.saves.will.label)
+				savewill.onclick = (event) => {this.actor.saves.will.check.roll(event)};
+				
+				savesdiv.appendChild(savefortitude);
+				savesdiv.appendChild(savereflex);
+				savesdiv.appendChild(savewill);
+				
+				this.element.appendChild(savesdiv);
+			}
+			
 			//circle buttons
 			const circlebuttonsize = "60";
 			
@@ -679,7 +724,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			circlediv.style.position = "absolute";
 			circlediv.style.top = "50%";
 			circlediv.style.right = 0;
-			circlediv.style.transform = "translate(0, -50%)"
+			circlediv.style.transform = "translate(0, -50%)";
 			
 			this.element.appendChild(circlediv);
 			

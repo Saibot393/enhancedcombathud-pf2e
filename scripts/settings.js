@@ -51,6 +51,16 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "showquicksaves", {
+		name: game.i18n.localize(`${ModuleName}.Settings.showquicksaves.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.showquicksaves.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "shownpctraits", {
 		name: game.i18n.localize(`${ModuleName}.Settings.shownpctraits.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.shownpctraits.descrp`),
