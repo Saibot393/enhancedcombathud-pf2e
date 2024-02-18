@@ -688,7 +688,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				savefortitude.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
 				savefortitude.style.zIndex = 1;
 				savefortitude.setAttribute("data-tooltip", this.actor.saves.fortitude.label)
-				savefortitude.onclick = (event) => {this.actor.saves.fortitude.check.roll(event)};
+				savefortitude.onclick = (event) => {this.actor.saves.fortitude.check.roll({event : event})};
 				
 				let savereflex = document.createElement("i");
 				savereflex.classList.add("fa-solid", "fa-bolt");
@@ -697,7 +697,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				savereflex.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
 				savereflex.style.zIndex = 1;
 				savereflex.setAttribute("data-tooltip", this.actor.saves.reflex.label)
-				savereflex.onclick = (event) => {this.actor.saves.reflex.check.roll(event)};
+				savereflex.onclick = (event) => {this.actor.saves.reflex.check.roll({event : event})};
 				
 				let savewill = document.createElement("i");
 				savewill.classList.add("fa-solid", "fa-brain");
@@ -706,7 +706,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				savewill.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
 				savewill.style.zIndex = 1;
 				savewill.setAttribute("data-tooltip", this.actor.saves.will.label)
-				savewill.onclick = (event) => {this.actor.saves.will.check.roll(event)};
+				savewill.onclick = (event) => {this.actor.saves.will.check.roll({event : event})};
 				
 				savesdiv.appendChild(savefortitude);
 				savesdiv.appendChild(savereflex);
