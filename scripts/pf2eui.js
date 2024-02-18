@@ -1188,7 +1188,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 				
 				CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions = value;
-				//updateActionEffect(this.actor, value);
 			})
 		}
 
@@ -1310,6 +1309,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				};
 			}
+		}
+		
+		updateActionUse() {
+			super.updateActionUse();
+			updateActionEffect(this.actor, {Actions : this.currentActions});
 		}
     }
 	

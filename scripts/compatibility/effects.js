@@ -10,12 +10,15 @@ export function updateActionEffect(Actor, Updates = {Actions : undefined, Reacti
 	if (Actor?.isOwner && Sequencer?.EffectManager) {
 		let Tokens = canvas.tokens.placeables.filter(Token => Token.actor == Actor);
 		
-		for (Token of Tokens) {
+		for (let Token of Tokens) {
 			if (Updates.Actions != undefined) {
 				for (let i = 1; i <= maxActions; i++) {
-					let hasActionEffect = Sequencer.EffectManager.getEffects({name : [Token.name,ModuleName,"Action",i].join("-"), object : Token.document});
+					let hasActionEffect = !isEmpty(Sequencer.EffectManager.getEffects({name : [Token.name,ModuleName,"Action",i].join("-"), object : Token.document}));
 					
-					if (hasActionEffect.length != (i <= Updates.Actions)) {
+					if (hasActionEffect != (i <= Updates.Actions)) {
+						console.log(i);
+						console.log(hasActionEffect);
+						console.log(Updates.Actions);
 						if (i <= Updates.Actions) {
 							giveActionEffect(Token, i);
 						}
@@ -30,9 +33,9 @@ export function updateActionEffect(Actor, Updates = {Actions : undefined, Reacti
 }
 
 function giveActionEffect(Token, number) {
-	new Sequence({moduleName: "PF2e Animations", softFail: true})
+	let seq = new Sequence({moduleName: ModuleName, softFail: true})
         .effect()
-        .name([Token.name,ModuleName,"Action",i].join("-"))
+        .name([Token.name,ModuleName,"Action",number].join("-"))
         .file("modules/pf2e-jb2a-macros/assets/actions/one.png", true)
         .fadeIn(1000)
         .animateProperty("sprite", `position.y`, 
@@ -63,9 +66,11 @@ function giveActionEffect(Token, number) {
             }
         )
         .persist(true)
-        .scaleToObject(0.2)
+        .scale(0.15)
         .aboveLighting()
         .opacity(0.8)
-        .wait(250)
-		.play()
+        .wait(250);
+		
+		
+	seq.play();
 }
