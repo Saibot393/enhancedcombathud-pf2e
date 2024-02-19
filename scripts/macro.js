@@ -1,8 +1,9 @@
 export async function createItemMacro(item) {
-	let Macro;
+	let itemMacro;
 	
+	console.log(item);
 	if (item) {
-		Macro = await Macro.create({
+		itemMacro = await Macro.create({
 			command: itemMacroCode(item),
 			name: item.name,
 			type: "script",
@@ -10,10 +11,11 @@ export async function createItemMacro(item) {
 		})
 	}
 	
-	return Macro;
+	return itemMacro;
 }
 
 function itemMacroCode(item) {
+	console.log(item.type);
 	switch (item.type) {
 		case "condition": return `
 			for (let actor of actors) {
@@ -41,6 +43,8 @@ function itemMacroCode(item) {
 				}
 			}
 		`;
+		case "action":
+			return `game.pf2e.rollActionMacro({ actorUUID: "${item.actorUUID}",  type: "strike", itemId: "LlYpQtJJJGFb1jri", slug: "staff" })`;
 		default: return `game.pf2e.rollItemMacro("${item.id}");`;
 	}
 }

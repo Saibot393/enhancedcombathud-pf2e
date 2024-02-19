@@ -2,6 +2,7 @@ import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EE
 import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";  
+import {createItemMacro} from "./macro.js";
 
 import {updateActionEffect} from "./compatibility/effects.js";                                                                                                                                                                      
 
@@ -2415,19 +2416,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			super(args);
 			this._index = args.index;
 			
-			/*
-			if (!this.macroLocked) {
-				let setmacros = this.actor.getFlag(ModuleName, "setmacros");
-				
-				if (setmacros && setmacros[this.index]) {
-					this.setitem(setmacros[this.index], false);
-				}
-			}
-			else {
-				
-			}
-			*/
-			//this.updateItem(false);
 			this.updateMacro();
 		}
 		
@@ -2574,6 +2562,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const data = JSON.parse(event.dataTransfer.getData("text/plain"));
 				if (data.type == "Macro") {
 					this.setMacro(data.uuid);
+				}
+				else {
+					console.log(data);
+					console.log(await fromUuid(data.uuid));
+					let macro = await createItemMacro(await fromUuid(data.uuid));
+					console.log(macro);
+					this.setMacro(macro.uuid)
 				}
 			} catch (error) {
 		  
