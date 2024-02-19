@@ -1,6 +1,7 @@
 ## v1.8.0
 - Items(including conditions & effects) can now be dragged into macro buttons to create an appropiate macro
 - Added option to show icon indicating the required actions on item buttons
+- Added option to show quick buttons for saves in portrait
 - Improved weaponsets created by drag & dropping actions
 - Improved action tracking
 - Improved replacement image search
