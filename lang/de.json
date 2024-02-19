@@ -33,6 +33,10 @@
 				"name"					: "Zeige Vertrauten/Meister Knopf",
 				"descrp"				: "Zeigt einen Knopf mit Verlinkung zum Vertrauten/Meister des Characters im Portrait"
 			},
+			"showquicksaves" : {
+				"name"					: "Zeige Rettungswurfknöpfe im Portrait",
+				"descrp"				: "Ob Knöpfe für das schnelle Würfeln von Rettungswürfen im Portrait angzeigt werden sollen"
+			},
 			"shownpctraits" : {
 				"name"					: "Zeige NPC Traits",
 				"descrp"				: "Ob NPC Traits im Portrait angezeigt werden sollen"

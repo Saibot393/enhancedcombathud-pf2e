@@ -3671,8 +3671,17 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 					else {
 						if (data.hasOwnProperty("index")) {
-							sets[set][slot] = this.actor.system.actions[data.index]?.item?.uuid.replace("Actor", "ActorAction") || null;
-							sets[set][slot + "-infos"] = {slug : this.actor.system.actions[data.index]?.slug, index : data.index};
+							let connectedItem = this.actor.system.actions[data.index]?.item;
+							
+							if (connectedItem) {
+								if (this.actor.items.find(item => item.id == connectedItem.id)) {
+									sets[set][slot] = connectedItem.uuid;
+								}
+								else {
+									sets[set][slot] = connectedItem.uuid.replace("Actor", "ActorAction") || null;
+									sets[set][slot + "-infos"] = {slug : this.actor.system.actions[data.index]?.slug, index : data.index};
+								}
+							}
 						}
 						else {
 							

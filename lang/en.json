@@ -33,6 +33,10 @@
 				"name"					: "Show Familiar/Master button",
 				"descrp"				: "Shows a button linking to the characters Familiar/Master in the portrait"
 			},
+			"showquicksaves" : {
+				"name"					: "Show saving throws in portrait",
+				"descrp"				: "If buttons for the saving throws should be shown in the portrait"
+			},
 			"shownpctraits" : {
 				"name"					: "Show NPC traits",
 				"descrp"				: "If NPC triats should be displayed in the character portrait"
