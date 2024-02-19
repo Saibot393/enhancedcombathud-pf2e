@@ -160,6 +160,16 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "showactionrequirements", {
+		name: game.i18n.localize(`${ModuleName}.Settings.showactionrequirements.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.showactionrequirements.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "consumableswap", {
 		name: game.i18n.localize(`${ModuleName}.Settings.consumableswap.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.consumableswap.descrp`),

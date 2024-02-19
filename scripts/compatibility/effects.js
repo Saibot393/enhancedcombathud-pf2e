@@ -8,31 +8,29 @@ const maxActions = 4;
 
 export function updateActionEffect(Actor, Updates = {Actions : undefined, Reaction : undefined}) {
 	if (Actor?.isOwner && Sequencer?.EffectManager) {
-		let Tokens = canvas.tokens.placeables.filter(Token => Token.actor == Actor);
+		//let Tokens = canvas.tokens.placeables.filter(Token => Token.actor == Actor);
+		let Token = Actor.token;
 		
-		for (let Token of Tokens) {
-			if (Updates.Actions != undefined) {
-				for (let i = 1; i <= maxActions; i++) {
-					let hasActionEffect = !isEmpty(Sequencer.EffectManager.getEffects({name : [Token.name,ModuleName,"Action",i].join("-"), object : Token.document}));
-					
-					if (hasActionEffect != (i <= Updates.Actions)) {
-						console.log(i);
-						console.log(hasActionEffect);
-						console.log(Updates.Actions);
-						if (i <= Updates.Actions) {
-							giveActionEffect(Token, i);
-						}
-						else {
-							Sequencer.EffectManager.endEffects({ name: [Token.name,ModuleName,"Action",i].join("-"), object: Token.document });
-						}
+		//for (let Token of Tokens) {
+		if (Updates.Actions != undefined) {
+			for (let i = 1; i <= maxActions; i++) {
+				let hasActionEffect = !isEmpty(Sequencer.EffectManager.getEffects({name : [Token.name,ModuleName,"Action",i].join("-"), object : Token.document}));
+				
+				if (hasActionEffect != (i <= Updates.Actions)) {
+					if (i <= Updates.Actions) {
+						giveActionEffect(Token, i);
+					}
+					else {
+						Sequencer.EffectManager.endEffects({ name: [Token.name,ModuleName,"Action",i].join("-"), object: Token.document });
 					}
 				}
 			}
 		}
+		//}
 	}
 }
 
-function giveActionEffect(Token, number) {
+function giveActionEffect(Token, id) {
 	let seq = new Sequence({moduleName: ModuleName, softFail: true})
         .effect()
         .name([Token.name,ModuleName,"Action",number].join("-"))
@@ -71,6 +69,47 @@ function giveActionEffect(Token, number) {
         .opacity(0.8)
         .wait(250);
 		
+	seq.play();
+}
+
+function giveReActionEffect(Token, number) {
+	let seq = new Sequence({moduleName: ModuleName, softFail: true})
+        .effect()
+        .name([Token.name,ModuleName,"Action",number].join("-"))
+        .file("modules/pf2e-jb2a-macros/assets/actions/re.png", true)
+        .fadeIn(1000)
+        .animateProperty("sprite", `position.y`, 
+            {
+                from: 0.3, 
+                to: 0, 
+                gridUnits: true, 
+                duration: 1000 
+            }
+        )
+        .fadeOut(500)
+        .attachTo(Token.document, 
+            { 
+                align: "top", 
+                edge: "outer", 
+                offset: { x: 2/6 }, 
+                gridUnits: true, 
+                followRotation: false 
+            }
+        )
+        .animateProperty("sprite", `position.y`, 
+            {
+                from: 0, 
+                to: -0.3, 
+                gridUnits: true,
+                duration: 1000, 
+                fromEnd: true
+            }
+        )
+        .persist(true)
+        .scale(0.15)
+        .aboveLighting()
+        .opacity(0.8)
+        .wait(250);
 		
 	seq.play();
 }

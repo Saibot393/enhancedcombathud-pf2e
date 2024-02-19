@@ -73,6 +73,10 @@
 				"name"					: "Direct Staff use",
 				"descrp"				: "If magical Staves should be used as spell casting items instead of weapons by default"
 			},
+			"showactionrequirements" : {
+				"name"					: "Show action requirements",
+				"descrp"				: "If an icon indicating the required actions should be shown in item buttons"
+			},
 			"consumableswap" : {
 				"name"					: "Consumeables swapable",
 				"descrp"				: "If consumables that can be held should have an action icon to swap them into the active weapon set"	

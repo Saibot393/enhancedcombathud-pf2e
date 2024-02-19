@@ -626,4 +626,4 @@ function autoset(item) {
 	
 }
 
-export { ModuleName, settingActionSpace, tabnames, replacewords, getTooltipDetails, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter}
+export { ModuleName, settingActionSpace, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter}

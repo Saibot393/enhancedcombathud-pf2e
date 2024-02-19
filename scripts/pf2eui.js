@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter} from "./utils.js";
+import {replacewords, ModuleName, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";  
 import {createItemMacro} from "./macro.js";
@@ -44,17 +44,21 @@ function createToggleIcons(toggles, options = {}) {
 		if (options.hasOwnProperty(direction + "offset")) iconpanel.style[direction] = `${options[direction + "offset"]}px`;
 	}
 	iconpanel.style.position = "absolute";
-	iconpanel.style.width = `${iconsize}px`;
-	iconpanel.style.height = `${toggles.length * iconsize}px`;
+	//iconpanel.style.width = `${iconsize}px`;
+	iconpanel.style.width = "auto";
+	//iconpanel.style.height = `${toggles.length * iconsize}px`;
+	iconpanel.style.height = "auto";
 	iconpanel.style.backgroundColor = `rgba(0, 0, 0, ${game.settings.get(ModuleName, "iconshadow")})`;
 	iconpanel.style.display = "flex";
 	iconpanel.style.flexDirection = "column";
 	iconpanel.style.alignItems = "center";
 	iconpanel.style.justifyContent = "center";
+	/*
 	if (toggles.find(toggle => !toggle.showalways)) {
 		iconpanel.classList.add("specialAction");
 		iconpanel.style.visibility = "hidden";
 	}
+	*/
 	
 	for (let toggle of toggles) {
 		let icon;
@@ -75,12 +79,23 @@ function createToggleIcons(toggles, options = {}) {
 				icon.style.filter = "invert(0.4)"; //for white icon
 			}
 		}
+		if (toggle.text) {
+			icon = document.createElement("div");
+			icon.classList.add("action-glyph");
+			icon.innerHTML = toggle.text;
+			icon.style.fontColor = "white"; //for white icon
+			icon.style.fontSize = `${iconsize*0.75}px`;
+			if (toggle.greyed) {
+				icon.style.fontColor = "grey"; //for white icon
+			}
+		}
 		
 		if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
 		
 		if (!toggle.showalways) {
 			icon.classList.add("specialAction");
-			icon.style.visibility = "hidden";
+			//icon.style.visibility = "hidden";
+			icon.style.display = "none";
 		}
 		icon.onclick = (event) => {
 			toggle.onclick(event);
@@ -96,6 +111,9 @@ function createToggleIcons(toggles, options = {}) {
 	return iconpanel;	
 }
 
+
+
+//ammend Hooks
 Hooks.once("ready", async () => {
 	if (game.settings.get(ModuleName, "lockedmacros")) {//remove in later version
 		await game.user.setFlag(ModuleName, "lockedmacros", game.settings.get(ModuleName, "lockedmacros"));
@@ -108,7 +126,6 @@ Hooks.once("ready", async () => {
 	}
 });
 
-//ammend Hooks
 Hooks.on("updateItem", (item) => {
 	const PF2EDailies = "pf2e-dailies";
 	if (ui.ARGON && item.parent == ui.ARGON?.components.portrait?.actor) {
@@ -185,8 +202,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 	await registerPF2EECHSItems();
 	
-	CoreHUD._movementSave = {};
 	CoreHUD._actionSave = {action : {}, reaction : {}};
+	CoreHUD._movementSave = {};
   
     class PF2EPortraitPanel extends ARGON.PORTRAIT.PortraitPanel {
 		constructor(...args) {
@@ -1359,7 +1376,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		updateActionUse() {
 			super.updateActionUse();
-			updateActionEffect(this.actor, {Actions : this.currentActions});
+			//updateActionEffect(this.actor, {Actions : this.currentActions});
 		}
     }
 	
@@ -1554,7 +1571,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (this.item?.type == "action" || this.item?.type == "feat") {
 					let replaceItem = connectedItem(this.item);
 					
-					if (replaceItem) {
+					if (replaceItem && !defaultIcons.includes(replaceItem.img)) {
 						return replaceItem.img;
 					}
 				}
@@ -1562,12 +1579,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (this.item?.type == "feat") {
 					let action = this.actor.system.actions?.find(action => action.slug == this.item.system.slug);
 					
-					if (action?.item) {
+					if (action?.item && !defaultIcons.includes(action.item.img)) {
 						return action.item.img;
 					}
 				}
 				
-				if (this.item?.system.selfEffect?.img) {
+				if (this.item?.system.selfEffect?.img && !defaultIcons.includes(this.item.system.selfEffect.img)) {
 					return this.item.system.selfEffect.img;
 				}
 			}
@@ -1902,7 +1919,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (element) element.style.visibility = "hidden"; 
 				}
 				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
-					specialelement.style.visibility = "";
+					//specialelement.style.visibility = "";
+					specialelement.style.display = "";
 				}
 			}
 		}
@@ -1917,7 +1935,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (element) element.style.visibility = ""; 
 				}
 				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
-					specialelement.style.visibility = "hidden";
+					//specialelement.style.visibility = "hidden";
+					specialelement.style.display = "none";
 				}
 			}
 		}
@@ -1981,7 +2000,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					optionselect.style.backgroundColor = "rgba(0,0,0,.3)";
 					optionselect.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
 					optionselect.style.borderColor = "inherit";
-					optionselect.style.visibility = "hidden";
+					//optionselect.style.visibility = "hidden";
+					optionselect.style.display = "none";
 					
 					optionselect.onchange = (event) => {this.item.flags[ModuleName].onchange(event.target.value)};
 					
@@ -1990,6 +2010,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			let toggles = [];
+			
+			if (!this.isWeaponSet && game.settings.get(ModuleName, "showactionrequirements")) {
+				let toggleData = {
+					text : actionGlyphofItem(this.item),
+					showalways : true
+				};	
+
+				toggles.push(toggleData);
+			}
 			
 			if (this.isWeaponSet && !(this.panel && game.settings.get(ModuleName, "directStaffuse"))) {
 				const MAPActions = [{MAP : 1}, {MAP : 2}];
@@ -2004,7 +2033,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						ActionTitle.classList.add("action-element-title");
 						ActionTitle.innerHTML = MAPtext(this.item, Action.MAP);
 						ActionTitle.onclick = (event) => {event.stopPropagation(); event.preventDefault(); this._onLeftClick(event, {MAP : Action.MAP, specialAction : true})};
-						ActionTitle.style.visibility = "hidden";
+						//ActionTitle.style.visibility = "hidden";
+						ActionTitle.style.display = "none";
 						
 						ActionTitle.style.width = `${100/MAPActions.length}%`;
 						ActionTitle.style.left = `${i * 100/MAPActions.length}%`;
@@ -2047,7 +2077,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					ammoSelect.style.backgroundColor = "rgba(0,0,0,.3)";
 					ammoSelect.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
 					ammoSelect.style.borderColor = "inherit";
-					ammoSelect.style.visibility = "hidden";
+					//ammoSelect.style.visibility = "hidden";
+					ammoSelect.style.display = "none";
 					
 					ammoSelect.onchange = () => {this.item.update({system : {selectedAmmoId : ammoSelect.value}})};
 					
@@ -2535,7 +2566,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (element) element.style.visibility = "hidden"; 
 				}
 				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
-					specialelement.style.visibility = "";
+					//specialelement.style.visibility = "";
+					specialelement.style.display = "";
 				}
 			}
 		}
@@ -2550,7 +2582,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (element) element.style.visibility = ""; 
 				}
 				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
-					specialelement.style.visibility = "hidden";
+					//specialelement.style.visibility = "hidden";
+					specialelement.style.display = "none";
 				}
 			}
 		}

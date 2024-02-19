@@ -24,7 +24,7 @@ function itemMacroCode(item) {
 		`
 		case "effect": return `
 			//based on PF2E effect toggle macro:
-			ITEM_UUID = ${item.getFlag("core", "sourceId")};
+			ITEM_UUID = "${item.getFlag("core", "sourceId")}";
 		
 			source = (await fromUuid(ITEM_UUID))?.toObject();
 			
@@ -32,7 +32,7 @@ function itemMacroCode(item) {
 				return;
 			}
 			
-			for (let actor of actors) {
+			if (actor) {
 				const existing = actor.itemTypes.effect.find((item) => item.flags.core?.sourceId === ITEM_UUID);
 				
 				if (existing) {

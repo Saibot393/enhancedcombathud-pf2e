@@ -73,6 +73,10 @@
 				"name"					: "Direkte Stab Nutzung",
 				"descrp"				: "Ob magische Stäbe direkt zum Zauberwirken anstatt als Waffe benutzt werden sollen"
 			},
+			"showactionrequirements" : {
+				"name"					: "Zeige Aktionsanforderungen",
+				"descrp"				: "Ob Icons für die Aktionsanforderungen für Gegenstandsknöpfe angezeigt werden sollen"
+			},
 			"consumableswap" : {
 				"name"					: "Konsumierbare tauschbar",
 				"descrp"				: "Ob konsumierbare Gegenstände wleche gehalten werden können ein Aktionsicon zum in die hand nehmen haben sollen"	
