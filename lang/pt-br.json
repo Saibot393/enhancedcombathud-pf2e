@@ -1,0 +1,128 @@
+{
+	"enhancedcombathud-pf2e" : {
+		"Titles" : {
+			"refocus"					: "Refocar",
+			"accept"					: "Aceitar",
+			"abbort"					: "Abortar",
+			"swapin"					: "Pegar",
+			"macrolocked"				: "Macro travado",
+			"macrounlocked"				: "Macro destravado",
+			"regainedfocus"				: "{Actor} recupera <b>{n}</b> pontod de foco",
+			
+			"opensheetat"				: "Abra a ficha de personagem em {tab}"
+		},
+		
+		"Settings" : {
+			"sheetbuttontab" : {
+				"name"					: "Sheet button tab",
+				"descrp"				: "The tab opended when the sheet tab above the portrait is clicked"
+			},
+			"rollinitiative" : {
+				"name"					: "Initiative mode",
+				"descrp"				: "The behaviour when the initiative button above the portrait is clicked",
+				"options" : {
+					"choiceroll"		: "Choose skill",
+					"quickroll"			: "Quick roll"
+				}
+			},
+			"showpartybutton" : {
+				"name"					: "Show Party button",
+				"descrp"				: "Shows a button linking to the characters party in the portrait"
+			},
+			"showfamiliarmaster" : {
+				"name"					: "Show Familiar/Master button",
+				"descrp"				: "Shows a button linking to the characters Familiar/Master in the portrait"
+			},
+			"shownpctraits" : {
+				"name"					: "Show NPC traits",
+				"descrp"				: "If NPC triats should be displayed in the character portrait"
+			},
+			"panondblclick" : {
+				"name"					: "Pan on portrait doubleclick",
+				"descrp"				: "Camera pans to the current token when the portrait image is double clicked"
+			},
+			"reversesaveskilllore" : {
+				"name"					: "Reverse save, skill, lore",
+				"descrp"				: "Reverses the order to lore skill saves"
+			},
+			"filtertrainedactions" : {
+				"name"					: "Filter trained actions",
+				"descrp"				: "If the actions that can not be used due to the character not being trained in the appropiate skill should be hidden"
+			},
+			"showtrainedrankletter" : {
+				"name"					: "Show trained rank letter",
+				"descrp"				: "Shows a letter next to saves & skills to indicate the training rank"
+			},
+			"skillrankiconscale" : {
+				"name"					: "Trained rank letter scale",
+				"descrp"				: "The scale of the rank letter for saves & skills"
+			},
+			"onlyonespellrank" : {
+				"name"					: "Only one spell rank open",
+				"descrp"				: "Closes all other spell rank panels when a spell rank is opened" 
+			},
+			"weaponsetscount" : {
+				"name"					: "Weapon sets",
+				"descrp"				: "Amount of displayed weapon sets"
+			},
+			"directStaffuse" : {
+				"name"					: "Direct Staff use",
+				"descrp"				: "If magical Staves should be used as spell casting items instead of weapons by default"
+			},
+			"consumableswap" : {
+				"name"					: "Consumeables swapable",
+				"descrp"				: "If consumables that can be held should have an action icon to swap them into the active weapon set"	
+			},
+			"reduceAoO" : {
+				"name"					: "Reduce Attack of Opportunity buttons",
+				"descrp"				: "If buttons connected to Attack of Opportunity should be reduced in size/hidden"	
+			},
+			"usetakecover": {
+				"name"					: "Use take cover",
+				"descrp"				: "If the take cover action should be used (instead of being posted to the chat)"	
+			},
+			"ECHAction" : {
+				"name1"					: "Standard Action 1",
+				"name2"					: "Standard Action 2",
+				"name3"					: "Standard Action 3",
+				"name4"					: "Standard Action 4",
+				"name5"					: "Standard Action 5",
+				"name6"					: "Standard Action 6"
+			},
+			"macrobuttons" : {
+				"name"					: "Number of macro buttons",
+				"descrp"				: "The number of displayed macro buttons ((shift)right click to open macro folder, drag & drop to choose macro, shift left click to remove macro)"
+			},
+			"consumableuse" : {
+				"name"					: "Consumable click behaviour",
+				"descrp"				: "What should happen when a consumable item is clicked:",
+				"options" : {
+					"consume"			: "Consume item",
+					"chat"				: "Send item to chat",
+					"consumechat"		: "Consume item & send to chat"
+				}
+			},
+			"onitemiconscale" : {
+				"name"					: "Info icon scale",
+				"descrp"				: "The scale of info icons on item buttons"
+			},
+			"iconshadow" : {
+				"name"					: "Info icon shadow intensity",
+				"descrp"				: "The intensity of the info icon contrast shadow on item buttons"
+			},
+			"showpassives" : {
+				"name"					: "Mostar passivas dos NPCs",
+				"descrp"				: "If the passives of NPCs should be shown"
+			},
+			"showmacrocategory" : {
+				"name"					: "Mostrar a categoria do macro",
+				"descrp"				: "If a macro category should be shown in the HUD (based on the macros in the Foundry macro bar)"
+			}
+		}
+	},
+	
+    "enhancedcombathud.themeOptions.mainAction" : "Cores das Ações Padrão",
+    "enhancedcombathud.themeOptions.bonusAction" : "Cores das Reações",
+    "enhancedcombathud.themeOptions.freeAction" : "Cores das Ações Livres",
+    "enhancedcombathud.themeOptions.reaction" : "Cores das Habidade Passivas"
+}
