@@ -1,3 +1,6 @@
+## v1.8.4
+- Bug fix for strikes gained via feats in weaponsets
+
 ## v1.8.3
 - Fixed bug with NPC weapons in item sets
 
