@@ -1864,6 +1864,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						else {
 							let action = connectedsettingAction(this.item);
 							
+							if (!action) {
+								if (this.actor.type == "npc" && (this.item.type == "weapon" || this.item.type == "shield")) {//find melee item
+									let meleeitem = this.actor.items.find(item => item.flags?.pf2e?.linkedWeapon == this.item.id);
+									
+									if (meleeitem) {
+										action = connectedsettingAction(meleeitem);
+									}
+								}
+							}
+							
 							if (action) {//default actions
 								let variant = action.variants[options.MAP];
 								
