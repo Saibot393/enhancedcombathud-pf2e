@@ -1,3 +1,9 @@
+## v1.8.1
+- Fixed bug that allowed players to see the HUD for dead NPCs
+- Fixed bug with action use api
+- Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
+- Added translation for Brazilian Portuguese (thanks to [zengerbr](https://github.com/zengerbr))
+
 ## v1.8.0
 - Items(including conditions & effects) can now be dragged into macro buttons to create an appropiate macro
 - Added option to show icon indicating the required actions on item buttons
