@@ -1,3 +1,6 @@
+## v1.8.3
+- Fixed bug with NPC weapons in item sets
+
 ## v1.8.2
 - Further bug fix for action use api
 
