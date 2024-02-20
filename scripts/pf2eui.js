@@ -169,7 +169,7 @@ Hooks.on("createCombatant", (combatant) => {
 });
 
 function useAction(actionType, actions = 1) {
-	if (!ui?.ARGON?.components) return false;
+	if (!ui?.ARGON?.components?.main?.length) return false;
 	
 	let used = actions;
 	
@@ -191,10 +191,27 @@ function useAction(actionType, actions = 1) {
 	return used;
 }
 
-Hooks.once("init", () => {
+Hooks.once("init", async () => {
 	game.modules.get(ModuleName).api = {
 		useAction
 	}
+	
+	let oldBind = CONFIG.ARGON.CORE.CoreHUD.prototype.bind;
+	
+	async function newBind (target) {
+		console.log(target);
+		console.log(this);
+		
+		if (target && !target.isOwner) return;
+		
+		console.log("test");
+		
+		let call = oldBind.bind(this);
+		
+		return await call(target);
+	}
+	
+	CONFIG.ARGON.CORE.CoreHUD.prototype.bind = newBind;
 });
 
 Hooks.on("argonInit", async (CoreHUD) => {

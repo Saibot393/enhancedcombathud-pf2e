@@ -33,6 +33,10 @@
 				"name"					: "Pokaż przycisk Chowańca/Mistrza",
 				"descrp"				: "Wyświetla przycisk łączący się z postaciami Chowańca/Mistrza na portrecie."
 			},
+			"showquicksaves" : {
+				"name"					: "Pokaż rzuty obronne na portrecie",
+				"descrp"				: "Przyciski dla rzutów obronnych powinny być wyświetlane na portrecie"
+			},
 			"shownpctraits" : {
 				"name"					: "Pokaż cechy BNów",
 				"descrp"				: "Wyświetla cechy BNów na portrecie postaci"
@@ -68,6 +72,10 @@
 			"directStaffuse" : {
 				"name"					: "Bezpośrednie użycie Kosturów",
 				"descrp"				: "Magiczne Kostury powinny być domyślnie używane jako przedmioty do rzucania zaklęć zamiast broni."
+			},
+			"showactionrequirements" : {
+				"name"					: "Pokaż wymagania dotyczące akcji",
+				"descrp"				: "Ikona wskazująca wymagane działania powinna być wyświetlana na przyciskach elementów"
 			},
 			"consumableswap" : {
 				"name"					: "Zamienne materiały eksploatacyjne",
