@@ -35,6 +35,6 @@ The reload and unload actions as added by **[PF2e Ranged Combat](https://foundry
 
 #### Languages:
 
-The module contains an English, a German, and a Polish (thanks to [Lioheart](https://github.com/Lioheart)) translation. If you want additional languages to be supported [let me know](https://github.com/Saibot393/enhancedcombathud-pf2e/issues).
+The module contains an English, a German, a Polish (thanks to [Lioheart](https://github.com/Lioheart)), and a Brazilian Portuguese (thanks to [zengerbr](https://github.com/zengerbr)) translation. If you want additional languages to be supported [let me know](https://github.com/Saibot393/enhancedcombathud-pf2e/issues).
 
 **If you have suggestions, questions, or requests for additional features please [let me know](https://github.com/Saibot393/enhancedcombathud-pf2e/issues).**
