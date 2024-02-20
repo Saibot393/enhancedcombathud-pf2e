@@ -169,7 +169,7 @@ Hooks.on("createCombatant", (combatant) => {
 });
 
 function useAction(actionType, actions = 1) {
-	if (!ui?.ARGON?.components?.main?.length) return false;
+	if (!ui.ARGON.enabled) return false;
 	
 	let used = actions;
 	
