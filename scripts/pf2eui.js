@@ -199,12 +199,7 @@ Hooks.once("init", async () => {
 	let oldBind = CONFIG.ARGON.CORE.CoreHUD.prototype.bind;
 	
 	async function newBind (target) {
-		console.log(target);
-		console.log(this);
-		
 		if (target && !target.isOwner) return;
-		
-		console.log("test");
 		
 		let call = oldBind.bind(this);
 		
@@ -2624,10 +2619,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					this.setMacro(data.uuid);
 				}
 				else {
-					console.log(data);
-					console.log(await fromUuid(data.uuid));
 					let macro = await createItemMacro(await fromUuid(data.uuid));
-					console.log(macro);
+					
 					this.setMacro(macro.uuid)
 				}
 			} catch (error) {
@@ -3734,7 +3727,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							let connectedItem = this.actor.system.actions[data.index]?.item;
 							
 							if (connectedItem) {
-								if (this.actor.items.find(item => item.id == connectedItem.id)) {
+								let owneditem = this.actor.items.find(item => item.id == connectedItem.id);
+								
+								if (owneditem && ["weapon", "shield"].includes(owneditem.type)) {
 									sets[set][slot] = connectedItem.uuid;
 								}
 								else {
