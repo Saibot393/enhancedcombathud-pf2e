@@ -1,3 +1,6 @@
+## v1.8.2
+- Further bug fix for action use api
+
 ## v1.8.1
 - Fixed bug that allowed players to see the HUD for dead NPCs
 - Fixed bug with action use api
