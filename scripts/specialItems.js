@@ -34,6 +34,23 @@ const settingActionIDs = {
 	}
 }
 
+const settingActionNameReplace = {
+	PF2EECHActionItems : {
+		"administerFirstAid"	: "administer-first-aid",
+		"commandAnAnimal"		: "command-an-animal",
+		"concealAnObject"		: "conceal-an-object",
+		"createADiversion"		: "create-a-diversion",
+		"disableDevice"			: "disable-device",
+		"forceOpen"				: "force-open",
+		"highJump"				: "high-jump",
+		"longJump"				: "long-jump",
+		"palmAnObject"			: "palm-an-object",
+		"pickALock"				: "pick-a-lock",
+		"senseMotive"			: "sense-motive",
+		"tumbleThrough"			: "tumble-through"
+	}
+}
+
 const settingActionIMGs = {
 	PF2EECHActionItems : {
 		"administerFirstAid"	: `modules/${ModuleName}/icons/first-aid-kit.svg`,
@@ -73,18 +90,10 @@ var PF2EECHActionItems = {};
 var PF2EECHFreeActionItems = {};
 var PF2EECHReActionItems = {};
 
-var baseitem = {}
+var baseitem = {};
+var baseaction = {};
 
 async function registerPF2EECHSItems () {
-	baseitem.ProneDropStand = {
-		prone : (await fromUuid("Compendium.pf2e.actionspf2e.Item.OdIUybJ3ddfL7wzj")),
-		notprone : (await fromUuid("Compendium.pf2e.actionspf2e.Item.HYNhdaPtF1QmQbR3"))
-	};
-	
-	baseitem.ArrestorGrab = {
-		fly : (await fromUuid("Compendium.pf2e.actionspf2e.Item.qm7xptMSozAinnPS")),
-		nofly : (await fromUuid("Compendium.pf2e.actionspf2e.Item.3yoajuKjwHZ9ApUY"))
-	};
 	
 	PF2EECHActionItems = {
 		groupflags : {
@@ -111,24 +120,27 @@ async function registerPF2EECHSItems () {
 							
 							if (actor) {
 								if (actor.hasCondition("prone")) {
-									return baseitem.ProneDropStand.prone?.name;
+									return game.i18n.localize(game.pf2e.actions.get("stand").name);//baseitem.ProneDropStand.prone?.name;
 								}
 								else {
-									return baseitem.ProneDropStand.notprone?.name;
+									return game.i18n.localize(game.pf2e.actions.get("drop-prone").name);//baseitem.ProneDropStand.notprone?.name;
 								}
 							}
 						},
 						system : (options) => {
 							let actor = options.actor;
+							let action;
 							
 							if (actor) {
 								if (actor.hasCondition("prone")) {
-									return baseitem.ProneDropStand.prone?.system;
+									action = game.pf2e.actions.get("stand");
 								}
 								else {
-									return baseitem.ProneDropStand.notprone?.system;
+									action = game.pf2e.actions.get("drop-prone");
 								}
 							}
+							
+							return systemfromaction(action);
 						}
 					},
 					onclick : async (options) => {
@@ -145,10 +157,10 @@ async function registerPF2EECHSItems () {
 						
 						if (actor) {
 							if (actor.hasCondition("prone")) {
-								return baseitem.ProneDropStand.prone?.sheet.render(true);
+								return (await fromUuid("Compendium.pf2e.actionspf2e.Item.OdIUybJ3ddfL7wzj")).sheet.render(true);
 							}
 							else {
-								return baseitem.ProneDropStand.notprone?.sheet.render(true);
+								return (await fromUuid("Compendium.pf2e.actionspf2e.Item.HYNhdaPtF1QmQbR3")).sheet.render(true);
 							}
 						}
 					},
@@ -185,7 +197,8 @@ async function registerPF2EECHSItems () {
 				}
 			},
 			img: `modules/${ModuleName}/icons/walk.svg`,
-			id: "UHpkTuCtyaPqiCAB"
+			id: "UHpkTuCtyaPqiCAB",
+			action: "step"
 		},
 		TakeCover : {
 			flags : {
@@ -206,11 +219,13 @@ async function registerPF2EECHSItems () {
 				}
 			},
 			img: `modules/${ModuleName}/icons/armor-upgrade.svg`,
-			id: "ust1jJSCZQUhBZIz"
+			id: "ust1jJSCZQUhBZIz",
+			action: "take-cover"
 		},
 		ready : {
 			img: `modules/${ModuleName}/icons/sands-of-time.svg`,
-			id: "dLgAMt3TbkmLkUqE"
+			id: "dLgAMt3TbkmLkUqE",
+			action: "ready"
 		},
 		escape : {//conditional
 			flags : {
@@ -227,7 +242,8 @@ async function registerPF2EECHSItems () {
 				}
 			},
 			img: `modules/${ModuleName}/icons/breaking-chain.svg`,
-			id: "SkZAQRkLLkmBQNB9"
+			id: "SkZAQRkLLkmBQNB9",
+			action: "escape"
 		}
 		/*
 		Sustain : {
@@ -272,7 +288,8 @@ async function registerPF2EECHSItems () {
 				}
 			},
 			img: `modules/${ModuleName}/icons/thumb-up.svg`,
-			id: "HCl3pzVefiv9ZKQW"
+			id: "HCl3pzVefiv9ZKQW",
+			action: "aid"
 		},
 		ArrestorGrab : {
 			flags : {
@@ -295,24 +312,27 @@ async function registerPF2EECHSItems () {
 							
 							if (actor) {
 								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
-									return baseitem.ArrestorGrab.fly?.name;
+									return game.i18n.localize(game.pf2e.actions.get("arrest-a-fall").name);
 								}
 								else {
-									return baseitem.ArrestorGrab.nofly?.name;
+									return game.i18n.localize(game.pf2e.actions.get("grab-an-edge").name);
 								}
 							}
 						},
 						system : (options) => {
 							let actor = options.actor;
+							let action;
 							
 							if (actor) {
 								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
-									return baseitem.ArrestorGrab.fly?.system;
+									action = game.pf2e.actions.get("arrest-a-fall");
 								}
 								else {
-									return baseitem.ArrestorGrab.nofly?.system;
+									action = game.pf2e.actions.get("grab-an-edge");
 								}
 							}
+							
+							return systemfromaction(action);
 						}
 					},
 					onclick : async (options) => {
@@ -336,10 +356,10 @@ async function registerPF2EECHSItems () {
 						
 						if (actor) {
 							if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
-								return baseitem.ArrestorGrab.fly?.sheet.render(true);
+								return (await fromUuid("Compendium.pf2e.actionspf2e.Item.qm7xptMSozAinnPS")).sheet.render(true);
 							}
 							else {
-								return baseitem.ArrestorGrab.nofly?.sheet.render(true);
+								return (await fromUuid("Compendium.pf2e.actionspf2e.Item.3yoajuKjwHZ9ApUY")).sheet.render(true);
 							}
 						}
 					},
@@ -364,12 +384,16 @@ async function registerPF2EECHSItems () {
 		for (let i = 1; i <= settingActionSpace[setkey]; i++) {
 			let chosenoption = game.settings.get(ModuleName, setkey + i);
 			
-			if (settingActionIDs[setkey] && settingActionIDs[setkey][chosenoption]) {
+			if (settingActionIDs[setkey]) {
 				itemset[chosenoption] = {
 					id : settingActionIDs[setkey][chosenoption],
-					img : settingActionIMGs[setkey][chosenoption]
+					img : settingActionIMGs[setkey][chosenoption],
+					action : settingActionNameReplace[setkey][chosenoption] ?? chosenoption
 				}
 			}
+			
+			console.log(itemset[chosenoption]);
+			console.log(settingActionIDs[setkey][chosenoption]);
 		}
 		
 		for (let itemkey of Object.keys(itemset)) {
@@ -384,69 +408,66 @@ async function registerPF2EECHSItems () {
 					itemset[itemkey].system = {};
 				}
 				
-				let abilityItem = await fromUuid("Compendium.pf2e.actionspf2e.Item." + itemset[itemkey].id);
-				if (abilityItem) {
-					itemset[itemkey].name = abilityItem.name;
-					itemset[itemkey].system.description = {value : abilityItem.system.description.value};
-					itemset[itemkey].system.traits = {value : abilityItem.system.traits.value.map(trait => trait)};
-					if (abilityItem.system.actions?.value) itemset[itemkey].system.actions = {value : abilityItem.system.actions.value};
-					if (abilityItem.system.actionType?.value) itemset[itemkey].system.actionType = {value : abilityItem.system.actionType.value};
+				//let abilityItem = await fromUuid("Compendium.pf2e.actionspf2e.Item." + itemset[itemkey].id);
+				let actionitem = game.pf2e.actions.get(itemset[itemkey].action);
+				if (actionitem) {
+					itemset[itemkey].name = game.i18n.localize(actionitem.name);
+					itemset[itemkey].system = systemfromaction(actionitem);
 					
 					if (!itemset[itemkey].flags[ModuleName].onclick) {
-						if (game.pf2e.actions[itemkey]) {
-							itemset[itemkey].flags[ModuleName].onclick = async (options) => {
-								let actor = options.actor;
+						itemset[itemkey].flags[ModuleName].onclick = async (options) => {
+							let actor = options.actor;
+							
+							if (actor) {
+								let settings = {actors : actor};
 								
-								if (actor) {
-									let settings = {actors : actor};
+								let options;
+								
+								switch (itemkey) {
+									case "perform" :
+										options = ["acting", "comedy", "dance", "keyboards", "oratory", "percussion", "singing", "strings", "winds"];
+										break;
+									case "administerFirstAid":
+										options = ["stabilize", "stop-bleeding"];
+										break;
+								}
+								
+								if (options) {
+									let optionsinfo = {};
 									
-									let options;
-									
-									switch (itemkey) {
-										case "perform" :
-											options = ["acting", "comedy", "dance", "keyboards", "oratory", "percussion", "singing", "strings", "winds"];
-											break;
-										case "administerFirstAid":
-											options = ["stabilize", "stop-bleeding"];
-											break;
+									for (let key of options) {
+										optionsinfo[key] = {label : key};
 									}
 									
-									if (options) {
-										let optionsinfo = {};
-										
-										for (let key of options) {
-											optionsinfo[key] = {label : key};
-										}
-										
-										let name = (await getSettingActionTitles(setkey))[itemkey];
-										
-										let variant = await openNewInput("choice", name, `${name}: `, {defaultValue : options[0], options : optionsinfo});
-										
-										if (!variant) return;
-										settings.variant = variant; 
+									let name = (await getSettingActionTitles(setkey))[itemkey];
+									
+									let variant = await openNewInput("choice", name, `${name}: `, {defaultValue : options[0], options : optionsinfo});
+									
+									if (!variant) return;
+									settings.variant = variant; 
 
-										settings.event = options.event;
-									}
-									
+									settings.event = options.event;
+								}
+								
+								if (game.pf2e.actions[itemkey]) {
 									game.pf2e.actions[itemkey](settings);
 									return true;
 								}
-							}
-						}
-						else {
-							let simpleaction = game.pf2e.actions.get(itemkey);
-							
-							if (simpleaction) {
-								itemset[itemkey].flags[ModuleName].onclick = async (options) => {
-									simpleaction.toMessage();
+								
+								if (game.pf2e.actions.get(itemkey)) {
+									game.pf2e.actions.get(itemkey).toActionVariant().use(settings);
 									return true;
 								}
 							}
 						}
 					}
+					
+					let referid = itemset[itemkey].id;
+					
 					if (!itemset[itemkey].flags[ModuleName].onrclick) {
 						itemset[itemkey].flags[ModuleName].onrclick = async (options) => {
-							abilityItem.sheet.render(true);
+							let abilityItem = await fromUuid("Compendium.pf2e.actionspf2e.Item." + referid);
+							abilityItem?.sheet.render(true);
 						}
 					}
 				}
@@ -558,6 +579,19 @@ function executefunction(key, options) {
 
 function skillactionkeys(skill) {
 	return Array.from(game.pf2e.actions.keys()).filter(key => game.pf2e.actions.get(key).statistic == skill || (game.pf2e.actions.get(key).statistic?.length && game.pf2e.actions.get(key).statistic.includes(skill)))
+}
+
+function systemfromaction(action) {
+	if (!action) return {};
+	
+	return {
+		description : {value : game.i18n.localize(action.description)},
+		traits : {value : action.traits},
+		slug : action.slug,
+		statistic : action.statistic,
+		actionType : {value : Number.isNumeric(action.glyph) ? "action" : action.glyph},
+		actions : {value : Number.isNumeric(action.glyph) ? Number(action.glyph) : ""}
+	};
 }
 
 export {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule, getSettingActionOptions, getSettingActionTitles}
