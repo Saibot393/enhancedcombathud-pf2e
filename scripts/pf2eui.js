@@ -995,7 +995,31 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						skill.check.roll({event : event})
 					}
 					
-					let skillentries = [new PF2EDrawerButton([
+					let unfold = (event) => {
+						let unfolded = false;
+						
+						this.element.querySelectorAll(`.${skillKey}-action`).forEach(element => {
+							let actionelement = element.parentElement.parentElement;
+							
+							if (actionelement.style.display == "none") {
+								actionelement.style.display = "grid";
+								unfolded = true;
+							}
+							else {
+								actionelement.style.display = "none";
+							}
+						})
+						
+						let unfoldbutton = this.element.querySelector(`.${skillKey}-unfold`);
+						if (unfolded) {
+							unfoldbutton.style.transform = `rotate(90deg)`;
+						}
+						else {
+							unfoldbutton.style.transform = `rotate(0deg)`;
+						}
+					}
+					
+					let entrydata = [
 						{
 							label: this.actor.system.initiative?.statistic == skillKey ? `<i class="fa-solid fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>` : `<i class="fa-regular fa-circle" data-tooltip="${game.i18n.localize("PF2E.InitiativeLabel")}"></i>`,
 							onClick: async () => {
@@ -1008,18 +1032,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						{
 							label: nameLabel,
 							onClick: roll,
-							onRClick : (event) => {
-								this.element.querySelectorAll(`.${skillKey}-action`).forEach(element => {
-									let actionelement = element.parentElement.parentElement;
-									
-									if (actionelement.style.display == "none") {
-										actionelement.style.display = "grid"
-									}
-									else {
-										actionelement.style.display = "none"
-									}
-								})
-							}
+							onRClick : unfold
+						},
+						{
 						},
 						{
 						},
@@ -1027,14 +1042,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							label: valueLabel,
 							onClick: roll,
 							style: "display: flex; justify-content: flex-end;"
-						},
-					])];
+						}
+					];
 					
 					let localskillactions = skillactions.filter(action => action.statistic?.includes(skillKey));
 					
 					if (game.settings.get(ModuleName, "filtertrainedactions")) {
 						localskillactions = localskillactions.filter(action => skill.rank > 0 || !trainedactions.includes(action.slug));
 					}
+					
+					if (localskillactions.length) {
+						entrydata[2] = {
+							label: `<i class="${skillKey}-unfold fa-regular fa-circle-arrow-right" style="transform:rotate(0deg)"></i>`,
+							onClick : unfold,
+							style: "display: flex; justify-content: center;"
+						}
+					}
+					
+					let skillentries = [new PF2EDrawerButton(entrydata)];
 					
 					localskillactions.forEach(action => {
 						let actiontitle = `<span class="${skillKey}-action">${game.i18n.localize(action.name)}</span>`;
@@ -1087,6 +1112,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								label: actiontitle,
 								onClick: (event) => {roll(0, event)},
 								style: "display: flex; justify-content: center"
+							},
+							{
 							},
 							{
 								label: hasMAP ? `<span>${MAPtext(action, 1)}</span>` : "",
@@ -1154,10 +1181,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (skillsButtons.length) {
 				returncategories.push({
-					gridCols: "1fr 7fr 3fr 3fr",
+					gridCols: "1fr 7fr 1fr 3fr 3fr",
 					captions: [
 						{
 							label: game.i18n.localize("PF2E.CoreSkillsHeader"),
+						},
+						{
+							label: "",
 						},
 						{
 							label: "",
