@@ -141,6 +141,20 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "actionpipsstyle", {
+		name: game.i18n.localize(`${ModuleName}.Settings.actionpipsstyle.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.actionpipsstyle.descrp`),
+		scope: "client",
+		config: true,
+		type: String,
+		choices: {
+			"CORE": game.i18n.localize(`${ModuleName}.Settings.actionpipsstyle.options.CORE`),
+			"PF2E": game.i18n.localize(`${ModuleName}.Settings.actionpipsstyle.options.PF2E`)
+		},
+		default: "CORE",
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "rangedammoswapmacro", {
 		name: game.i18n.localize(`${ModuleName}.Settings.rangedammoswapmacro.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.rangedammoswapmacro.descrp`),

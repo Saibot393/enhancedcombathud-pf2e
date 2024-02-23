@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter} from "./utils.js";
+import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";  
 import {createItemMacro} from "./macro.js";
@@ -99,6 +99,11 @@ function createToggleIcons(toggles, options = {}) {
 		}
 		icon.onclick = (event) => {
 			toggle.onclick(event);
+		}
+		if (toggle.onrclick) {
+			icon.oncontextmenu = (event) => {
+				toggle.onrclick(event);
+			}
 		}
 		icon.style.height = `${iconsize}px`;
 		icon.style.width = `${iconsize}px`;
@@ -1429,8 +1434,51 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		updateActionUse() {
-			super.updateActionUse();
-			//updateActionEffect(this.actor, {Actions : this.currentActions});
+			const actionsContainer = this.element.querySelector(".actions-uses-container");
+			if (this.maxActions === null || this.currentActions === null) {
+				actionsContainer.innerHTML = "";
+			}
+			if (!actionsContainer) return;
+
+			const childrenArray = Array.from(actionsContainer.children);
+
+			let availableActions;
+			console.log(game.settings.get(ModuleName, "actionpipsstyle"))
+			switch (game.settings.get(ModuleName, "actionpipsstyle")) {
+				case "CORE":
+					if (childrenArray.length !== this.maxActions) {
+						actionsContainer.innerHTML = "";
+						for (let i = 0; i < this.maxActions; i++) {
+							const action = document.createElement("div");
+							action.classList.add("action-pip");
+							actionsContainer.appendChild(action);
+						}
+					}
+
+					availableActions = this.currentActions;
+					for (const child of childrenArray) {
+						child.classList.toggle("actions-used", availableActions <= 0);
+						availableActions--;
+					}
+					break;
+				case "PF2E":
+					if (childrenArray.length !== this.maxActions) {
+						actionsContainer.innerHTML = "";
+						for (let i = 0; i < this.maxActions; i++) {
+							const action = document.createElement("span");
+							action.classList.add("action-pip", "action-glyph");
+							action.innerText = "A";
+							actionsContainer.appendChild(action);
+						}
+					}
+				
+					
+					availableActions = this.currentActions;
+					for (let i = 0;i < childrenArray.length; i++) {
+						childrenArray[i].style.fontColor = i < this.currentActions ? "var(--ech-mainAction-base-color)" : "#788291"
+					}
+					break;
+			}
 		}
     }
 	
@@ -2764,6 +2812,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			this._parent = parent;
 			
 			this.replacementItem = item;
+			
+			this._sorttype = sorttypes[0],
+			this._sortdirection = sortdirections[0];
 		}
 
 		get colorScheme() {
@@ -2788,6 +2839,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		get tooltipCls() {
 			return PF2ETooltips;
+		}
+		
+		get sorttype() {
+			return this._sorttype;
+		}
+		
+		get sortdirection() {
+			return this._sortdirection;
 		}
 
 		async getTooltipData() {
@@ -2827,8 +2886,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (game.settings.get(ModuleName, "consumablesweaponsinpanel")) {
 						consumeitems = consumeitems.concat(this.actor.items.filter(item => item.type == "weapon" && item.system?.traits?.value?.includes("consumable")));
 					}
-					console.log(consumeitems);
-					console.log(consumeitems.map(item => actioninfo(item)));
 					
 					consumeitems = consumeitems.filter(item => actioninfo(item).actionType.value == this.actionType);
 					
@@ -3046,6 +3103,111 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					break;
 			}
 		}
+		
+		async activateListeners(html) {
+			//await super.activateListeners(html);
+			this.element.onclick = this._onLeftClick.bind(this);
+			this.element.onmouseenter = this._onMouseEnter.bind(this);
+			this.element.onmouseleave = this._onMouseLeave.bind(this);
+		}
+		
+		async _onMouseEnter(event, locked = false) {
+			if (this.element.querySelector(".specialAction")) {
+				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
+					//specialelement.style.visibility = "";
+					specialelement.style.display = "";
+				}
+			}
+		}
+
+		async _onMouseLeave(event) {
+			if (this.element.querySelector(".specialAction")) {
+				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
+					//specialelement.style.visibility = "hidden";
+					specialelement.style.display = "none";
+				}
+			}
+		}
+		
+		async _onLeftClick(event) {
+			if (event.target.classList.contains("specialAction")) return;
+			
+			await super._onClick(event);
+		}
+		
+		async _renderInner() {
+			await super._renderInner();
+			
+			await this._renderToggles();
+		}
+		
+		async _renderToggles() {
+			for (const specialelement of this.element.querySelectorAll(".specialAction")) {
+				specialelement.remove();
+			}
+			
+			const iconsize = 30 * game.settings.get(ModuleName, "onitemiconscale");
+			
+			let toggles = [];
+			
+			if (this.type != "spell") {
+				let toggleData = {
+					tooltip : replacewords(game.i18n.localize(ModuleName + ".Titles.sort.name"), {type : game.i18n.localize(ModuleName + ".Titles.sort.type." + this.sorttype), direction : game.i18n.localize(ModuleName + ".Titles.sort.direction." + this.sortdirection)}),
+					onclick : async () => {
+						await this.increaseSortType();
+					},
+					onrclick : async () => {
+						await this.toggleSortDirection();
+					}
+				};
+
+				switch(this.sorttype) {
+					case "none":
+						toggleData.iconclass = ["fa-solid", "fa-sort"];
+						break;
+					case "alpha":
+						toggleData.iconclass = this.sortdirection == sortdirections[0] ? ["fa-solid", "fa-arrow-down-a-z"] : ["fa-solid", "fa-arrow-down-z-a"];
+						break;
+					case "level":
+						toggleData.iconclass = this.sortdirection == sortdirections[0] ? ["fa-solid", "fa-arrow-down-1-9"] : ["fa-solid", "fa-arrow-down-9-1"];
+						break;
+					case "action":
+						toggleData.text = "1";
+						break;
+					case "rarity":
+						toggleData.iconclass = ["fa-solid", "fa-star"];
+						break;
+				}
+
+				toggles.push(toggleData);
+			}
+			
+			this.element.appendChild(createToggleIcons(toggles, {iconsize : iconsize, rightoffset : 0, topoffset : 0}));
+		}
+		
+		async increaseSortType() {
+			let newindex = sorttypes.indexOf(this.sorttype) + 1;
+			
+			if (sorttypes[newindex] == "action" && this.actionType != sorttypes[newindex]) {
+				newindex = newindex + 1;
+			}
+			
+			newindex = newindex % sorttypes.length;
+			
+			this._sorttype = sorttypes[newindex];
+
+			await this.panel.sortbuttons(sortfunction(this.sorttype, this.sortdirection));
+			
+			await this._renderToggles();
+		}	
+		
+		async toggleSortDirection() {
+			this._sortdirection = sortdirections[(sortdirections.indexOf(this._sortdirection) + 1) % sortdirections.length];
+
+			await this.panel.sortbuttons(sortfunction(this.sorttype, this.sortdirection));
+			
+			await this._renderToggles();
+		}
     }
 	
 	class PF2EAccordionPanel extends ARGON.MAIN.BUTTON_PANELS.ACCORDION.AccordionPanel {
@@ -3102,6 +3264,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	class PF2EButtonPanel extends ARGON.MAIN.BUTTON_PANELS.ButtonPanel {
 		get actionType() {
 			return this.parent?.actionType;
+		}
+		
+		async sortbuttons(sortfunction) {
+			this._buttons = this._buttons.sort((a,b) => sortfunction(a.item, b.item));
+			
+			this.render();
 		}
 	}
 	

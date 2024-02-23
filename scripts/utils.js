@@ -23,6 +23,9 @@ const tabnames = {
 const AoOids = ["NMWXHGWUcZGoLDKb", "hmShTfPOcTaKgbf4", "OqU6QXkMrZqToEEi"]; //id of Attack of Opportunity id
 const SBid = "jM72TjJ965jocBV8"; //id of Shield Block
 
+const sorttypes = ["none", "alpha", "level", "action", "rarity"];
+const sortdirections = ["up", "down"];
+
 function replacewords(text, words = {}){
 	let localtext = text;
 	
@@ -622,8 +625,57 @@ function actionfilter(action, settings = {actiontype : "", classonly : false, no
 	return true;
 }
 
+function sortfunction(type, direction) {
+	let directionfactor = 0;
+	
+	switch (direction) {
+		case "<":
+		case "up":
+			directionfactor = 1;
+			break;
+		case ">":
+		case "down":
+			directionfactor = -1;
+			break;
+	}
+	
+	switch (type) {
+		case "alpha":
+			return (itema, itemb) => {
+				if (itema.name < itemb.name) return -directionfactor;
+				if (itema.name > itemb.name) return directionfactor;
+				return 0;
+			}
+		case "level":
+			return (itema, itemb) => {
+				if (itema.level < itemb.level) return -directionfactor;
+				if (itema.level > itemb.level) return directionfactor;	
+				return 0;
+			}
+		case "action":
+			return (itema, itemb) => {
+				let actioninfoa = actioninfo(itema);
+				let actioninfob = actioninfo(itemb);
+				if (actioninfoa.actionType.value == actioninfob.actionType.value) {
+					if (actioninfoa.actions.value < actioninfoa.actions.value) return -directionfactor;
+					if (actioninfoa.actions.value > actioninfoa.actions.value) return directionfactor;	
+				}
+				return 0;
+			}
+		case "rarity":
+			return (itema, itemb) => {
+				const rarities = ["common", "uncommon", "rare", "unique"];
+				if (rarities.indexOf(itema.rarity) < rarities.indexOf(itemb.rarity)) return -directionfactor;
+				if (rarities.indexOf(itema.rarity) > rarities.indexOf(itemb.rarity)) return directionfactor;	
+				return 0;
+			}
+		default:
+			return (itema, itemb) => {return 0};
+	}
+}
+
 function autoset(item) {
 	
 }
 
-export { ModuleName, settingActionSpace, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter}
+export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction}

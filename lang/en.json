@@ -9,7 +9,22 @@
 			"macrounlocked"				: "Macro is unlocked",
 			"regainedfocus"				: "{Actor} regained <b>{n}</b> focus point",
 			
-			"opensheetat"				: "Open character sheet at {tab}"
+			"opensheetat"				: "Open character sheet at {tab}",
+			
+			"sort" : {
+				"name"  				: "Sort mode: {type} ({direction})",
+				"direction" : {
+					"up"				: "ascending",
+					"down"				: "descending"
+				},
+				"type" : {
+					"none"				: "none",
+					"alpha"				: "Alphabetically",
+					"level"				: "Level",
+					"action"			: "Actions",
+					"rarity"			: "Rarity"
+				}
+			}
 		},
 		
 		"Settings" : {
