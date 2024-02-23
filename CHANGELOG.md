@@ -1,3 +1,6 @@
+## v1.8.5
+- Changed the way actions are loaded to improve compatibility with translation modules (and make it possible to change them on the fly in the future)
+
 ## v1.8.4
 - Bug fix for strikes gained via feats in weaponsets
 
