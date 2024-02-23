@@ -564,6 +564,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let hpvaluebox = hpbox.querySelector("#HPvalue");
 				
 				let mainHPbox = document.createElement("div");
+				mainHPbox.style.zIndex = "2";
 				
 				let tempHPbox = document.createElement("div");
 				tempHPbox.classList.add("portrait-stat-block");
@@ -1716,6 +1717,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (this.item?.getFlag(ModuleName, "thrown")) {
 						return this.item.system.quantity;
 					}
+					
+					if (this.item?.system?.traits?.value?.includes("consumable")) {
+						return this.item.quantity;
+					}
+					
 					break;
 				case "shield":
 					if (this.item) {
@@ -1916,6 +1922,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (used) {
 				let action = actioninfo(this.item);
+				
+				if (this.isWeaponSet) {
+					action.actionType.value = this.actionType;
+				}
 				
 				useAction(action?.actionType?.value, action?.actions?.value);
 			}
@@ -2152,7 +2162,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 				
-				if (this.item.isThrowable) {
+				if (this.item.isThrowable && !this.item?.system?.traits?.value?.includes("consumable")) {
 					let isthrown = this.item.getFlag(ModuleName, "thrown");
 					
 					let toggleData = {
@@ -2756,6 +2766,19 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					break;
 				case "feat":
 					return this.actor.items.filter(item => (item.type == this.type || item.type == "action") && item.system.actionType?.value == this.actionType).filter(item => !isClassFeature(item));
+					break;
+				case "consumable":
+					let consumeitems = this.actor.items.filter(item => item.type == this.type);
+					
+					if (game.settings.get(ModuleName, "consumablesweaponsinpanel")) {
+						consumeitems = consumeitems.concat(this.actor.items.filter(item => item.type == "weapon" && item.system?.traits?.value?.includes("consumable")));
+					}
+					console.log(consumeitems);
+					console.log(consumeitems.map(item => actioninfo(item)));
+					
+					consumeitems = consumeitems.filter(item => actioninfo(item).actionType.value == this.actionType);
+					
+					return consumeitems;
 					break;
 				default:
 					let items = this.actor.items.filter(item => item.type == this.type);

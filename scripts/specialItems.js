@@ -391,9 +391,6 @@ async function registerPF2EECHSItems () {
 					action : settingActionNameReplace[setkey][chosenoption] ?? chosenoption
 				}
 			}
-			
-			console.log(itemset[chosenoption]);
-			console.log(settingActionIDs[setkey][chosenoption]);
 		}
 		
 		for (let itemkey of Object.keys(itemset)) {

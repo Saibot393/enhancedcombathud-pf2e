@@ -141,6 +141,16 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "consumablesweaponsinpanel", {
+		name: game.i18n.localize(`${ModuleName}.Settings.consumablesweaponsinpanel.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.consumablesweaponsinpanel.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "onlyonespellrank", {
 		name: game.i18n.localize(`${ModuleName}.Settings.onlyonespellrank.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.onlyonespellrank.descrp`),
