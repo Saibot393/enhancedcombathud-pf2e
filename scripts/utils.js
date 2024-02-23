@@ -55,7 +55,7 @@ async function getTooltipDetails(item) {
 			subtitle = subtitle + ` ${replacewords(game.i18n.localize("PF2E.LevelN"), {level : item.system.level.value})}`;
 		}
 		subtitlecolor = system.traits.rarity ? `var(--color-rarity-${system.traits.rarity})` : "";
-		properties = system.traits.value?.map((trait) => {return {label : trait.toUpperCase()}});
+		properties = system.traits.value?.map((trait) => {return {id : trait}});
 		propertiesLabel = properties?.length ? game.i18n.localize("PF2E.TraitsLabel") : "";
 		
 		details = [];

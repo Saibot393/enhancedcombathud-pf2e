@@ -1212,8 +1212,19 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			let traits = this._tooltipData.properties;
 			
 			for(let trait of traits) {
-				let localizationstring = trait.label?.split("-").map(string => firstUpper(string?.toLowerCase()));
+				let localizationstring = trait.id?.split("-").map(string => firstUpper(string));
 				if (localizationstring?.length > 1) localizationstring.pop();
+				
+				let namelocalization = "PF2E.Trait" + localizationstring.join("");
+				let name = game.i18n.localize(namelocalization);
+				
+				if (namelocalization != name) {
+					trait.label = name;
+				}
+				else {
+					trait.label = trait.id.toUpperCase();
+				}
+				
 				let hintlocalization = "PF2E.TraitDescription" + localizationstring.join("");
 				let hint = game.i18n.localize(hintlocalization);
 				
