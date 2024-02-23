@@ -2079,42 +2079,55 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 				
 				if (this.item?.requiresAmmo) {
-					let ammoSelect = document.createElement("select");
-					//ammoSelect.classList.add("action-element-title");
-					ammoSelect.classList.add("specialAction");
-					
-					for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => item.isAmmo)]) {
-						let option = document.createElement("option");
-						option.text = ammo.name;
-						option.value = ammo.id;
+					if (game.modules.get("pf2e-ranged-combat")?.active && game.settings.get(ModuleName, "rangedammoswapmacro")) {
+						let toggleData = {
+							iconclass : ["fa-solid", "fa-repeat"],
+							onclick : () => {
+								game.pf2eRangedCombat.switchAmmunition();
+							},
+							tooltip : `${(await fromUuid("Compendium.pf2e-ranged-combat.macros.Item.K9jrrGLnMF23WKET")).name} (${this.item.ammo ? this.item.ammo?.name : "-"})`
+						};	
 
-						option.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
-						option.style.width = "200px";
-						option.style.height = "20px";
-						option.style.backgroundColor = "grey";
-						option.style.fontSize = "12px";
-						option.selected = this.item.system.selectedAmmoId == ammo.id;
-						
-						ammoSelect.appendChild(option);
+						toggles.push(toggleData);
 					}
-					
-					ammoSelect.style.position = "absolute";
-					ammoSelect.style.top = "0";
-					ammoSelect.style.left = "50%";
-					ammoSelect.style.width = `${100/2}%`;
-					ammoSelect.style.height = `25px`;
-					topoffset = topoffset + 25;
-					ammoSelect.style.color = "#c8c8c8";
-					ammoSelect.style.backdropFilter = "var(--ech-blur-amount)";
-					ammoSelect.style.backgroundColor = "rgba(0,0,0,.3)";
-					ammoSelect.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
-					ammoSelect.style.borderColor = "inherit";
-					//ammoSelect.style.visibility = "hidden";
-					ammoSelect.style.display = "none";
-					
-					ammoSelect.onchange = () => {this.item.update({system : {selectedAmmoId : ammoSelect.value}})};
-					
-					this.element.appendChild(ammoSelect);
+					else {
+						let ammoSelect = document.createElement("select");
+						//ammoSelect.classList.add("action-element-title");
+						ammoSelect.classList.add("specialAction");
+						
+						for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => item.isAmmo)]) {
+							let option = document.createElement("option");
+							option.text = ammo.name;
+							option.value = ammo.id;
+
+							option.style.boxShadow = "0 0 50vw var(--color-shadow-dark) inset";
+							option.style.width = "200px";
+							option.style.height = "20px";
+							option.style.backgroundColor = "grey";
+							option.style.fontSize = "12px";
+							option.selected = this.item.system.selectedAmmoId == ammo.id;
+							
+							ammoSelect.appendChild(option);
+						}
+						
+						ammoSelect.style.position = "absolute";
+						ammoSelect.style.top = "0";
+						ammoSelect.style.left = "50%";
+						ammoSelect.style.width = `${100/2}%`;
+						ammoSelect.style.height = `25px`;
+						topoffset = topoffset + 25;
+						ammoSelect.style.color = "#c8c8c8";
+						ammoSelect.style.backdropFilter = "var(--ech-blur-amount)";
+						ammoSelect.style.backgroundColor = "rgba(0,0,0,.3)";
+						ammoSelect.style.textShadow = "0 0 10px rgba(0,0,0,.9)";
+						ammoSelect.style.borderColor = "inherit";
+						//ammoSelect.style.visibility = "hidden";
+						ammoSelect.style.display = "none";
+						
+						ammoSelect.onchange = () => {this.item.update({system : {selectedAmmoId : ammoSelect.value}})};
+						
+						this.element.appendChild(ammoSelect);
+					}
 				}
 				
 				if (this.item?.type == "shield" && this.actionType == "action") {

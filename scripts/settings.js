@@ -141,6 +141,16 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "rangedammoswapmacro", {
+		name: game.i18n.localize(`${ModuleName}.Settings.rangedammoswapmacro.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.rangedammoswapmacro.descrp`),
+		scope: "client",
+		config: game.modules.get("pf2e-ranged-combat")?.active,
+		type: Boolean,
+		default: false,
+		
+	});
+	
 	game.settings.register(ModuleName, "consumablesweaponsinpanel", {
 		name: game.i18n.localize(`${ModuleName}.Settings.consumablesweaponsinpanel.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.consumablesweaponsinpanel.descrp`),
