@@ -1248,13 +1248,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			for(let trait of traits) {
 				let localizationstring = trait.id?.split("-").map(string => firstUpper(string));
-				if (localizationstring?.length > 1) localizationstring.pop();
+				let diceinfo = "";
+				if (localizationstring?.length > 1) diceinfo = localizationstring.pop();
 				
 				let namelocalization = "PF2E.Trait" + localizationstring.join("");
 				let name = game.i18n.localize(namelocalization);
 				
 				if (namelocalization != name) {
-					trait.label = name;
+					trait.label = [name, diceinfo].join(" ");
 				}
 				else {
 					trait.label = trait.id.toUpperCase();
@@ -1433,6 +1434,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 		
+		get template() {
+			return `/modules/${ModuleName}/templates/ActionPanel.hbs`;
+		}
+		
 		updateActionUse() {
 			const actionsContainer = this.element.querySelector(".actions-uses-container");
 			if (this.maxActions === null || this.currentActions === null) {
@@ -1462,12 +1467,17 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 					break;
 				case "PF2E":
+					const pipsize = 35; //in px
 					if (childrenArray.length !== this.maxActions) {
 						actionsContainer.innerHTML = "";
 						for (let i = 0; i < this.maxActions; i++) {
 							const action = document.createElement("span");
-							action.classList.add("action-pip", "action-glyph");
+							action.classList.add("action-glyph");
 							action.innerText = "A";
+							action.style.fontSize = `${pipsize}px`;
+							action.style.transform = `translate(0, ${pipsize/2}px)`;
+							action.style.marginLeft = "15px";
+							action.style.marginRight = "15px";
 							actionsContainer.appendChild(action);
 						}
 					}
@@ -1475,7 +1485,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					
 					availableActions = this.currentActions;
 					for (let i = 0;i < childrenArray.length; i++) {
-						childrenArray[i].style.fontColor = i < this.currentActions ? "var(--ech-mainAction-base-color)" : "#788291"
+						childrenArray[i].style.color = i < this.currentActions ? "var(--ech-mainAction-base-color)" : "#788291"
 					}
 					break;
 			}
@@ -1576,6 +1586,63 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						this.currentActions = this.currentActions - 1;
 					}
 				};
+			}
+		}
+
+		get template() {
+			return `/modules/${ModuleName}/templates/ActionPanel.hbs`;
+		}
+		
+		updateActionUse() {
+			const actionsContainer = this.element.querySelector(".actions-uses-container");
+			if (this.maxActions === null || this.currentActions === null) {
+				actionsContainer.innerHTML = "";
+			}
+			if (!actionsContainer) return;
+
+			const childrenArray = Array.from(actionsContainer.children);
+
+			let availableActions;
+			console.log(game.settings.get(ModuleName, "actionpipsstyle"))
+			switch (game.settings.get(ModuleName, "actionpipsstyle")) {
+				case "CORE":
+					if (childrenArray.length !== this.maxActions) {
+						actionsContainer.innerHTML = "";
+						for (let i = 0; i < this.maxActions; i++) {
+							const action = document.createElement("div");
+							action.classList.add("action-pip");
+							actionsContainer.appendChild(action);
+						}
+					}
+
+					availableActions = this.currentActions;
+					for (const child of childrenArray) {
+						child.classList.toggle("actions-used", availableActions <= 0);
+						availableActions--;
+					}
+					break;
+				case "PF2E":
+					const pipsize = 35; //in px
+					if (childrenArray.length !== this.maxActions) {
+						actionsContainer.innerHTML = "";
+						for (let i = 0; i < this.maxActions; i++) {
+							const action = document.createElement("span");
+							action.classList.add("action-glyph");
+							action.innerText = "R";
+							action.style.fontSize = `${pipsize}px`;
+							action.style.transform = `translate(0, ${pipsize/2}px)`;
+							action.style.marginLeft = "15px";
+							action.style.marginRight = "15px";
+							actionsContainer.appendChild(action);
+						}
+					}
+				
+					
+					availableActions = this.currentActions;
+					for (let i = 0;i < childrenArray.length; i++) {
+						childrenArray[i].style.color = i < this.currentActions ? "var(--ech-mainAction-base-color)" : "#788291"
+					}
+					break;
 			}
 		}
     }
