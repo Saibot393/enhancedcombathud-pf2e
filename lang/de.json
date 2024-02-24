@@ -9,7 +9,22 @@
 			"macrounlocked"				: "Macro ist frei",
 			"regainedfocus"				: "{Actor} hat <b>{n}</b> Fokuspunkt wieder hergestellt",
 			
-			"opensheetat"				: "Öffne Charakterbogen bei {tab}"
+			"opensheetat"				: "Öffne Charakterbogen bei {tab}",
+			
+			"sort" : {
+				"name"  				: "Sortier Art: {type} ({direction})",
+				"direction" : {
+					"up"				: "aufsteigend",
+					"down"				: "absteigend"
+				},
+				"type" : {
+					"none"				: "nicht",
+					"alpha"				: "Alphabetisch",
+					"level"				: "Level",
+					"action"			: "Aktionen",
+					"rarity"			: "Seltenheit"
+				}
+			}
 		},
 		
 		"Settings" : {
@@ -68,6 +83,22 @@
 			"weaponsetscount" : {
 				"name"					: "Waffen Sets",
 				"descrp"				: "Anzahl der angezeigten Waffen sets"
+			},
+			"actionpipsstyle" : {
+				"name"					: "Aktions Pip Style",
+				"descrp"				: "Der Style welcher für Aktions Pips unten in Aktionspanelen benutzt wird",
+				"options" : {
+					"CORE"				: "CORE (standard)",
+					"PF2E"				: "PF2e"
+				}
+			},
+			"rangedammoswapmacro" : {
+				"name"					: "Nutze Ammo swap macro",
+				"descrp"				: "Ob das Ammo swap macro anstatt einer Munitionsauswahl in den Gegenstandsknöpfen von Waffen benutzt werden soll"
+			},
+			"consumablesweaponsinpanel" : {
+				"name"					: "Konsumierbare Waffen in Panel",
+				"descrp"				: "Ob konsumierbare Waffen im Verbrauchsgegenstandspanel angezeigt werden soll"
 			},
 			"directStaffuse" : {
 				"name"					: "Direkte Stab Nutzung",

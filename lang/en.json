@@ -84,6 +84,22 @@
 				"name"					: "Weapon sets",
 				"descrp"				: "Amount of displayed weapon sets"
 			},
+			"actionpipsstyle" : {
+				"name"					: "Action pip style",
+				"descrp"				: "The style used for the action pips at the bottom of action panels",
+				"options" : {
+					"CORE"				: "CORE (default)",
+					"PF2E"				: "PF2e"
+				}
+			},
+			"rangedammoswapmacro" : {
+				"name"					: "Use ammo swap macro",
+				"descrp"				: "If the ammunition swap macro should be used instead of an ammunition select at the top of ranged weapon item buttons"
+			},
+			"consumablesweaponsinpanel" : {
+				"name"					: "Consumable weapons in panel",
+				"descrp"				: "If consumable weapons should be shown in the consumables panel"
+			},
 			"directStaffuse" : {
 				"name"					: "Direct Staff use",
 				"descrp"				: "If magical Staves should be used as spell casting items instead of weapons by default"
