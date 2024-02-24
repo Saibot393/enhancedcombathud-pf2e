@@ -1,3 +1,13 @@
+## v1.9.0
+- Added setting to choose the action pip display (either CORE (as is now) or PF2e action style)
+- Added sort option to item panels 
+- Added button to toggle a skills action section
+- Added option to use swap ammo macro instead of the ammo select
+- Added option to show consumables weapons in the consumable panel
+- Improved item trait localization
+- Fixed the z-level of the hp segment in the portrait
+- Attack of opportunity actions will now correctly consume actions
+
 ## v1.8.5
 - Changed the way actions are loaded to improve compatibility with translation modules (and make it possible to change them on the fly in the future)
 
