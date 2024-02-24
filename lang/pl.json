@@ -9,7 +9,22 @@
 			"macrounlocked"				: "Makro jest odblokowane",
 			"regainedfocus"				: "{Actor} odzyskuje <b>{n}</b> punktów skupienia",
 			
-			"opensheetat"				: "Otwórz kartę postaci na zakładce {tab}"
+			"opensheetat"				: "Otwórz kartę postaci na zakładce {tab}",
+			
+			"sort" : {
+				"name"  				: "Tryb sortowania: {type} ({direction})",
+				"direction" : {
+					"up"				: "rosnąco",
+					"down"				: "malejąco"
+				},
+				"type" : {
+					"none"				: "brak",
+					"alpha"				: "Alfabetycznie",
+					"level"				: "Poziom",
+					"action"			: "Akcje",
+					"rarity"			: "Rzadkość"
+				}
+			}
 		},
 		
 		"Settings" : {
@@ -68,6 +83,22 @@
 			"weaponsetscount" : {
 				"name"					: "Zestawy broni",
 				"descrp"				: "Ilość wyświetlanych zestawów broni"
+			},
+			"actionpipsstyle" : {
+				"name"					: "Styl znaczników akcji",
+				"descrp"				: "Styl używany dla znaczników akcji na dole paneli akcji",
+				"options" : {
+					"CORE"				: "CORE (domyślne)",
+					"PF2E"				: "PF2e"
+				}
+			},
+			"rangedammoswapmacro" : {
+				"name"					: "Użyj makra zamiany amunicji",
+				"descrp"				: "Makro zamiany amunicji powinno być używane zamiast wyboru amunicji na górze przycisków broni dystansowej"
+			},
+			"consumablesweaponsinpanel" : {
+				"name"					: "Broń zużywalna na panelu",
+				"descrp"				: "Broń zużywalna powinna być wyświetlana w panelu materiałów eksploatacyjnych"
 			},
 			"directStaffuse" : {
 				"name"					: "Bezpośrednie użycie Kosturów",
