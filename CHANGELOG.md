@@ -1,3 +1,6 @@
+## v1.9.2
+- Fixed spelling mistake
+
 ## v1.9.1
 - Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
 
