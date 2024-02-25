@@ -383,8 +383,8 @@ async function registerPF2EECHSItems () {
 	
 		for (let i = 1; i <= settingActionSpace[setkey]; i++) {
 			let chosenoption = game.settings.get(ModuleName, setkey + i);
-			
-			if (settingActionIDs[setkey]) {
+
+			if (settingActionIDs[setkey][chosenoption]) {
 				itemset[chosenoption] = {
 					id : settingActionIDs[setkey][chosenoption],
 					img : settingActionIMGs[setkey][chosenoption],
