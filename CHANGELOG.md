@@ -1,3 +1,6 @@
+## v1.9.1
+- Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
+
 ## v1.9.0
 - Added setting to choose the action pip display (either CORE (as is now) or PF2e action style)
 - Added sort option to item panels 

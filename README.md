@@ -14,12 +14,17 @@ This module adjust various Argon features for the Pathfinder 2e system:
     - The character sheet can be opened via rightclick
     - The current taken can be panned to via doubleclick
     - The currently worn armor can be inspected by rightclicking the AC box
-- **Action tracking** The module tracks boths actions and reactions used, including reduced actions via conditions
+    - Qucik buttons for the party sheet and potential familiars/master can be displayed
+- **Action tracking**
+    - The module tracks boths actions and reactions used, including reduced actions via conditions
+    - The CORE Argon action pips can be replaced by PF2e specific icons
 - **Skills and Attributes**
     - Skills, lore skills and saves are displayed, including their proficiency level via color
+    - The skill actions can be directly used from the skills section
 - **Weapons**
     - Icons for toggles such as thrown, versatile and modular will be displayed on the hud
     - The used ammunition can be adjusted from the hud
+    - The amount of weapon sets can be adjusted
 - **Tooltips** will display traits, required actions and further details such as damage, range, area...
 - **Movement HUD** will track different movement types (including step and crawl) and allows for check like swim or climb to be rolled
 - **Special actions**
@@ -32,6 +37,7 @@ The reload and unload actions as added by **[PF2e Ranged Combat](https://foundry
 
 ### Client Customization
 - **Standard action slots** several standard PF2E actions (e.g. Seek, Hide, Shove) can be chosen to be displayed on the action bar for quick use
+- **Macro buttons** addtional macro buttons can be displayed, whose macros can either be set per character or per user
 
 #### Languages:
 
