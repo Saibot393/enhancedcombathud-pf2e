@@ -1,3 +1,6 @@
+## v1.9.3
+- Fixed bug that caused a "none" action to show up in the action panel
+
 ## v1.9.2
 - Fixed spelling mistake
 
