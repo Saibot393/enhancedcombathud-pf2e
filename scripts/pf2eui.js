@@ -1448,7 +1448,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const childrenArray = Array.from(actionsContainer.children);
 
 			let availableActions;
-			console.log(game.settings.get(ModuleName, "actionpipsstyle"))
 			switch (game.settings.get(ModuleName, "actionpipsstyle")) {
 				case "CORE":
 					if (childrenArray.length !== this.maxActions) {
@@ -1603,7 +1602,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const childrenArray = Array.from(actionsContainer.children);
 
 			let availableActions;
-			console.log(game.settings.get(ModuleName, "actionpipsstyle"))
 			switch (game.settings.get(ModuleName, "actionpipsstyle")) {
 				case "CORE":
 					if (childrenArray.length !== this.maxActions) {
