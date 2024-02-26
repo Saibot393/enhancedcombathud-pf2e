@@ -1432,6 +1432,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				};
 			}
+			
+			this.updateActionUse();
 		}
 		
 		get template() {
@@ -1586,6 +1588,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				};
 			}
+			
+			this.updateActionUse();
 		}
 
 		get template() {
@@ -2287,10 +2291,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (this.item?.type == "shield" && this.actionType == "action") {
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-shield"],
-						greyed : !this.item.isRaised,
-						onclick : () => {
+						greyed : this.actor.system.attributes.shield?.raised,//!this.item.isRaised,
+						onclick : async () => {
+							await game.pf2e.actions.raiseAShield({actors : this.actor});
 							useAction("action");
-							game.pf2e.actions.raiseAShield({actors : this.actor})
 						},
 						tooltip : (await fromUuid("Compendium.pf2e.actionspf2e.Item.xjGwis0uaC2305pm")).name
 					};	
