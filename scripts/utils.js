@@ -20,8 +20,12 @@ const tabnames = {
 	biography : "PF2E.Biography"
 }
 
-const AoOids = ["NMWXHGWUcZGoLDKb", "hmShTfPOcTaKgbf4", "OqU6QXkMrZqToEEi"]; //id of Attack of Opportunity id
-const SBid = "jM72TjJ965jocBV8"; //id of Shield Block
+// A little bit of future-proofing, can hasFeat function will look for id or array of ids. Slug names seemed appropriate for now.
+const featIds = {
+	"reactive-strike": ["NMWXHGWUcZGoLDKb", "hmShTfPOcTaKgbf4", "OqU6QXkMrZqToEEi"],
+	"shield-block": "jM72TjJ965jocBV8",
+	"reactive-shield": "w8Ycgeq2zfyshtoS"
+};
 
 const sorttypes = ["none", "alpha", "level", "action", "rarity"];
 const sortdirections = ["up", "down"];
@@ -434,12 +438,38 @@ function actionGlyphofItem(item) {
 	}
 }
 
-function hasAoO(actor) {
-	return Boolean(actor.items.find(item => AoOids.find(id => item.flags?.core?.sourceId?.includes(id))));
-}
-
-function hasSB(actor) {
-	return Boolean(actor.items.find(item => item.flags?.core?.sourceId?.includes(SBid)));
+/**
+ * Checks if the actor has any of the specified feats.
+ *
+ * @param {Object} actor - The actor to check for feats.
+ * @param {string|string[]} featNames - The name or names of the feats to check for. This can be a single string or an array of strings.
+ *
+ * @returns {boolean} Returns true if the actor has any of the specified feats, otherwise returns false.
+ *
+ * @example
+ * // Check if the actor has the "Shield Block" feat
+ * let hasShieldBlock = hasFeat(actor, "Shield Block");
+ *
+ * @example
+ * // Check if the actor has either the "Shield Block" or "Reactive Shield" feat
+ * let hasShieldFeats = hasFeat(actor, ["Shield Block", "Reactive Shield"]);
+ */
+function hasFeats(actor, featNames) {
+    if (Array.isArray(featNames)) {
+        return featNames.some(featName => {
+            if (Array.isArray(featIds[featName])) {
+                return Boolean(actor.items.find(item => featIds[featName].some(id => item.flags?.core?.sourceId?.includes(id))));
+            } else {
+                return Boolean(actor.items.find(item => item.flags?.core?.sourceId?.includes(featIds[featName])));
+            }
+        });
+    } else {
+        if (Array.isArray(featIds[featNames])) {
+            return Boolean(actor.items.find(item => featIds[featNames].some(id => item.flags?.core?.sourceId?.includes(id))));
+        } else {
+            return Boolean(actor.items.find(item => item.flags?.core?.sourceId?.includes(featIds[featNames])));
+        }
+    }
 }
 
 function MAPtext(item, MAP = 0) {
@@ -619,7 +649,7 @@ function actionfilter(action, settings = {actiontype : "", classonly : false, no
 	}
 	if (settings.notAoO) {
 		let sourceID = connectedItem(action)?.getFlag("core", "sourceId");
-		if (AoOids.find(id => sourceID?.includes(id))) {return false;}
+		if (hasFeats(this.actor, "reactive-strike")) {return false;}
 	}
 	
 	return true;
@@ -678,4 +708,4 @@ function autoset(item) {
 	
 }
 
-export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasAoO, hasSB, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction}
+export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction}
