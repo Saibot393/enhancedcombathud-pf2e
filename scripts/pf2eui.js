@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasAoO, hasSB, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction} from "./utils.js";
+import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasFeats, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";  
 import {createItemMacro} from "./macro.js";
@@ -1809,15 +1809,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			if (this.isWeaponSet && this.actionType != "action") {
+			if (this.isWeaponSet && this.actionType !== "action") {
 				if (this.item) {
-					if (this.item.type == "shield") {
-						return /*hasSB(this.actor) ||*/ hasAoO(this.actor);
+					if (this.item.type === "shield") {
+						return /*hasFeat(this.actor, "shield-block") ||*/ hasFeats(this.actor, ['reactive-strike', 'reactive-shield']);
 					}
 					
-					if (this.item.type == "weapon") {
+					if (this.item.type === "weapon") {
 						if (!this.item.system.range) {
-							return hasAoO(this.actor);
+							return hasFeats(this.actor, 'reactive-strike');
 						}
 					}
 					
@@ -2287,14 +2287,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						this.element.appendChild(ammoSelect);
 					}
 				}
-				
-				if (this.item?.type == "shield" && this.actionType == "action") {
+
+				if (this.item?.type === "shield" && (this.actionType === "action" || (this.actionType === "reaction" && hasFeats(this.actor,"reactive-shield")))) {
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-shield"],
 						greyed : this.actor.system.attributes.shield?.raised,//!this.item.isRaised,
 						onclick : async () => {
 							await game.pf2e.actions.raiseAShield({actors : this.actor});
-							useAction("action");
+							useAction(this.actionType);
 						},
 						tooltip : (await fromUuid("Compendium.pf2e.actionspf2e.Item.xjGwis0uaC2305pm")).name
 					};	
