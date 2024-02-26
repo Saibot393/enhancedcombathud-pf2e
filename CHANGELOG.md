@@ -1,3 +1,6 @@
+## v1.9.4
+- Fixed bug that caused the remaining actions to not update correctly
+
 ## v1.9.3
 - Fixed bug that caused a "none" action to show up in the action panel
 
