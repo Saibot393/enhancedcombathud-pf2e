@@ -2289,6 +2289,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 
 				if (this.item?.type === "shield" && (this.actionType === "action" || (this.actionType === "reaction" && hasFeats(this.actor,"reactive-shield")))) {
+					console.log(this.actionType === "action");
+					console.log(this.actionType === "reaction");
+					console.log(hasFeats(this.actor,"reactive-shield"));
+					
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-shield"],
 						greyed : this.actor.system.attributes.shield?.raised,//!this.item.isRaised,

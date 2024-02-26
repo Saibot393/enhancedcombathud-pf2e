@@ -455,21 +455,13 @@ function actionGlyphofItem(item) {
  * let hasShieldFeats = hasFeat(actor, ["Shield Block", "Reactive Shield"]);
  */
 function hasFeats(actor, featNames) {
-    if (Array.isArray(featNames)) {
-        return featNames.some(featName => {
-            if (Array.isArray(featIds[featName])) {
-                return Boolean(actor.items.find(item => featIds[featName].some(id => item.flags?.core?.sourceId?.includes(id))));
-            } else {
-                return Boolean(actor.items.find(item => item.flags?.core?.sourceId?.includes(featIds[featName])));
-            }
-        });
-    } else {
-        if (Array.isArray(featIds[featNames])) {
-            return Boolean(actor.items.find(item => featIds[featNames].some(id => item.flags?.core?.sourceId?.includes(id))));
-        } else {
-            return Boolean(actor.items.find(item => item.flags?.core?.sourceId?.includes(featIds[featNames])));
-        }
-    }
+	let featNamearray = Array.isArray(featNames) ? featNames : [featNames];
+	
+	return featNamearray.some(featName => {
+		let featIDarray = Array.isArray(featIds[featName]) ? featIds[featName] : [featIds[featName]];
+		
+		return Boolean(actor.items.find(item => featIDarray.some(id => item.flags?.core?.sourceId?.includes(id))));
+	});
 }
 
 function MAPtext(item, MAP = 0) {
@@ -649,7 +641,7 @@ function actionfilter(action, settings = {actiontype : "", classonly : false, no
 	}
 	if (settings.notAoO) {
 		let sourceID = connectedItem(action)?.getFlag("core", "sourceId");
-		if (hasFeats(this.actor, "reactive-strike")) {return false;}
+		if (hasFeats(action.actor, "reactive-strike")) {return false;}
 	}
 	
 	return true;
