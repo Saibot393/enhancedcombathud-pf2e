@@ -1412,7 +1412,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[3]), new PF2ESpecialActionButton(specialActions[4])));
 			
 			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
-			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			
 			return buttons.filter(button => button.isvalid);
 		}
@@ -1568,7 +1568,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
 			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
-			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, notAoO : game.settings.get(ModuleName, "reduceAoO")}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, notAoO : game.settings.get(ModuleName, "reduceAoO"), includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			
 			return buttons.filter(button => button.isvalid);
 		}
@@ -1678,7 +1678,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
 			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
-			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
 			 
 			return buttons.filter(button => button.isvalid);
 		}

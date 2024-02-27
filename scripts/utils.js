@@ -620,14 +620,14 @@ function itemfilter(item, settings = {}) {
 	return true;
 }
 
-function actionfilter(action, settings = {actiontype : "", classonly : false, notclass : false, notAoO : false}) {
+function actionfilter(action, settings = {actiontype : "", classonly : false, notclass : false, notAoO : false, includeFeats : false}) {
 	if (!action) return;
 	
 	if (action.filter) {
 		return action.filter(action => actionfilter(action, settings));
 	}
 	
-	if (action.type != "action") {
+	if (action.type != "action" && !(settings.includeFeats && action.type == "feat")) {
 		return false;
 	}
 	if (settings.actiontype) {
