@@ -1,3 +1,6 @@
+## v1.9.5
+- Added support for "Reactive Shield" (thanks to [JamzTheMan](https://github.com/JamzTheMan))
+
 ## v1.9.4
 - Fixed bug that caused the remaining actions to not update correctly
 
