@@ -1,3 +1,6 @@
+## v1.9.6
+- Improved class ability recognition
+
 ## v1.9.5
 - Added support for "Reactive Shield" (thanks to [JamzTheMan](https://github.com/JamzTheMan))
 
