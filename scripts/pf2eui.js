@@ -3996,6 +3996,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			return returnsets;
 		}
+		
+		async onSetChange({sets, active}) {
+			await this._onSetChange({sets, active});
+			Hooks.callAll("argon-onSetChangeUpdateItem", {sets, active});
+			Hooks.callAll("argon-onSetChangeComplete", {sets, active});
+		}
 
 		async _onSetChange({ sets, active }) {
 			const updates = [];
