@@ -62,7 +62,7 @@ async function getTooltipDetails(item) {
 			subtitle = subtitle + ` ${replacewords(game.i18n.localize("PF2E.LevelN"), {level : item.system.level.value})}`;
 		}
 		subtitlecolor = system.traits.rarity ? `var(--color-rarity-${system.traits.rarity})` : "";
-		properties = system.traits.value?.map((trait) => {return {id : trait}});
+		properties = traitsofItem(item);
 		propertiesLabel = properties?.length ? game.i18n.localize("PF2E.TraitsLabel") : "";
 		
 		details = [];
@@ -716,8 +716,38 @@ function sortfunction(type, direction) {
 	}
 }
 
-function autoset(item) {
+function traitsofItem(item) {
+	let traits = item.system.traits.value?.map((trait) => {return {id : trait}});
 	
+	let action = connectedsettingAction(item);
+	
+	if (action) {
+		let actionTraits = action.traits.map(trait => {
+			return {
+				id : trait.name,
+				label : trait.label
+			}
+		});
+		
+		actionTraits = actionTraits.concat(action.additionalEffects?.map((trait) => {
+			return {
+				id : trait.tag,
+				label : trait.label
+			}
+		}));
+		
+		actionTraits = actionTraits.filter(trait => trait);
+		
+		actionTraits = actionTraits.filter(trait => !traits.find(includedtrait => includedtrait.id == trait.id));
+		
+		traits = traits.concat(actionTraits);
+	}
+	
+	return traits;
+}
+
+function autoset(item) {
+
 }
 
 export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction}

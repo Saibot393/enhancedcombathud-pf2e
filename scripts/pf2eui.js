@@ -878,7 +878,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 					
 					this.element.prepend(traitbox);
-					this.element.querySelector(".portrait-stat-block.player-details").style.top = `${height}px`;
+					if (!game.settings.get("enhancedcombathud", "playerDetailsBottom")) {
+						this.element.querySelector(".portrait-stat-block.player-details").style.top = `${height}px`;
+					}
 				}
 			}
 		}
@@ -1258,14 +1260,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let diceinfo = "";
 				if (localizationstring?.length > 1) diceinfo = localizationstring.pop();
 				
-				let namelocalization = "PF2E.Trait" + localizationstring.join("");
-				let name = game.i18n.localize(namelocalization);
-				
-				if (namelocalization != name) {
-					trait.label = [name, diceinfo].join(" ");
-				}
-				else {
-					trait.label = trait.id.toUpperCase();
+				if (!trait.label) {
+					let namelocalization = "PF2E.Trait" + localizationstring.join("");
+					let name = game.i18n.localize(namelocalization);
+					
+					if (namelocalization != name) {
+						trait.label = [name, diceinfo].join(" ");
+					}
+					else {
+						trait.label = trait.id.toUpperCase();
+					}
 				}
 				
 				let hintlocalization = "PF2E.TraitDescription" + localizationstring.join("");
