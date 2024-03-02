@@ -14,6 +14,7 @@ const maxreactions = 1;
 const hpblue = "rgb(10, 200, 255)";
 const hpred = "rgb(255 10 10)";
 const hporange = "rgb(255 127 0)";
+const hpyellow = "rgb(255 255 0)";
 const hpgreen = "rgb(0 255 100)";
 
 /* EXPERIMENTAL code to add custom colors
@@ -3295,6 +3296,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						break;
 					case "rarity":
 						toggleData.iconclass = ["fa-solid", "fa-star"];
+					case "infused":
+						toggleData.iconclass = ["fa-solid", "fa-flask"];
 						break;
 				}
 
@@ -3305,15 +3308,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async increaseSortType() {
-			let newindex = sorttypes.indexOf(this.sorttype) + 1;
+			let localsorttypes = [...sorttypes];
 			
-			if (sorttypes[newindex] == "action" && this.actionType != sorttypes[newindex]) {
+			if (this.panel._buttons.find(button => button.item.system?.traits.value?.includes("infused"))) {
+				localsorttypes.push("infused");
+			}
+			
+			let newindex = localsorttypes.indexOf(this.sorttype) + 1;
+			
+			if (localsorttypes[newindex] == "action" && this.actionType != localsorttypes[newindex]) {
 				newindex = newindex + 1;
 			}
 			
-			newindex = newindex % sorttypes.length;
+			newindex = newindex % localsorttypes.length;
 			
-			this._sorttype = sorttypes[newindex];
+			console.log(newindex);
+			console.log(localsorttypes);
+			
+			this._sorttype = localsorttypes[newindex];
 
 			await this.panel.sortbuttons(sortfunction(this.sorttype, this.sortdirection));
 			

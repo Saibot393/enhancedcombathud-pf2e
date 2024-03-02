@@ -711,6 +711,16 @@ function sortfunction(type, direction) {
 				if (rarities.indexOf(itema.rarity) > rarities.indexOf(itemb.rarity)) return directionfactor;	
 				return 0;
 			}
+		case "infused":
+			return (itema, itemb) => {
+				let aisinfused = itema.system?.traits.value?.includes("infused");
+				let bisinfused = itemb.system?.traits.value?.includes("infused");
+				console.log(aisinfused);
+				console.log(bisinfused);
+				if (!aisinfused && bisinfused) return -directionfactor;
+				if (aisinfused && !bisinfused) return directionfactor;	
+				return 0;
+			}
 		default:
 			return (itema, itemb) => {return 0};
 	}
