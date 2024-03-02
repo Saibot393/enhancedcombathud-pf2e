@@ -1,3 +1,6 @@
+## v1.9.7
+- Small bug fix for two handed weapon sets
+
 ## v1.9.6
 - Improved class ability recognition
 
