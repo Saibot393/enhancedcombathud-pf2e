@@ -356,21 +356,44 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		async getStatBlocks() {
-			const HPText = game.i18n.localize("PF2E.HitPointsShortLabel");
-			
 			const ACText = game.i18n.localize("PF2E.ArmorClassShortLabel");
 			
 			const DCText = game.i18n.localize("PF2E.Check.DC.Unspecific");
 
 			const hppercent = this.actor.system.attributes.hp.value/this.actor.system.attributes.hp.max;
-			const hpColor = this.actor.system.attributes.hp.temp ? hpblue : (hppercent <= 0.5 ? (hppercent <= 0.1 ?  hpred : hporange) : hpgreen);
+			const useStamina = (game.settings.get("pf2e", "staminaVariant") && (this.actor.system.attributes.hp.sp?.value > 0));
+			
+			const HPText = 	useStamina ?
+							game.i18n.localize("PF2E.StaminaPointsHeader").split(" ").map(text => text[0]).join("")
+							:
+							game.i18n.localize("PF2E.HitPointsShortLabel");
+			
+			const hpColor = useStamina ?
+							this.actor.system.attributes.hp.temp ? hpblue : hpyellow
+							: 
+							(this.actor.system.attributes.hp.temp ? hpblue : (hppercent <= 0.5 ? (hppercent <= 0.1 ?  hpred : hporange) : hpgreen));
+							
+			const hpMax = 	useStamina ?
+							this.actor.system.attributes.hp.sp?.max
+							:
+							this.actor.system.attributes.hp.max + (this.actor.system.attributes.hp.tempmax ?? 0);
+							
+			const hpValue = useStamina ?
+							this.actor.system.attributes.hp.sp?.value + (this.actor.system.attributes.hp.temp ?? 0)
+							:
+							this.actor.system.attributes.hp.value + (this.actor.system.attributes.hp.temp ?? 0);
+							
 			const tempMax = this.actor.system.attributes.hp.tempmax;
-			const hpMaxColor = tempMax ? (tempMax > 0 ? "rgb(222 91 255)" : "#ffb000") : "rgb(255 255 255)";
+			
+			const hpMaxColor = 	useStamina ?
+								hpyellow
+								:
+								tempMax ? (tempMax > 0 ? "rgb(222 91 255)" : "#ffb000") : "rgb(255 255 255)";
 
 			let blocks = [
 				[
 					{
-						text: `${this.actor.system.attributes.hp.value + (this.actor.system.attributes.hp.temp ?? 0)}`,
+						text: `${hpValue}`,
 						color: hpColor,
 						id: "HPvalue"
 					},
@@ -378,12 +401,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						text: `/`,
 					},
 					{
-						text: `${this.actor.system.attributes.hp.max + (this.actor.system.attributes.hp.tempmax ?? 0)}`,
+						text: `${hpMax}`,
 						color: hpMaxColor,
 					},
 					{
 						text: HPText,
-						id: "HPtext"
+						id: "HPtext",
 					},
 				],
 				[
@@ -588,6 +611,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			let mainHPbox;
 			if (hpbox) {
 				let hpvaluebox = hpbox.querySelector("#HPvalue");
+				let hptextbox = hpbox.querySelector("#HPtext");
 				
 				let mainHPbox = document.createElement("div");
 				mainHPbox.style.zIndex = "2";
@@ -608,6 +632,35 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				tempHPbox.appendChild(tempHPvalue);
 				tempHPbox.appendChild(tempHPtext);
 				
+				let spHPbox;
+				let spHPvalue;
+				if (game.settings.get("pf2e", "staminaVariant")) {
+					spHPbox = document.createElement("div");
+					spHPbox.classList.add("portrait-stat-block");
+					spHPbox.style.display = "none";
+					
+					spHPvalue = document.createElement("input");
+					spHPvalue.type = "number";
+					spHPvalue.style.color = hpyellow;
+					spHPvalue.style.width = "30px";
+					spHPvalue.onfocus = () => {spHPvalue.select()};
+					
+					let spHPdash = document.createElement("span");
+					spHPdash.innerHTML = "/";
+					
+					let spHPmax = document.createElement("span");
+					spHPmax.style.color = hpyellow;
+					spHPmax.innerHTML = this.actor.system.attributes.hp.sp.max;
+					
+					let spHPtext = document.createElement("span");
+					spHPtext.innerText = game.i18n.localize("PF2E.StaminaPointsHeader").split(" ").map(text => text[0]).join("");
+					
+					spHPbox.appendChild(spHPvalue);
+					spHPbox.appendChild(spHPdash);
+					spHPbox.appendChild(spHPmax);
+					spHPbox.appendChild(spHPtext);
+				}
+				
 				let currentHPvalue = document.createElement("input");
 				currentHPvalue.type = "number";
 				currentHPvalue.style.display = "none";
@@ -623,10 +676,13 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				mainHPbox.onmouseenter = () => {
 					tempHPbox.style.display = "";
+					if (game.settings.get("pf2e", "staminaVariant")) spHPbox.style.display = "";
 					currentHPvalue.style.display = "";
 					hpvaluebox.style.display = "none";
+					hptextbox.innerHTML = game.i18n.localize("PF2E.HitPointsShortLabel")
 					
 					tempHPvalue.value = this.actor.system.attributes.hp.temp;
+					spHPvalue.value = this.actor.system.attributes.hp.sp.value;
 					currentHPvalue.value = this.actor.system.attributes.hp.value;
 					
 					currentHPvalue.onchange();
@@ -634,17 +690,29 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				mainHPbox.onmouseleave = () => {
 					tempHPbox.style.display = "none";
+					if (game.settings.get("pf2e", "staminaVariant")) spHPbox.style.display = "none";
 					currentHPvalue.style.display = "none";
 					hpvaluebox.style.display = "";
+					const useStamina = (game.settings.get("pf2e", "staminaVariant") && (this.actor.system.attributes.hp.sp?.value > 0));
+					const HPText = 	useStamina ?
+									game.i18n.localize("PF2E.StaminaPointsHeader").split(" ").map(text => text[0]).join("")
+									:
+									game.i18n.localize("PF2E.HitPointsShortLabel");
 					
-					if (tempHPvalue.value != this.actor.system.attributes.hp.temp || currentHPvalue.value != this.actor.system.attributes.hp.value) {
+					if (tempHPvalue.value != this.actor.system.attributes.hp.temp || currentHPvalue.value != this.actor.system.attributes.hp.value || (game.settings.get("pf2e", "staminaVariant") && spHPvalue.value != this.actor.system.attributes.hp.sp.value)) {
 						let update = {system : {attributes : {hp : {temp : tempHPvalue.value, value : currentHPvalue.value}}}};
+						
+						if (game.settings.get("pf2e", "staminaVariant")) {
+							update.system.attributes.hp.sp = {value : spHPvalue.value};
+						}
+						console.log(update);
 						
 						this.actor.update(update);
 					}
 				}
 				
 				mainHPbox.appendChild(tempHPbox);
+				if (game.settings.get("pf2e", "staminaVariant")) mainHPbox.appendChild(spHPbox);
 				mainHPbox.appendChild(hpbox);
 				this.element.prepend(mainHPbox);
 			}
