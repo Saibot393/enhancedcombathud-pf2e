@@ -90,27 +90,34 @@ function createToggleIcons(toggles, options = {}) {
 			}
 		}
 		
-		if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
-		
-		if (!toggle.showalways) {
-			icon.classList.add("specialAction");
-			//icon.style.visibility = "hidden";
-			icon.style.display = "none";
-		}
-		icon.onclick = (event) => {
-			toggle.onclick(event);
-		}
-		if (toggle.onrclick) {
-			icon.oncontextmenu = (event) => {
-				toggle.onrclick(event);
+		if (icon) {
+			if (toggle.tooltip) icon.setAttribute("data-tooltip", toggle.tooltip);
+			
+			if (!toggle.showalways) {
+				icon.classList.add("specialAction");
+				//icon.style.visibility = "hidden";
+				icon.style.display = "none";
 			}
+			
+			icon.onclick = (event) => {
+				toggle.onclick(event);
+			}
+			if (toggle.onrclick) {
+				icon.oncontextmenu = (event) => {
+					toggle.onrclick(event);
+				}
+			}
+			icon.style.height = `${iconsize}px`;
+			icon.style.width = `${iconsize}px`;
+			icon.style.textShadow = "0 0 10px rgba(0,0,0,0)";
+			icon.style.textAlign = "center";
+			
+			iconpanel.appendChild(icon);
 		}
-		icon.style.height = `${iconsize}px`;
-		icon.style.width = `${iconsize}px`;
-		icon.style.textShadow = "0 0 10px rgba(0,0,0,0)";
-		icon.style.textAlign = "center";
-		
-		iconpanel.appendChild(icon);
+		else {
+			console.log(toggle);
+			console.log(toggles);
+		}
 	}
 	
 	return iconpanel;	
@@ -2289,10 +2296,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 
 				if (this.item?.type === "shield" && (this.actionType === "action" || (this.actionType === "reaction" && hasFeats(this.actor,"reactive-shield")))) {
-					console.log(this.actionType === "action");
-					console.log(this.actionType === "reaction");
-					console.log(hasFeats(this.actor,"reactive-shield"));
-					
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-shield"],
 						greyed : this.actor.system.attributes.shield?.raised,//!this.item.isRaised,

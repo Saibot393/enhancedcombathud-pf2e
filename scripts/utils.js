@@ -465,15 +465,29 @@ function hasFeats(actor, featNames) {
 }
 
 function MAPtext(item, MAP = 0) {
-	let penaltyLevel = 5;
+	let action = connectedsettingAction(item);
 	
-	if (item?.system?.traits?.value?.includes("agile")) {
-		penaltyLevel = 4;
+	let variant = action?.variants[MAP];
+	
+	if (action && variant) {
+		let mapString = variant.label?.substring(
+			variant.label.indexOf("(") + 1, 
+			variant.label.lastIndexOf(")")
+		);
+		
+		return mapString;
 	}
-	
-	let penalty = -MAP * penaltyLevel;
-	
-	return replacewords(game.i18n.localize("PF2E.MAPAbbreviationLabel"), {penalty : penalty});
+	else {
+		let penaltyLevel = 5;
+		
+		if (item?.system?.traits?.value?.includes("agile")) {
+			penaltyLevel = 4;
+		}
+		
+		let penalty = -MAP * penaltyLevel;
+		
+		return replacewords(game.i18n.localize("PF2E.MAPAbbreviationLabel"), {penalty : penalty});
+	}
 }
 
 function spelluseAction(spell, level, heightenlevel = 0) {
@@ -550,31 +564,33 @@ function connectedsettingAction(item) {
 	if (item) {
 		let actor = item.actor;
 		
-		if (item.system.slug) {
-			action = actor.system.actions.find(action => action.slug == item.system.slug && action.item == item);
-			
-			if (!action) {
-				action = actor.system.actions.find(action => action.slug == item.system.slug);
-			}
-		}
-		else {
-			action = actor.system.actions.find(action => action.item == item);
-		}
-		
-		if (!action && item.type == "melee") {
-			action = actor.system.actions.find(action => action.slug == item.name.toLowerCase());
-		}
-		
-		if (item.getFlag(ModuleName, "thrown") || item.getFlag(ModuleName, "combination-melee")) {
-			if (action?.altUsages?.length) {
-				action = action.altUsages[0];
+		if (actor) {
+			if (item.system?.slug) {
+				action = actor.system.actions.find(action => action.slug == item.system.slug && action.item == item);
+				
+				if (!action) {
+					action = actor.system.actions.find(action => action.slug == item.system.slug);
+				}
 			}
 			else {
-				if (item.getFlag(ModuleName, "thrown")) {
-					action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("ranged"));
+				action = actor.system.actions.find(action => action.item == item);
+			}
+			
+			if (!action && item.type == "melee") {
+				action = actor.system.actions.find(action => action.slug == item.name.toLowerCase());
+			}
+			
+			if (item.getFlag(ModuleName, "thrown") || item.getFlag(ModuleName, "combination-melee")) {
+				if (action?.altUsages?.length) {
+					action = action.altUsages[0];
 				}
-				if (item.getFlag(ModuleName, "combination-melee")) {
-					action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("melee"));
+				else {
+					if (item.getFlag(ModuleName, "thrown")) {
+						action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("ranged"));
+					}
+					if (item.getFlag(ModuleName, "combination-melee")) {
+						action = actor.system.actions.find(action => action.slug == item.name.toLowerCase() && action.options.includes("melee"));
+					}
 				}
 			}
 		}
