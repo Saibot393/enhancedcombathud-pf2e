@@ -333,7 +333,17 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		config: true,
 		type: Boolean,
 		default: true,
-		requiresReload : true
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
+	game.settings.register(ModuleName, "showfeatpassives", {
+		name: game.i18n.localize(`${ModuleName}.Settings.showfeatpassives.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.showfeatpassives.descrp`),
+		scope: "client",
+		config: true,
+		type: Boolean,
+		default: false,
+		onChange: () => {ui.ARGON?.render()}
 	});
 	
 	game.settings.register(ModuleName, "showmacrocategory", {

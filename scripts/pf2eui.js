@@ -1731,7 +1731,14 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			//buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[0]), new PF2ESpecialActionButton(specialActions[1])));
 			
 			if (this.actor.type == "npc") {
-				buttons.push(new PF2EButtonPanelButton({parent : this, type: "action"}));
+				if (game.settings.get(ModuleName, "showpassives")) {
+					buttons.push(new PF2EButtonPanelButton({parent : this, type: "action"}));
+				}
+			}
+			else {
+				if (game.settings.get(ModuleName, "showfeatpassives")) {
+					buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
+				}
 			}
 			
 			return buttons.filter(button => button.isvalid);
@@ -4130,12 +4137,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	let panels = [
 		PF2EActionPanel,
 		PF2EReActionPanel,
-		PF2EFreeActionPanel
+		PF2EFreeActionPanel,
+		PF2EPassiveActionPanel
 	];
-	
-	if (game.settings.get(ModuleName, "showpassives")) {
-		panels.push(PF2EPassiveActionPanel);
-	}
 	
 	if (game.settings.get(ModuleName, "showmacrocategory")) {
 		panels.push(ARGON.PREFAB.MacroPanel);
