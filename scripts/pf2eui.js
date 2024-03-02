@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasFeats, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction} from "./utils.js";
+import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasFeats, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction, connectedPassives} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";  
 import {createItemMacro} from "./macro.js";
@@ -43,6 +43,8 @@ function createToggleIcons(toggles, options = {}) {
 	for (let direction of ["top", "bottom", "left", "right"]) {
 		if (options.hasOwnProperty(direction + "offset")) iconpanel.style[direction] = `${options[direction + "offset"]}px`;
 	}
+	if (options.align) iconpanel.style.alignSelf = options.align;
+	
 	iconpanel.style.position = "absolute";
 	//iconpanel.style.width = `${iconsize}px`;
 	iconpanel.style.width = "auto";
@@ -2101,6 +2103,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _onRightClick(event) {
+			if (event.target.classList.contains("specialAction")) return;
+			
 			if (this.item?.sheet) {
 				this.item?.sheet?.render(true);
 			}
@@ -2511,6 +2515,23 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			this.element.appendChild(createToggleIcons(toggles, {iconsize : iconsize, rightoffset : 0, topoffset : topoffset}));
+			
+			if (game.settings.get(ModuleName, "showconnectedpassives")) {
+				if (["weapon", "shield", "action", "melee"].includes(this.item.type)) {
+					let passives = connectedPassives(this.item);
+					
+					let passiveToggles = passives.map(passive => {
+						return {
+							iconsource : passive.img,
+							tooltip : passive.name,
+							onclick : () => (passive.toChat()),
+							onrclick : () => (passive.sheet?.render(true))
+						}
+					});
+					
+					this.element.appendChild(createToggleIcons(passiveToggles, {iconsize : iconsize, leftoffset : 0, align : "center"}));
+				}
+			}
 		}
 	}
 	

@@ -746,8 +746,20 @@ function traitsofItem(item) {
 	return traits;
 }
 
+function connectedPassives(item) {
+	let actor = item?.actor;
+	
+	if (actor) {
+		let traits = traitsofItem(item);
+		
+		let passives = traits.map(trait => actor.items.find(i => i.name == trait?.label)).filter(passive => passive);
+		
+		return passives;
+	}
+}
+
 function autoset(item) {
 
 }
 
-export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction}
+export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction, connectedPassives}
