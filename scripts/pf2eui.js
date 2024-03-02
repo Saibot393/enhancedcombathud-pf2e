@@ -682,22 +682,17 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					hptextbox.innerHTML = game.i18n.localize("PF2E.HitPointsShortLabel")
 					
 					tempHPvalue.value = this.actor.system.attributes.hp.temp;
-					spHPvalue.value = this.actor.system.attributes.hp.sp.value;
+					if (game.settings.get("pf2e", "staminaVariant")) spHPvalue.value = this.actor.system.attributes.hp.sp.value;
 					currentHPvalue.value = this.actor.system.attributes.hp.value;
 					
 					currentHPvalue.onchange();
 				}
 				
-				mainHPbox.onmouseleave = () => {
+				mainHPbox.onmouseleave = async () => {
 					tempHPbox.style.display = "none";
 					if (game.settings.get("pf2e", "staminaVariant")) spHPbox.style.display = "none";
 					currentHPvalue.style.display = "none";
 					hpvaluebox.style.display = "";
-					const useStamina = (game.settings.get("pf2e", "staminaVariant") && (this.actor.system.attributes.hp.sp?.value > 0));
-					const HPText = 	useStamina ?
-									game.i18n.localize("PF2E.StaminaPointsHeader").split(" ").map(text => text[0]).join("")
-									:
-									game.i18n.localize("PF2E.HitPointsShortLabel");
 					
 					if (tempHPvalue.value != this.actor.system.attributes.hp.temp || currentHPvalue.value != this.actor.system.attributes.hp.value || (game.settings.get("pf2e", "staminaVariant") && spHPvalue.value != this.actor.system.attributes.hp.sp.value)) {
 						let update = {system : {attributes : {hp : {temp : tempHPvalue.value, value : currentHPvalue.value}}}};
@@ -705,10 +700,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						if (game.settings.get("pf2e", "staminaVariant")) {
 							update.system.attributes.hp.sp = {value : spHPvalue.value};
 						}
-						console.log(update);
 						
-						this.actor.update(update);
+						await this.actor.update(update);
 					}
+					
+					const useStamina = (game.settings.get("pf2e", "staminaVariant") && (this.actor.system.attributes.hp.sp?.value > 0));
+					hptextbox.innerHTML = 	useStamina ?
+											game.i18n.localize("PF2E.StaminaPointsHeader").split(" ").map(text => text[0]).join("")
+											:
+											game.i18n.localize("PF2E.HitPointsShortLabel");
 				}
 				
 				mainHPbox.appendChild(tempHPbox);
@@ -3364,6 +3364,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						break;
 					case "rarity":
 						toggleData.iconclass = ["fa-solid", "fa-star"];
+						break;
 					case "infused":
 						toggleData.iconclass = ["fa-solid", "fa-flask"];
 						break;
@@ -3389,9 +3390,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			newindex = newindex % localsorttypes.length;
-			
-			console.log(newindex);
-			console.log(localsorttypes);
 			
 			this._sorttype = localsorttypes[newindex];
 

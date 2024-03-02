@@ -22,7 +22,8 @@
 					"alpha"				: "Alphabetically",
 					"level"				: "Level",
 					"action"			: "Actions",
-					"rarity"			: "Rarity"
+					"rarity"			: "Rarity",
+					"infused"			: "Infused Trait"
 				}
 			}
 		},
@@ -92,6 +93,10 @@
 					"PF2E"				: "PF2e"
 				}
 			},
+			"showconnectedpassives" : {
+				"name"					: "Show connected passives",
+				"descrp"				: "If passives connected to attacks should be indicated in the item button"
+			},
 			"rangedammoswapmacro" : {
 				"name"					: "Use ammo swap macro",
 				"descrp"				: "If the ammunition swap macro should be used instead of an ammunition select at the top of ranged weapon item buttons"
@@ -152,6 +157,10 @@
 			"showpassives" : {
 				"name"					: "Show NPC passives",
 				"descrp"				: "If the passives of NPCs should be shown"
+			},
+			"showfeatpassives" : {
+				"name"					: "Show passive feats",
+				"descrp"				: "If passive feats should be shown"
 			},
 			"showmacrocategory" : {
 				"name"					: "Show macro category",
