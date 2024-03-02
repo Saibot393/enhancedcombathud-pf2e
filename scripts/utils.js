@@ -132,20 +132,24 @@ async function getTooltipDetails(item) {
 			});
 		}
 		
-		if (item.type == "weapon") {
-			let value = item.system.attackValue;
-			
-			if (!value) {
-				let action = item.actor?.system.actions.find(action => action.slug == item.system.slug);
-				if (action?.variants?.length) {
-					value = action.variants[0].label;
-				}
+		let Attackvalue = item.system.attackValue;
+		if (!Attackvalue) {
+			let action = item.actor?.system.actions.find(action => action.slug == item.system.slug);
+			if (action?.variants?.length) {
+				Attackvalue = action.variants[0].label;
 			}
+		}
+		if (Attackvalue) {
+			details.push({
+				label: game.i18n.localize("PF2E.TraitAttack"),
+				value: Attackvalue
+			});
 			
-			if (value) {
+			let mapValues = [MAPtext(item, 1), MAPtext(item, 2)].filter(map => map).map(map => map.split(" ")[1]);
+			if (mapValues.length == 2) {
 				details.push({
-					label: game.i18n.localize("PF2E.TraitAttack"),
-					value: value
+					label: game.i18n.localize("PF2E.MAPAbbreviationLabel").split(" ")[0],
+					value: mapValues.join("/")
 				});
 			}
 		}
