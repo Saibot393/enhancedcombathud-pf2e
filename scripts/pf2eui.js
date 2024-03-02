@@ -173,8 +173,19 @@ Hooks.on("updateItem", (item) => {
 				}
 			}
 		}
+		if (item.type == "action") {
+			ui.ARGON.itemButtons.filter(button => button.isWeaponSet).forEach(button => button.render());
+		}
 	}
 });
+
+/*
+Hooks.on("updateActor", (actor) => {
+	if (ui.ARGON?.components.portrait?.actor == actor) {
+		ui.ARGON.itemButtons.filter(button => button.isWeaponSet).forEach(button => button.render());
+	}
+});
+*/
 
 Hooks.on("createCombatant", (combatant) => {
 	if (ui.ARGON?._actor?.id == combatant?.actorId) {
