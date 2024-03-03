@@ -1,3 +1,13 @@
+## v1.10.0
+- Added setting to display connected passives in action item buttons
+- Added setting to show passive feats in HUD
+- Added support for the optional stamina rule
+- Added sort option for the infused trait
+- Added MAP to tooltips
+- Improved MAP update
+- Improved item trait recognition
+- Improved MAP recognition
+
 ## v1.9.7
 - Small bug fix for two handed weapon sets
 
