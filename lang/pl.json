@@ -3,7 +3,7 @@
 		"Titles" : {
 			"refocus"					: "ponowne skupienie",
 			"accept"					: "Akceptuj",
-			"abbort"					: "Wycofaj",
+			"abbort"					: "Anuluj",
 			"swapin"					: "Zamiana",
 			"macrolocked"				: "Makro jest zablokowane",
 			"macrounlocked"				: "Makro jest odblokowane",
@@ -22,7 +22,8 @@
 					"alpha"				: "Alfabetycznie",
 					"level"				: "Poziom",
 					"action"			: "Akcje",
-					"rarity"			: "Rzadkość"
+					"rarity"			: "Rzadkość",
+					"infused"			: "Cecha Nasycenia"
 				}
 			}
 		},
@@ -92,6 +93,10 @@
 					"PF2E"				: "PF2e"
 				}
 			},
+			"showconnectedpassives" : {
+				"name"					: "Pokaż połączone elementy pasywne",
+				"descrp"				: "Pasywne elementy połączone z atakami powinny być wskazywane na przycisku przedmiotu"
+			},
 			"rangedammoswapmacro" : {
 				"name"					: "Użyj makra zamiany amunicji",
 				"descrp"				: "Makro zamiany amunicji powinno być używane zamiast wyboru amunicji na górze przycisków broni dystansowej"
@@ -152,6 +157,10 @@
 			"showpassives" : {
 				"name"					: "Pokaż pasywne zdolności BNów",
 				"descrp"				: "Pasywne zdolności BNów powinny być wyświetlane"
+			},
+			"showfeatpassives" : {
+				"name"					: "Pokaż pasywne atuty",
+				"descrp"				: "Pasywne atuty powinny być pokazywane"
 			},
 			"showmacrocategory" : {
 				"name"					: "Pokaż kategorię makro",
