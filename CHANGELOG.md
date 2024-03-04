@@ -1,3 +1,6 @@
+## v1.10.1
+- Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
+
 ## v1.10.0
 - Added setting to display connected passives in action item buttons
 - Added setting to show passive feats in HUD
