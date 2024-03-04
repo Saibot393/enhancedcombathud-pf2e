@@ -1,4 +1,5 @@
 import {openNewInput} from "./popupInput.js";
+import { InlineRollLinks } from "/systems/pf2e/src/scripts/ui/inline-roll-links.js"
 
 const ModuleName = "enhancedcombathud-pf2e";
 
@@ -56,7 +57,8 @@ async function getTooltipDetails(item) {
 		const system = dynamicstate ? dynamicstate.system({actor}) : item.system;
 		
 		title = dynamicstate ? dynamicstate.name({actor}) : item.name;
-		description = await TextEditor.enrichHTML(system.description.value);
+		description = await TextEditor.enrichHTML(system.description.value)//, {async : true, processVisibility : false, rollData : {actor : item.actor, item : item}, secrets : true});
+		InlineRollLinks.listen(description, item);
 		subtitle = system.traits.rarity ? game.i18n.localize("PF2E.Trait" + firstUpper(system.traits.rarity)) : "";
 		if (item.system?.level?.hasOwnProperty("value")) {
 			subtitle = subtitle + ` ${replacewords(game.i18n.localize("PF2E.LevelN"), {level : item.system.level.value})}`;
