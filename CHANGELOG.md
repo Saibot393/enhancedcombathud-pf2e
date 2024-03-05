@@ -1,3 +1,6 @@
+## v1.10.2
+- Improved attack and damage tooltips
+
 ## v1.10.1
 - Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
 
