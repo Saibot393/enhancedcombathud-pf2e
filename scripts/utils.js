@@ -1,5 +1,4 @@
 import {openNewInput} from "./popupInput.js";
-import { InlineRollLinks } from "/systems/pf2e/src/scripts/ui/inline-roll-links.js"
 
 const ModuleName = "enhancedcombathud-pf2e";
 
@@ -58,7 +57,6 @@ async function getTooltipDetails(item) {
 		
 		title = dynamicstate ? dynamicstate.name({actor}) : item.name;
 		description = await TextEditor.enrichHTML(system.description.value)//, {async : true, processVisibility : false, rollData : {actor : item.actor, item : item}, secrets : true});
-		InlineRollLinks.listen(description, item);
 		subtitle = system.traits.rarity ? game.i18n.localize("PF2E.Trait" + firstUpper(system.traits.rarity)) : "";
 		if (item.system?.level?.hasOwnProperty("value")) {
 			subtitle = subtitle + ` ${replacewords(game.i18n.localize("PF2E.LevelN"), {level : item.system.level.value})}`;
@@ -140,11 +138,15 @@ async function getTooltipDetails(item) {
 			if (action?.variants?.length) {
 				Attackvalue = action.variants[0].label;
 			}
+			
+			if (!Attackvalue && item.type == "melee") {
+				Attackvalue = item.system?.bonus?.value
+			}
 		}
-		if (Attackvalue) {
+		if (Attackvalue || (Attackvalue === 0)) {
 			details.push({
 				label: game.i18n.localize("PF2E.TraitAttack"),
-				value: Attackvalue
+				value: `${Attackvalue > 0 ? "+" : ""}${Attackvalue}`
 			});
 			
 			let mapValues = [MAPtext(item, 1), MAPtext(item, 2)].filter(map => map).map(map => map.split(" ")[1]);
@@ -180,16 +182,19 @@ async function getTooltipDetails(item) {
 		}
 		
 		let damageentry;
-		if (item.type == "spell") {
+		if (item.type == "spell" || item.type == "melee") {
+			let damages = item.type == "spell" ? item.system.damage : item.system.damageRolls
 			let entries = [];
-			for (let key of Object.keys(item.system.damage)) {
-				let type = item.system.damage[key].type || item.system.damage[key].kind;
+			for (let key of Object.keys(damages)) {
+				let type = damages[key].type || damages[key].kind || damages[key].damageType;
 				
-				if (!type && item.system.damage[key].kinds) {
-					type = Object.values(item.system.damage[key].kinds).find(value => damageIcon(value).length);
+				let formula = damages[key].formula || damages[key].damage
+				
+				if (!type && damages[key].kinds) {
+					type = Object.values(damages[key].kinds).find(value => damageIcon(value).length);
 				}
 				
-				entries.push(`${item.system.damage[key].formula} ${damagecategoryIcon(item.system.damage[key].category)} <i class="${damageIcon(type).join(" ")}"></i>`)
+				entries.push(`${formula} ${damagecategoryIcon(damages[key].category)} <i class="${damageIcon(type).join(" ")}"></i>`)
 			}
 			damageentry = entries.join("<br>");
 		}
