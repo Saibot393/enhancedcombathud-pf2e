@@ -1894,6 +1894,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const item = this.isPrimary ? activeSet.primary : activeSet.secondary;
 				this.setItem(item);    
 			}
+			
+			if (this.isPrimary) {
+				this.updatePartnerButton();
+			}
 		}
 		
 		get visible() {
@@ -2043,7 +2047,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		
 		updatePartnerButton() {
 			if (this.isWeaponSet) {
-				return this.parent?.buttons.find(button => button != this && button.isWeaponSet)?.render();
+				if (this.parent) {
+					if (this.parent.buttons) {
+						return this.parent.buttons.find(button => button != this && button.isWeaponSet)?.render();
+					}
+					
+					if (this.parent.button1 && this.parent.button2) {
+						return [this.parent.button1, this.parent.button2].find(button => button != this && button.isWeaponSet)?.render();
+					}
+				}
 			}
 		}
 		
@@ -2314,7 +2326,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (this.isWeaponSet && !(this.panel && game.settings.get(ModuleName, "directStaffuse"))) {
 				const MAPActions = [{MAP : 1}, {MAP : 2}];
-				if ((this.item.type == "weapon" || this.item.type == "shield" || this.item.type == "melee" || (this.actor.system.actions.find(action => action.slug == this.item.system.slug)?.variants?.length == 3)) && this.actionType == "action") {
+				if (this.item && (this.item.type == "weapon" || this.item.type == "shield" || this.item.type == "melee" || (this.actor.system.actions.find(action => action.slug == this.item.system.slug)?.variants?.length == 3)) && this.actionType == "action") {
 					this.element.querySelector("span").id = "maintitle";
 					
 					for (let i = 0; i < MAPActions.length; i++) {
@@ -2407,7 +2419,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let toggleoptions = ["versatile", "modular"];
 				
 				for (let togglekey of toggleoptions) {
-					if (this.item.system.traits.toggles) {
+					if (this.item?.system.traits.toggles) {
 						let toggle = this.item.system.traits.toggles[togglekey];
 						
 						if (toggle.options.length) {
@@ -2435,7 +2447,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 				
-				if (this.item.isThrowable && !this.item?.system?.traits?.value?.includes("consumable")) {
+				if (this.item?.isThrowable && !this.item?.system?.traits?.value?.includes("consumable")) {
 					let isthrown = this.item.getFlag(ModuleName, "thrown");
 					
 					let toggleData = {
@@ -2448,7 +2460,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					toggles.push(toggleData);
 				}
 				
-				if (this.item.system?.traits.value?.includes("combination")) {
+				if (this.item?.system?.traits.value?.includes("combination")) {
 					let ismelee = this.item.getFlag(ModuleName, "combination-melee");
 					
 					let toggleData = {
@@ -2534,7 +2546,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				toggles.push(toggleData);
 			}
 			
-			if (this.item.isElementalBlast) {
+			if (this.item?.isElementalBlast) {
 				let toggleData
 				
 				toggleData = {
@@ -2554,7 +2566,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				toggles.push(toggleData);
 			}
 			
-			if (this.item.type == "spell") {
+			if (this.item?.type == "spell") {
 				if (this.item.system.duration?.sustained) {
 					let toggleData = {
 						iconclass : ["fa-solid", "fa-s"],
@@ -2576,7 +2588,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 			}
 			
-			if (this.item.isInvested) {
+			if (this.item?.isInvested) {
 				let toggleData = {
 					iconclass : ["fa-solid", "fa-gem"],
 					tooltip : game.i18n.localize("PF2E.InvestedLabel")
@@ -4128,6 +4140,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		async _onSetChange({ sets, active }) {
+			let lastSet = this.actor.getFlag(ModuleName, "lastSet") || {};
+			
+			if (active == lastSet.active && sets[active].primary?._id == lastSet.primary && sets[active].secondary?._id == lastSet.secondary) return;
+			
+			lastSet = {
+				active : active,
+				primary : sets[active].primary?._id,
+				secondary : sets[active].secondary?._id
+			}
+			
+			this.actor.setFlag(ModuleName, "lastSet", lastSet);
+			
 			const updates = [];
 			const activeSet = sets[active] || {primary : null, secondary : null};
 			const activeItems = Object.values(activeSet).filter((item) => item);
