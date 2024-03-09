@@ -1,3 +1,6 @@
+## v1.10.3
+- Small improvement to weapon sets
+
 ## v1.10.2
 - Improved attack and damage tooltips
 
