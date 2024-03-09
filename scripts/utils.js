@@ -773,11 +773,11 @@ function connectedPassives(item) {
 	}
 }
 
-async toggleFavourite(item) {
+async function toggleFavourite(item) {
 	item.setFlag(ModuleName, "isFavourite", !isFavourite(item));
 }
 
-async isFavourite(item) {
+function isFavourite(item) {
 	let favourite = item.getFlag(ModuleName, "isFavourite");
 	
 	if (favourite == undefined) favourite = isClassFeature(item);

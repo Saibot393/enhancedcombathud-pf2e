@@ -1327,6 +1327,33 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		get title() {
 			return `${game.i18n.localize("PF2E.SavesHeader")}, ${game.i18n.localize("PF2E.CoreSkillsHeader")} & ${game.i18n.localize("PF2E.LoreSkillsHeader")}`;
 		}
+		
+		_expandPanel(index) {
+			if(isNaN(index)) return;
+			
+			super._expandPanel(index);
+			
+			const scale = game.settings.get(ModuleName, "saveskilllorescale");
+			
+			if (scale != 1) {
+				const element = this.element?.querySelector(`.ability-toggle .ability.ability-title[data-index="${index}"]`)?.parentElement?.parentElement;
+				
+				if (element) {
+					const panel = element.querySelector(".collapsible-panel");
+				
+					const expanded = !["0px", ""].includes(element.querySelector(".collapsible-panel").style.maxHeight);
+					
+					if (expanded) {
+						element.style.width = `${375 * scale}px`;
+						panel.style.fontSize = `${16 * scale}px`;
+					}
+					else {
+						element.style.width = "";
+						panel.style.fontSize = `16px`;
+					}
+				}
+			}
+		}
 	}
 	
 	class PF2ETooltips extends ARGON.CORE.Tooltip {

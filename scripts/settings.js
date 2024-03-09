@@ -91,6 +91,21 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "saveskilllorescale", {
+		name: game.i18n.localize(`${ModuleName}.Settings.saveskilllorescale.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.saveskilllorescale.descrp`),
+		scope: "client",
+		config: true,
+		type: Number,
+		range: {
+			min: 1,
+			max: 3,
+			step: 0.05
+		},
+		default: 1,
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "filtertrainedactions", {
 		name: game.i18n.localize(`${ModuleName}.Settings.filtertrainedactions.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.filtertrainedactions.descrp`),
