@@ -773,8 +773,16 @@ function connectedPassives(item) {
 	}
 }
 
-function autoset(actor) {
+async toggleFavourite(item) {
+	item.setFlag(ModuleName, "isFavourite", !isFavourite(item));
+}
+
+async isFavourite(item) {
+	let favourite = item.getFlag(ModuleName, "isFavourite");
 	
+	if (favourite == undefined) favourite = isClassFeature(item);
+	
+	return favourite;
 }
 
 export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction, connectedPassives}

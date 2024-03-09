@@ -4093,7 +4093,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				});
 				
-				actions = actions.concat(this.actor.items.filter(item => item.type == "shield"));
+				actions = actions.concat(this.actor.items.filter(item => item.type == "shield" && !actions.includes(item)));
 				
 				if(onlyactions) {
 					for (let i = 1; i <= this.setsnumber; i++) {
