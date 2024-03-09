@@ -326,13 +326,19 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
-	game.settings.register(ModuleName, "showpassives", {
-		name: game.i18n.localize(`${ModuleName}.Settings.showpassives.name`),
-		hint: game.i18n.localize(`${ModuleName}.Settings.showpassives.descrp`),
+	game.settings.register(ModuleName, "shownpcpassives", {
+		name: game.i18n.localize(`${ModuleName}.Settings.shownpcpassives.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.shownpcpassives.descrp`),
 		scope: "client",
 		config: true,
-		type: Boolean,
-		default: true,
+		type: String,
+		choices : {
+			"no" : game.i18n.localize(`${ModuleName}.Settings.shownpcpassives.options.no`),
+			"panel" : game.i18n.localize(`${ModuleName}.Settings.shownpcpassives.options.panel`),
+			"full" : game.i18n.localize(`${ModuleName}.Settings.shownpcpassives.options.full`),
+			"reduced" : game.i18n.localize(`${ModuleName}.Settings.shownpcpassives.options.reduced`)
+		},
+		default: "panel",
 		onChange: () => {ui.ARGON?.render()}
 	});
 	

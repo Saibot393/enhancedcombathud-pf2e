@@ -1800,8 +1800,31 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			//buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[0]), new PF2ESpecialActionButton(specialActions[1])));
 			
 			if (this.actor.type == "npc") {
-				if (game.settings.get(ModuleName, "showpassives")) {
-					buttons.push(new PF2EButtonPanelButton({parent : this, type: "action"}));
+				switch (game.settings.get(ModuleName, "shownpcpassives")) {
+					case "panel" : 
+						buttons.push(new PF2EButtonPanelButton({parent : this, type: "action"}));
+						break;
+					case "full" : 
+					case "reduced" :
+						let passives = this.actor.items.filter(item => (item.type == "action") && item.system.actionType?.value == this.actionType).filter(item => !isClassFeature(item));
+						
+						let passivebuttons = passives.map(passive => new PF2EItemButton({item: passive, inActionPanel: true}));
+						
+						if (game.settings.get(ModuleName, "shownpcpassives") == "reduced") {
+							let reducedbuttons = [];
+							
+							for (let i = 0; i < passivebuttons.length; i = i + 2) {
+								let button1 = passivebuttons[i];
+								let button2 = passivebuttons[i + 1] || new PF2ESpecialActionButton(null);
+								
+								reducedbuttons.push(new PF2ESplitButton(button1, button2));
+							}
+							
+							passivebuttons = reducedbuttons;
+						}
+						
+						buttons = buttons.concat(passivebuttons);
+						break;
 				}
 			}
 			else {
