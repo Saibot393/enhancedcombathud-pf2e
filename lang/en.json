@@ -67,7 +67,7 @@
 				"name"					: "Reverse save, skill, lore",
 				"descrp"				: "Reverses the order to lore skill saves"
 			},
-			"savesskilllorescale" : {
+			"saveskilllorescale" : {
 				"name"					: "Save, skill, lore scale",
 				"descrp"				: "Scale of the Save, skill, lore panel"
 			},

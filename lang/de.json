@@ -67,7 +67,7 @@
 				"name"					: "Rettungs-, Fähigkeits- und Geschitswürfe umdrehen",
 				"descrp"				: "Dreht die Reihenfolge der Kategorien um"
 			},
-			"savesskilllorescale" : {
+			"saveskilllorescale" : {
 				"name"					: "Rettungs-, Fähigkeits- und Geschitswürfe Skalierung",
 				"descrp"				: "Skalierung des Rettungs-, Fähigkeits- und Geschitswürfe Menüs"
 			},
