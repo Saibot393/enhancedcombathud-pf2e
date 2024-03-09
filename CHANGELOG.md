@@ -1,3 +1,11 @@
+## v1.11.0
+- Added setting Favourite system, which allows certain items (consumables, feats...) to be favored, causing them to be displayed directly on the action panel (also allows for removal of class features)
+- Movement left will now be lost when an action is used
+- Added setting "Allow movement split" to allow for players to split their movement between actions
+- Changed setting "Show NPC passives" so that passives can now be displayed directly in the action panel instead of the toggle panel
+- Added setting "Save, skill, lore scale" to scale the size of the Save, skill, lore panel
+- Added shield to default weapon sets of NPCs
+
 ## v1.10.3
 - Small improvement to weapon sets
 
