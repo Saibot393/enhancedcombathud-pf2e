@@ -141,6 +141,15 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "allowmovementsplit", {
+		name: game.i18n.localize(`${ModuleName}.Settings.allowmovementsplit.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.allowmovementsplit.descrp`),
+		scope: "world",
+		config: true,
+		type: Boolean,
+		default: false
+	});
+	
 	game.settings.register(ModuleName, "actionpipsstyle", {
 		name: game.i18n.localize(`${ModuleName}.Settings.actionpipsstyle.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.actionpipsstyle.descrp`),

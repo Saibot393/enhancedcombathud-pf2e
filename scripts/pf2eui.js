@@ -194,7 +194,7 @@ Hooks.on("createCombatant", (combatant) => {
 	}
 });
 
-function useAction(actionType, actions = 1) {
+function useAction(actionType, actions = 1, context = {}) {
 	if (!ui.ARGON.enabled) return false;
 	
 	let used = actions;
@@ -212,6 +212,12 @@ function useAction(actionType, actions = 1) {
 		case "reaction":
 			ui.ARGON.components.main[1].currentActions = ui.ARGON.components.main[2].currentActions - used;
 			break;
+	}
+	
+	if (!context.actualmovement) {
+		if (!game.settings.get(ModuleName, "allowmovementsplit")) {
+			ui.ARGON.components.movement.breakMovement();
+		}
 	}
 	
 	return used;
@@ -3636,6 +3642,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			super._onNewRound(combat);
 	    }
 		
+		async breakMovement() {
+			let max = this.movementMax;
+			
+			this.resettempspeed();
+						
+			this._prevUsepoint = this._movementUsed - ((this._movementUsed - this._prevUsepoint)%max);
+			
+			this.updateMovement();
+		}
+		
 		async resettempspeed(forcerender) {
 			const render = Object.keys(this._tempmaxspeed).length || this._isstep || forcerender;
 			this._prevUsepoint = this._movementUsed;
@@ -3828,7 +3844,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				if (use > 0) {
 					this.updateMovement();
 					
-					useAction("action", use);
+					useAction("action", use, {actualmovement : true});
 				}
 			}
 		}
