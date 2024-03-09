@@ -9,6 +9,8 @@
 			"macrounlocked"				: "Macro ist frei",
 			"regainedfocus"				: "{Actor} hat <b>{n}</b> Fokuspunkt wieder hergestellt",
 			
+			"favourite"					: "Favorit",
+			
 			"opensheetat"				: "Öffne Charakterbogen bei {tab}",
 			
 			"sort" : {
@@ -65,6 +67,10 @@
 				"name"					: "Rettungs-, Fähigkeits- und Geschitswürfe umdrehen",
 				"descrp"				: "Dreht die Reihenfolge der Kategorien um"
 			},
+			"savesskilllorescale" : {
+				"name"					: "Rettungs-, Fähigkeits- und Geschitswürfe Skalierung",
+				"descrp"				: "Skalierung des Rettungs-, Fähigkeits- und Geschitswürfe Menüs"
+			},
 			"filtertrainedactions" : {
 				"name"					: "Filtere Trainierte Aktionen",
 				"descrp"				: "Ob Aktionen welche nicht ausgeführt werden können da der Character nicht in der entsprchenden Fertigkeit trainiert ist versteckt werden sollen"
@@ -85,12 +91,25 @@
 				"name"					: "Waffen Sets",
 				"descrp"				: "Anzahl der angezeigten Waffen sets"
 			},
+			"allowmovementsplit" : {
+				"name"					: "Erlaube Bewegungsaufteilung",
+				"descrp"				: "Erlaubt es verbleibende Bewegung zwischen Aktionen aufzuteilen"
+			},
 			"actionpipsstyle" : {
 				"name"					: "Aktions Pip Style",
 				"descrp"				: "Der Style welcher für Aktions Pips unten in Aktionspanelen benutzt wird",
 				"options" : {
 					"CORE"				: "CORE (standard)",
 					"PF2E"				: "PF2e"
+				}
+			},
+			"favouritesystem" : {
+				"name"					: "Favoritensystem",
+				"descrp"				: "Ob das Favoritensystem benutzt werden soll und wie die Favoriten angezeigt werden",
+				"options" : {
+					"no"				: "Nein",
+					"full"				: "Voll",
+					"reduced"			: "Reduziert"
 				}
 			},
 			"showconnectedpassives" : {
@@ -153,6 +172,16 @@
 			"iconshadow" : {
 				"name"					: "Info Icon Schatten Intensität",
 				"descrp"				: "Die Intensität des Info Icon Kontrastschattens Gegenstandsknöpfen"
+			},
+			"shownpcpassives" : {
+				"name"					: "Zeige NPC Passiven",
+				"descrp"				: "Ob und wie die Passiven von NPCs angezeigt werden sollen",
+				"options" : {
+					"no"				: "Nein",
+					"panel"				: "Panel",
+					"full"				: "Voll",
+					"reduced"			: "Reduziert"
+				}
 			},
 			"showpassives" : {
 				"name"					: "Zeige NPC Passiven",

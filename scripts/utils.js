@@ -774,15 +774,15 @@ function connectedPassives(item) {
 }
 
 async function toggleFavourite(item) {
-	item.setFlag(ModuleName, "isFavourite", !isFavourite(item));
+	await item.setFlag(ModuleName, "isFavourite", !isFavourite(item));
 }
 
-function isFavourite(item) {
+function isFavourite(item, classbydefault = true) {
 	let favourite = item.getFlag(ModuleName, "isFavourite");
 	
-	if (favourite == undefined) favourite = isClassFeature(item);
+	if (classbydefault && favourite == undefined) favourite = isClassFeature(item);
 	
 	return favourite;
 }
 
-export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction, connectedPassives}
+export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction, connectedPassives, toggleFavourite, isFavourite}

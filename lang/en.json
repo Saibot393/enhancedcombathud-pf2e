@@ -9,6 +9,8 @@
 			"macrounlocked"				: "Macro is unlocked",
 			"regainedfocus"				: "{Actor} regained <b>{n}</b> focus point",
 			
+			"favourite"					: "Favourite",
+			
 			"opensheetat"				: "Open character sheet at {tab}",
 			
 			"sort" : {
@@ -65,6 +67,10 @@
 				"name"					: "Reverse save, skill, lore",
 				"descrp"				: "Reverses the order to lore skill saves"
 			},
+			"savesskilllorescale" : {
+				"name"					: "Save, skill, lore scale",
+				"descrp"				: "Scale of the Save, skill, lore panel"
+			},
 			"filtertrainedactions" : {
 				"name"					: "Filter trained actions",
 				"descrp"				: "If the actions that can not be used due to the character not being trained in the appropiate skill should be hidden"
@@ -85,12 +91,25 @@
 				"name"					: "Weapon sets",
 				"descrp"				: "Amount of displayed weapon sets"
 			},
+			"allowmovementsplit" : {
+				"name"					: "Allow movement split",
+				"descrp"				: "Allows for movement to be split up between actions"
+			},
 			"actionpipsstyle" : {
 				"name"					: "Action pip style",
 				"descrp"				: "The style used for the action pips at the bottom of action panels",
 				"options" : {
 					"CORE"				: "CORE (default)",
 					"PF2E"				: "PF2e"
+				}
+			},
+			"favouritesystem" : {
+				"name"					: "Favourite system",
+				"descrp"				: "If the favourite system should be used and how favourites should be displayed",
+				"options" : {
+					"no"				: "no",
+					"full"				: "full",
+					"reduced"			: "reduced"
 				}
 			},
 			"showconnectedpassives" : {
@@ -153,6 +172,16 @@
 			"iconshadow" : {
 				"name"					: "Info icon shadow intensity",
 				"descrp"				: "The intensity of the info icon contrast shadow on item buttons"
+			},
+			"shownpcpassives" : {
+				"name"					: "Show NPC passives",
+				"descrp"				: "If and how the passives of NPCs should be displayed",
+				"options" : {
+					"no"				: "no",
+					"panel"				: "panel",
+					"full"				: "full",
+					"reduced"			: "reduced"
+				}
 			},
 			"showpassives" : {
 				"name"					: "Show NPC passives",

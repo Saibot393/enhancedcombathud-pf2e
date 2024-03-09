@@ -179,6 +179,21 @@ Hooks.once("init", async () => {  // game.settings.get(cModuleName, "")
 		onChange: () => {ui.ARGON?.render()}
 	});
 	
+	game.settings.register(ModuleName, "favouritesystem", {
+		name: game.i18n.localize(`${ModuleName}.Settings.favouritesystem.name`),
+		hint: game.i18n.localize(`${ModuleName}.Settings.favouritesystem.descrp`),
+		scope: "client",
+		config: true,
+		type: String,
+		choices : {
+			"no" : game.i18n.localize(`${ModuleName}.Settings.favouritesystem.options.no`),
+			"full" : game.i18n.localize(`${ModuleName}.Settings.favouritesystem.options.full`),
+			"reduced" : game.i18n.localize(`${ModuleName}.Settings.favouritesystem.options.reduced`)
+		},
+		default: "no",
+		onChange: () => {ui.ARGON?.render()}
+	});
+	
 	game.settings.register(ModuleName, "showconnectedpassives", {
 		name: game.i18n.localize(`${ModuleName}.Settings.showconnectedpassives.name`),
 		hint: game.i18n.localize(`${ModuleName}.Settings.showconnectedpassives.descrp`),

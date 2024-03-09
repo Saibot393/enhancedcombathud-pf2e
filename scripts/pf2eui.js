@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasFeats, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction, connectedPassives} from "./utils.js";
+import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasFeats, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction, connectedPassives, toggleFavourite, isFavourite} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";  
 import {createItemMacro} from "./macro.js";
@@ -36,6 +36,8 @@ Hooks.once("init", () => {
 });
 */
 const timeout = async ms => new Promise(res => setTimeout(res, ms));
+
+const favourableTypes = ["weapon", "shield", "consumable", "feat", "action"];
 
 function createToggleIcons(toggles, options = {}) {
 	const iconsize = options.hasOwnProperty("iconsize") ? options.iconsize : 30;
@@ -125,8 +127,6 @@ function createToggleIcons(toggles, options = {}) {
 	
 	return iconpanel;	
 }
-
-
 
 //ammend Hooks
 Hooks.once("ready", async () => {
@@ -248,6 +248,25 @@ Hooks.on("argonInit", async (CoreHUD) => {
 	
 	CoreHUD._actionSave = {action : {}, reaction : {}};
 	CoreHUD._movementSave = {};
+	
+	function buttify(items, type = "full") {
+		let buttons = items.map(item => new PF2EItemButton({item : item, inActionPanel : true}));
+		
+		if (type == "reduced") {
+			let reducedButtons = [];
+			
+			for (let i = 0; i < buttons.length; i = i + 2) {
+				let button1 = buttons[i];
+				let button2 = buttons[i+1] || new PF2ESpecialActionButton(null);
+				
+				reducedButtons.push(new PF2ESplitButton(button1, button2));
+			}
+			
+			buttons = reducedButtons;
+		}
+		
+		return buttons;
+	}
   
     class PF2EPortraitPanel extends ARGON.PORTRAIT.PortraitPanel {
 		constructor(...args) {
@@ -1537,8 +1556,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			buttons.push(new PF2ESplitButton(new PF2ESpecialActionButton(specialActions[3]), new PF2ESpecialActionButton(specialActions[4])));
 			
-			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
-			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			let favourite = game.settings.get(ModuleName, "favouritesystem");
+			
+			if (favourite == "no") buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})))
+			else buttons.push(...buttify(this.actor.items.filter(item => actioninfo(item).actionType.value == this.actionType && isFavourite(item)), favourite));
 			
 			return buttons.filter(button => button.isvalid);
 		}
@@ -1693,9 +1714,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
-			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
-			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, notAoO : game.settings.get(ModuleName, "reduceAoO"), includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
+			let favourite = game.settings.get(ModuleName, "favouritesystem");
 			
+			if (favourite == "no") buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})))
+			else buttons.push(...buttify(this.actor.items.filter(item => actioninfo(item).actionType.value == this.actionType && isFavourite(item)), favourite));
+		
 			return buttons.filter(button => button.isvalid);
 		}
 		
@@ -1803,9 +1826,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
 			buttons.push(new PF2EButtonPanelButton({parent : this, type: "consumable"}));
 			
-			//buttons.push(...this.actor.items.filter(item => item.type == "action" && isClassFeature(item) && item.system.actionType?.value == this.actionType).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
-			buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})));
-			 
+			let favourite = game.settings.get(ModuleName, "favouritesystem");
+			
+			if (favourite == "no") buttons.push(...actionfilter(this.actor.items, {actiontype : this.actionType, classonly : true, includeFeats : true}).map(item => new PF2EItemButton({item: item, inActionPanel: true})))
+			else buttons.push(...buttify(this.actor.items.filter(item => actioninfo(item).actionType.value == this.actionType && isFavourite(item)), favourite));
+		
 			return buttons.filter(button => button.isvalid);
 		}
     }
@@ -1839,24 +1864,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						break;
 					case "full" : 
 					case "reduced" :
-						let passives = this.actor.items.filter(item => (item.type == "action") && item.system.actionType?.value == this.actionType).filter(item => !isClassFeature(item));
+						let passives = this.actor.items.filter(item => (item.type == "action") && item.system.actionType?.value == this.actionType);
 						
-						let passivebuttons = passives.map(passive => new PF2EItemButton({item: passive, inActionPanel: true}));
-						
-						if (game.settings.get(ModuleName, "shownpcpassives") == "reduced") {
-							let reducedbuttons = [];
-							
-							for (let i = 0; i < passivebuttons.length; i = i + 2) {
-								let button1 = passivebuttons[i];
-								let button2 = passivebuttons[i + 1] || new PF2ESpecialActionButton(null);
-								
-								reducedbuttons.push(new PF2ESplitButton(button1, button2));
-							}
-							
-							passivebuttons = reducedbuttons;
-						}
-						
-						buttons = buttons.concat(passivebuttons);
+						buttons = buttons.concat(buttify(passives, game.settings.get(ModuleName, "shownpcpassives")));
 						break;
 				}
 			}
@@ -1865,6 +1875,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					buttons.push(new PF2EButtonPanelButton({parent : this, type: "feat"}));
 				}
 			}
+			
+			let favourite = game.settings.get(ModuleName, "favouritesystem");
+			
+			if (favourite != "no") buttons.push(...buttify(this.actor.items.filter(item => actioninfo(item).actionType.value == this.actionType && isFavourite(item, false)), favourite));
 			
 			return buttons.filter(button => button.isvalid);
 		}
@@ -2370,6 +2384,23 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			let toggles = [];
+			
+			if (!this.isWeaponSet && this.item && game.settings.get(ModuleName, "favouritesystem") != "no") {
+				let addFavourite = (isFavourite(this.item) || !this.inActionPanel) && (favourableTypes.includes(this.item.type));
+
+				if (addFavourite) {
+					let toggleData = {
+						iconclass : isFavourite(this.item) ? ["fa-solid", "fa-star"] : ["fa-regular", "fa-star"],
+						onclick : async () => {
+							await toggleFavourite(this.item);
+							ui.ARGON?.render();
+						},
+						tooltip : game.i18n.localize(ModuleName + ".Titles.favourite")
+					};
+
+					toggles.push(toggleData);
+				}
+			}
 			
 			if (!this.isWeaponSet && game.settings.get(ModuleName, "showactionrequirements")) {
 				let toggleData = {
@@ -3129,12 +3160,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get validitems() {
+			let items = [];
+				
 			switch (this.type) {
 				case "toggle":
-					return this.actor.rules.filter(rule => rule.toggleable).map(rule => itemfromRule(rule));
+					items = this.actor.rules.filter(rule => rule.toggleable).map(rule => itemfromRule(rule));
 					break;
 				case "feat":
-					return this.actor.items.filter(item => (item.type == this.type || item.type == "action") && item.system.actionType?.value == this.actionType).filter(item => !isClassFeature(item));
+					items = this.actor.items.filter(item => (item.type == this.type || item.type == "action") && item.system.actionType?.value == this.actionType)
+					
+					if (this.actionType != "passive" && game.settings.get(ModuleName, "favouritesystem") == "no") {
+						items = items.filter(item => !isClassFeature(item));
+					}
 					break;
 				case "consumable":
 					let consumeitems = this.actor.items.filter(item => item.type == this.type);
@@ -3145,16 +3182,20 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					
 					consumeitems = consumeitems.filter(item => actioninfo(item).actionType.value == this.actionType);
 					
-					return consumeitems;
+					items = consumeitems;
 					break;
 				default:
-					let items = this.actor.items.filter(item => item.type == this.type);
+					items = this.actor.items.filter(item => item.type == this.type);
 					
 					items = items.filter(item => actioninfo(item).actionType.value == this.actionType);
-					
-					return items;
 					break;
 			}
+			
+			if (game.settings.get(ModuleName, "favouritesystem") != "no") {
+				items = items.filter(item => !isFavourite(item));
+			}
+			
+			return items;
 		}
 		
 		get isvalid() {
