@@ -4081,7 +4081,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (this.actor.type == "npc") {
 				let onlyactions = true;
 				
-				const actions = this.actor.items.filter((item) => item.type === "melee").map((action) => {
+				let actions = this.actor.items.filter((item) => item.type === "melee").map((action) => {
 					let item = this.actor.items.find(item => item.type != "melee" && item.name == action.name);
 					
 					if (item) {
@@ -4092,6 +4092,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						return action;
 					}
 				});
+				
+				actions = actions.concat(this.actor.items.filter(item => item.type == "shield"));
 				
 				if(onlyactions) {
 					for (let i = 1; i <= this.setsnumber; i++) {

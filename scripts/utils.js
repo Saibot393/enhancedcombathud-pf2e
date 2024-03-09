@@ -773,8 +773,8 @@ function connectedPassives(item) {
 	}
 }
 
-function autoset(item) {
-
+function autoset(actor) {
+	
 }
 
 export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction, connectedPassives}
