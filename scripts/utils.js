@@ -146,7 +146,7 @@ async function getTooltipDetails(item) {
 		if (Attackvalue || (Attackvalue === 0)) {
 			details.push({
 				label: game.i18n.localize("PF2E.TraitAttack"),
-				value: `${Attackvalue > 0 ? "+" : ""}${Attackvalue}`
+				value: `${Attackvalue > 0 ? "+" : ""}${Number(Attackvalue)}`
 			});
 			
 			let mapValues = [MAPtext(item, 1), MAPtext(item, 2)].filter(map => map).map(map => map.split(" ")[1]);
@@ -778,11 +778,13 @@ async function toggleFavourite(item) {
 }
 
 function isFavourite(item, classbydefault = true) {
-	let favourite = item.getFlag(ModuleName, "isFavourite");
+	let favourite = item.getFlag && item.getFlag(ModuleName, "isFavourite");
 	
 	if (classbydefault && favourite == undefined) favourite = isClassFeature(item);
 	
 	return favourite;
+	
+	return false;
 }
 
 export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction, connectedPassives, toggleFavourite, isFavourite}
