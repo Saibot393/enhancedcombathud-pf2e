@@ -1,3 +1,7 @@
+## v1.11.1
+- Fixed bug that could prevent the HUD from opening when using the new favourite system
+- Fixed display bug that could cause attack values to be displayed with an additional "+"
+
 ## v1.11.0
 - Added setting Favourite system, which allows certain items (consumables, feats...) to be favored, causing them to be displayed directly on the action panel (also allows for removal of class features)
 - Movement left will now be lost when an action is used
