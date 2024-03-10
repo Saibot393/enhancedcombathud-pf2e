@@ -9,6 +9,8 @@
 			"macrounlocked"				: "Makro jest odblokowane",
 			"regainedfocus"				: "{Actor} odzyskuje <b>{n}</b> punktów skupienia",
 			
+			"favourite"					: "Ulubione",
+			
 			"opensheetat"				: "Otwórz kartę postaci na zakładce {tab}",
 			
 			"sort" : {
@@ -65,6 +67,10 @@
 				"name"					: "Odwrócenie rzutów obronnych, umiejętności, wiedzy",
 				"descrp"				: "Odwraca kolejność rzutów obronnych, umiejętności i wiedzy"
 			},
+			"saveskilllorescale" : {
+				"name"					: "Skala rzutów obronnych i umiejętności",
+				"descrp"				: "Skala panelu rzutów obronnych, umiejętności i wiedzy"
+			},
 			"filtertrainedactions" : {
 				"name"					: "Filtruj wytrenowane akcje",
 				"descrp"				: "Akcje, których nie można użyć, ponieważ postać nie jest wyszkolona w odpowiedniej umiejętności, powinny zostać ukryte."
@@ -85,12 +91,25 @@
 				"name"					: "Zestawy broni",
 				"descrp"				: "Ilość wyświetlanych zestawów broni"
 			},
+			"allowmovementsplit" : {
+				"name"					: "Zezwól na dzielenie ruchu",
+				"descrp"				: "Umożliwia rozdzielenie ruchu pomiędzy akcjami"
+			},
 			"actionpipsstyle" : {
 				"name"					: "Styl znaczników akcji",
 				"descrp"				: "Styl używany dla znaczników akcji na dole paneli akcji",
 				"options" : {
 					"CORE"				: "CORE (domyślne)",
 					"PF2E"				: "PF2e"
+				}
+			},
+			"favouritesystem" : {
+				"name"					: "Ulubiony system",
+				"descrp"				: "Korzystanie z systemu ulubionych i sposób wyświetlania ulubionych",
+				"options" : {
+					"no"				: "nie",
+					"full"				: "pełny",
+					"reduced"			: "zredukowany"
 				}
 			},
 			"showconnectedpassives" : {
@@ -153,6 +172,16 @@
 			"iconshadow" : {
 				"name"					: "Intensywność cienia ikon informacyjnych",
 				"descrp"				: "Intensywność kontrastowego cienia ikony informacyjnej na przyciskach elementów"
+			},
+			"shownpcpassives" : {
+				"name"					: "Pokaż pasywne zdolności BNów",
+				"descrp"				: "Wyświetlanie i sposób wyświetlania pasywnych zdolności postaci niezależnych",
+				"options" : {
+					"no"				: "nie",
+					"panel"				: "panel",
+					"full"				: "pełny",
+					"reduced"			: "zredukowany"
+				}
 			},
 			"showpassives" : {
 				"name"					: "Pokaż pasywne zdolności BNów",
