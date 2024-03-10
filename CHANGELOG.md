@@ -1,3 +1,6 @@
+## v1.11.2
+- Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
+
 ## v1.11.1
 - Fixed bug that could prevent the HUD from opening when using the new favourite system
 - Fixed display bug that could cause attack values to be displayed with an additional "+"
