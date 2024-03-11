@@ -1,3 +1,6 @@
+## v1.11.3
+- Small bug fix for elemental blasts
+
 ## v1.11.2
 - Update for Polish translation (thanks to [Lioheart](https://github.com/Lioheart))
 
