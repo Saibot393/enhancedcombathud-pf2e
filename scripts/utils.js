@@ -58,7 +58,7 @@ async function getTooltipDetails(item) {
 		title = dynamicstate ? dynamicstate.name({actor}) : item.name;
 		description = await TextEditor.enrichHTML(system.description.value)//, {async : true, processVisibility : false, rollData : {actor : item.actor, item : item}, secrets : true});
 		subtitle = system.traits.rarity ? game.i18n.localize("PF2E.Trait" + firstUpper(system.traits.rarity)) : "";
-		if (item.system?.level?.hasOwnProperty("value")) {
+		if (system?.level?.hasOwnProperty("value")) {
 			subtitle = subtitle + ` ${replacewords(game.i18n.localize("PF2E.LevelN"), {level : item.system.level.value})}`;
 		}
 		subtitlecolor = system.traits.rarity ? `var(--color-rarity-${system.traits.rarity})` : "";
@@ -79,30 +79,30 @@ async function getTooltipDetails(item) {
 			});
 		}
 		
-		if (item.system.target?.value) {
+		if (system.target?.value) {
 			details.push({
 				label: game.i18n.localize("PF2E.SpellTargetLabel"),
-				value: item.system.target?.value
+				value: system.target?.value
 			});
 		}
 		
-		if (item.system.category && item.type == "action") {
-			let actionicon = categoryIcon(item.system.category);
+		if (system.category && item.type == "action") {
+			let actionicon = categoryIcon(system.category);
 			
 			details.push({
 				label: game.i18n.localize("PF2E.Category"),
-				value: game.i18n.localize("PF2E.Item.Action.Category." + firstUpper(item.system.category)) + (actionicon.length ? ` <i class="${actionicon.join(" ")}"></i>` : "")
+				value: game.i18n.localize("PF2E.Item.Action.Category." + firstUpper(system.category)) + (actionicon.length ? ` <i class="${actionicon.join(" ")}"></i>` : "")
 			});
 		}
 		
 		let range;
 		if (item.type == "weapon" || item.type == "shield") {
-			if (item.system.rangelabel) {
-				range = item.system.rangelabel;
+			if (system.rangelabel) {
+				range = system.rangelabel;
 			}
 			else {
-				if (item.system.range) {
-					range = replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : item.system.range});
+				if (system.range) {
+					range = replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : system.range});
 				}
 				else {
 					range = replacewords(game.i18n.localize("PF2E.Item.Weapon.NoRangeMelee"));
@@ -110,8 +110,8 @@ async function getTooltipDetails(item) {
 			}
 		}
 		else {
-			if (item.system.range) {
-				range = item.system.range;
+			if (system.range) {
+				range = system.range;
 				
 				if (range && range.hasOwnProperty("value")) {
 					range = range.value;
@@ -125,22 +125,22 @@ async function getTooltipDetails(item) {
 			});
 		}
 		
-		if (item.system.area) {
+		if (system.area) {
 			details.push({
 				label: game.i18n.localize("PF2E.AreaLabel"),
-				value: replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : item.system.area.value}) + " " + game.i18n.localize("PF2E.AreaType" + firstUpper(item.system.area.type))
+				value: replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : system.area.value}) + " " + game.i18n.localize("PF2E.AreaType" + firstUpper(system.area.type))
 			});
 		}
 		
-		let Attackvalue = item.system.attackValue;
+		let Attackvalue = system.attackValue;
 		if (!Attackvalue) {
-			let action = item.actor?.system.actions.find(action => action.slug == item.system.slug);
+			let action = item.actor?.system.actions.find(action => action.slug == system.slug);
 			if (action?.variants?.length) {
 				Attackvalue = action.variants[0].label;
 			}
 			
 			if (!Attackvalue && item.type == "melee") {
-				Attackvalue = item.system?.bonus?.value
+				Attackvalue = system?.bonus?.value
 			}
 		}
 		if (Attackvalue || (Attackvalue === 0)) {
@@ -158,32 +158,32 @@ async function getTooltipDetails(item) {
 			}
 		}
 		
-		if (item.system.acBonus) {
+		if (system.acBonus) {
 			details.push({
 				label: game.i18n.localize("PF2E.ArmorArmorLabel"),
-				value: item.system.acBonus
+				value: system.acBonus
 			});
 		}
 		
 		if (item.type == "shield") {
-			if (item.system.hasOwnProperty("hardness")) {
+			if (system.hasOwnProperty("hardness")) {
 				details.push({
 					label: game.i18n.localize("PF2E.HardnessLabel"),
-					value: item.system.hardness
+					value: system.hardness
 				});
 			}
 			
-			if (item.system.hp?.hasOwnProperty("brokenThreshold")) {
+			if (system.hp?.hasOwnProperty("brokenThreshold")) {
 				details.push({
 					label: game.i18n.localize("PF2E.Item.Physical.BrokenThreshold.Label"),
-					value: item.system.hp.brokenThreshold
+					value: system.hp.brokenThreshold
 				});
 			}
 		}
 		
 		let damageentry;
 		if (item.type == "spell" || item.type == "melee") {
-			let damages = item.type == "spell" ? item.system.damage : item.system.damageRolls
+			let damages = item.type == "spell" ? system.damage : system.damageRolls
 			let entries = [];
 			for (let key of Object.keys(damages)) {
 				let type = damages[key].type || damages[key].kind || damages[key].damageType;
@@ -199,12 +199,12 @@ async function getTooltipDetails(item) {
 			damageentry = entries.join("<br>");
 		}
 		else {
-			if (item.system.damage) {
-				let type = item.system.damage.damageType || item.system.damage.kind;
+			if (system.damage) {
+				let type = system.damage.damageType || system.damage.kind;
 				
-				let formula = item.system.damage.dice && item.system.damage.die ? `${item.system.damage.dice}${item.system.damage.die}` : item.system.damage.formula;
+				let formula = system.damage.dice && system.damage.die ? `${system.damage.dice}${system.damage.die}` : system.damage.formula;
 				
-				damageentry = `${formula} ${damagecategoryIcon(item.system.damage.category)} <i class="${damageIcon(type).join(" ")}"></i>`
+				damageentry = `${formula} ${damagecategoryIcon(system.damage.category)} <i class="${damageIcon(type).join(" ")}"></i>`
 			}
 		}
 		if (damageentry) {
@@ -214,27 +214,27 @@ async function getTooltipDetails(item) {
 			});
 		}
 		
-		if (item.system.duration?.value || item.system.duration?.sustained) {
+		if (system.duration?.value || system.duration?.sustained) {
 			let symbol = "";
-			if (item.system.duration?.sustained) {
+			if (system.duration?.sustained) {
 				symbol = `<i class="fa-solid fa-s"></i> `;
 			}
 			
 			details.push({
 				label: game.i18n.localize("PF2E.Time.Duration"),
-				value: symbol + item.system.duration.value
+				value: symbol + system.duration.value
 			});
 		}
 		
-		if (item.system.defense?.save?.statistic) {
+		if (system.defense?.save?.statistic) {
 			details.push({
 				label: game.i18n.localize("PF2E.Item.Spell.Defense.Label"),
-				value: game.i18n.localize("PF2E.Saves" + firstUpper(item.system.defense.save.statistic))
+				value: game.i18n.localize("PF2E.Saves" + firstUpper(system.defense.save.statistic))
 			});
 		}
 		
 		if (game.user.isGM) {
-			footerText = await TextEditor.enrichHTML(item.system.description.gm);
+			footerText = await TextEditor.enrichHTML(system.description.gm);
 		}
 	}
 
