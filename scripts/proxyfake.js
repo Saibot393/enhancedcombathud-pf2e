@@ -29,49 +29,51 @@ async function elementalBlastProxy(actor, elementalID) {
 			
 			let localconfig = (new game.pf2e.ElementalBlast(actor)).configs.find(config => config.element == element);
 			
-			system.description = {value : localconfig.item.system.description.value};
-			
-			system.actionType = {value : "action"};
-			if (actionrule) {
-				system.actions = {value : actionrule.suboptions.find(option => option.selected)?.value};
-			}
-			
-			system.traits = {};
-			system.traits.__defineGetter__("value", () => {
-				let toggletraits = [];
-				let rule;
+			if (localconfig) {
+				system.description = {value : localconfig.item.system.description.value};
 				
-				if (actor.items.find(item => item.system.slug == "effect-weapon-infusion")) {
-					if (proxyFake.flags[ModuleName].ranged) {
-						rule = proxyFake.actor.rules.find(rule => rule.option == "weapon-infusion:ranged");
-					}
-					else {
-						rule = proxyFake.actor.rules.find(rule => rule.option == "weapon-infusion:melee");
-					}
+				system.actionType = {value : "action"};
+				if (actionrule) {
+					system.actions = {value : actionrule.suboptions.find(option => option.selected)?.value};
 				}
 				
-				if (rule) {
-					toggletraits.push(rule.suboptions.find(option => option.selected).value);
+				system.traits = {};
+				system.traits.__defineGetter__("value", () => {
+					let toggletraits = [];
+					let rule;
+					
+					if (actor.items.find(item => item.system.slug == "effect-weapon-infusion")) {
+						if (proxyFake.flags[ModuleName].ranged) {
+							rule = proxyFake.actor.rules.find(rule => rule.option == "weapon-infusion:ranged");
+						}
+						else {
+							rule = proxyFake.actor.rules.find(rule => rule.option == "weapon-infusion:melee");
+						}
+					}
+					
+					if (rule) {
+						toggletraits.push(rule.suboptions.find(option => option.selected).value);
+					}
+					
+					return localconfig.item.system.traits.value.concat([/*proxyFake.system.damage.damageType,*/ element]).concat(toggletraits)}
+				);
+				
+				if (proxyFake.flags[ModuleName].ranged) {
+					system.rangelabel = localconfig.range.label;
+				}
+				else {
+					game.i18n.localize("PF2E.Item.Weapon.NoRangeMelee");
 				}
 				
-				return localconfig.item.system.traits.value.concat([/*proxyFake.system.damage.damageType,*/ element]).concat(toggletraits)}
-			);
-			
-			if (proxyFake.flags[ModuleName].ranged) {
-				system.rangelabel = localconfig.range.label;
+				system.__defineGetter__("attackValue", () => {return proxyFake.flags[ModuleName].ranged ? localconfig.maps.ranged.map0 : localconfig.maps.melee.map0});
+				
+				system.damage = {};
+				system.damage.__defineGetter__("damageTypes", () => {return localconfig.damageTypes});
+				system.damage.__defineGetter__("damageType", () => {return localconfig.damageTypes[proxyFake.flags[ModuleName].damageType].value});
+				system.damage.die = "d" + localconfig.dieFaces;
+				system.damage.dice = Math.floor((actor.level-1)/4) + 1;
 			}
-			else {
-				game.i18n.localize("PF2E.Item.Weapon.NoRangeMelee");
-			}
-			
-			system.__defineGetter__("attackValue", () => {return proxyFake.flags[ModuleName].ranged ? localconfig.maps.ranged.map0 : localconfig.maps.melee.map0});
-			
-			system.damage = {};
-			system.damage.__defineGetter__("damageTypes", () => {return localconfig.damageTypes});
-			system.damage.__defineGetter__("damageType", () => {return localconfig.damageTypes[proxyFake.flags[ModuleName].damageType].value});
-			system.damage.die = "d" + localconfig.dieFaces;
-			system.damage.dice = Math.floor((actor.level-1)/4) + 1;
-			
+				
 			return system;
 		});
 		
