@@ -1090,7 +1090,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const skill = skills[skillKey];
 				
 				if (this.actor.type == "npc") {
-					if (!this.actor.system.skills[skill.slug]) return; //this skill has not been set for this npcs
+					if (!(skill.slug == "perception" || skill.proficient)) return; //this skill has not been set for this npcs
 				}
 				
 				if (!skill.lore) {
