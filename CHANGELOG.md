@@ -1,3 +1,6 @@
+## v1.11.6
+- Addendum for previous fix
+
 ## v1.11.5
 - Small bug fix regarding stamina points
 
