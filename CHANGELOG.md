@@ -1,3 +1,6 @@
+## v1.11.4
+- Fixed bug that prevented proficient NPC skill to be displayed in the skill drawer
+
 ## v1.11.3
 - Small bug fix for elemental blasts
 
