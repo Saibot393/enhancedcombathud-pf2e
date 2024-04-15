@@ -701,7 +701,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				mainHPbox.onmouseenter = () => {
 					tempHPbox.style.display = "";
-					if (game.settings.get("pf2e", "staminaVariant")) spHPbox.style.display = "";
+					if (game.settings.get("pf2e", "staminaVariant") && this.actor.system.attributes.hp.sp) spHPbox.style.display = "";
 					currentHPvalue.style.display = "";
 					hpvaluebox.style.display = "none";
 					hptextbox.innerHTML = game.i18n.localize("PF2E.HitPointsShortLabel")
@@ -715,7 +715,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				mainHPbox.onmouseleave = async () => {
 					tempHPbox.style.display = "none";
-					if (game.settings.get("pf2e", "staminaVariant")) spHPbox.style.display = "none";
+					if (game.settings.get("pf2e", "staminaVariant") && this.actor.system.attributes.hp.sp) spHPbox.style.display = "none";
 					currentHPvalue.style.display = "none";
 					hpvaluebox.style.display = "";
 					
@@ -737,7 +737,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				}
 				
 				mainHPbox.appendChild(tempHPbox);
-				if (game.settings.get("pf2e", "staminaVariant")) mainHPbox.appendChild(spHPbox);
+				if (game.settings.get("pf2e", "staminaVariant") && this.actor.system.attributes.hp.sp) mainHPbox.appendChild(spHPbox);
 				mainHPbox.appendChild(hpbox);
 				this.element.prepend(mainHPbox);
 			}
