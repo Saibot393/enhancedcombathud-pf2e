@@ -154,19 +154,24 @@ Hooks.on("updateItem", (item) => {
 				}
 			}
 		}
+		/*
 		if (item.type == "spellcastingEntry") {
 			let staffid;
 			
-			if (game.modules.get(PF2EDailies)?.active) {
-				staffid = item.getFlag(PF2EDailies, "staff")?.staveID;
+			if (game.modules.get(PF2EDailies)?.active) {	
+				staffid = item.staff?.id;
 			}
 			
-			for (const itemButton of ui.ARGON.itemButtons) {
-				if (itemButton.item?.id == staffid || item.spells?.get(itemButton.item?.id)) {
-							itemButton.render();
+			if (staffid) {
+				for (const itemButton of ui.ARGON.itemButtons) {
+					if (itemButton.item?.id == staffid || item.spells?.get(itemButton.item?.id)) {
+						console.log(itemButton);
+						itemButton.render();
+					}
 				}
 			}
 		}
+		*/
 		if (item.rules?.length) {
 			for (const itemButton of ui.ARGON.itemButtons) {
 				if (itemButton.item?.system?.updateID == item.id) {
@@ -180,13 +185,24 @@ Hooks.on("updateItem", (item) => {
 	}
 });
 
-/*
-Hooks.on("updateActor", (actor) => {
-	if (ui.ARGON?.components.portrait?.actor == actor) {
-		ui.ARGON.itemButtons.filter(button => button.isWeaponSet).forEach(button => button.render());
+Hooks.on("updateActor", (actor, change) => {
+	const PF2EDailies = "pf2e-dailies";
+	if (change?.flags && change?.flags[PF2EDailies]?.extra?.staffData) {
+		let staffid;
+		
+		if (game.modules.get(PF2EDailies)?.active) {	
+			staffid = actor?.flags[PF2EDailies]?.extra?.staffData?.staffId;
+		}
+		
+		if (staffid) {
+			for (const itemButton of ui.ARGON.itemButtons) {
+				if (itemButton.item?.id == staffid) {
+					itemButton.render();
+				}
+			}
+		}
 	}
 });
-*/
 
 Hooks.on("createCombatant", (combatant) => {
 	if (ui.ARGON?._actor?.id == combatant?.actorId) {
@@ -2020,10 +2036,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				case "weapon":
 					const PF2EDailies = "pf2e-dailies";
 					if (game.modules.get(PF2EDailies)?.active) {
-						let staffSpells = this.actor.items.find(item => item.type == "spellcastingEntry" && item.getFlag(PF2EDailies, "staff")?.staveID == this.item.id)
+						let staffData = this.actor.flags[PF2EDailies]?.extra?.staffData;
 						
-						if (staffSpells && staffSpells.getFlag(PF2EDailies, "staff")) {
-							return staffSpells.getFlag(PF2EDailies, "staff").charges;
+						if (staffData?.staffId == this.item.id) {
+							return staffData.charges?.value;
 						}
 					}
 					
@@ -2144,15 +2160,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			if (this.item?.system.traits?.value.includes("staff")) {
 				if (game.modules.get(PF2EDailies)?.active) {
-					let spellgroup = this.actor.items.filter(item => item.type == "spellcastingEntry").find(item => item.getFlag(PF2EDailies, "staff")?.staveID == this.item.id);
-					
-					if (spellgroup) {
+					//let spellgroup = this.actor.items.filter(item => item.type == "spellcastingEntry").find(item => item.getFlag(PF2EDailies, "staff")?.staveID == this.item.id);
+					let spellgroup = this.actor.flags[PF2EDailies]?.extra?.staffData;
+						
+					if (spellgroup?.staffId == this.item.id) {
 						let spellCategorie = {};
 						
 						spellCategorie.label = this.item.name;
 						spellCategorie.uses = () => {
-							let value = spellgroup?.getFlag(PF2EDailies, "staff")?.charges;
-							let max = spellgroup?.getFlag(PF2EDailies, "staff")?.max;
+							let value = spellgroup.charges?.value;
+							let max = spellgroup.charges?.max;
 							
 							if (!max || max < value) {
 								max = value;
@@ -2162,7 +2179,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							max : max,
 							value : value
 						}}
-						spellCategorie.buttons = spellgroup.spells.map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, spell.level)}));
+						let virtualCategory = this.item.actor?.spellcasting.collections.get(this.item.id + "-casting");
+
+						if (virtualCategory) {
+							spellCategorie.buttons = spellgroup.spells.map(spell => virtualCategory.get(spell._id)).map(spell => new PF2EItemButton({item : spell, clickAction : spelluseAction(spell, spell.system.level.value)}));
+						}
 						
 						return [spellCategorie];
 					}
@@ -2326,7 +2347,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			await super._renderInner();
 			
 			if (this.isWeaponSet && this.isPrimary) {
+				if (this.panel) {
+					this.panel.element.remove();
+				}
+				
 				this.panel = await this._getPanel();
+				
 				if (this.panel) {
 					this.panel._parent = this;
 					this.buttonPanelContainer.appendChild(this.panel.element);
