@@ -1,3 +1,6 @@
+## v1.11.5
+- Small bug fix regarding stamina points
+
 ## v1.11.4
 - Fixed bug that prevented proficient NPC skill to be displayed in the skill drawer
 
