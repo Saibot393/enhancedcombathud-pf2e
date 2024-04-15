@@ -659,7 +659,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				let spHPbox;
 				let spHPvalue;
-				if (game.settings.get("pf2e", "staminaVariant")) {
+				if (game.settings.get("pf2e", "staminaVariant") && this.actor.system.attributes.hp.sp) {
 					spHPbox = document.createElement("div");
 					spHPbox.classList.add("portrait-stat-block");
 					spHPbox.style.display = "none";
@@ -707,7 +707,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					hptextbox.innerHTML = game.i18n.localize("PF2E.HitPointsShortLabel")
 					
 					tempHPvalue.value = this.actor.system.attributes.hp.temp;
-					if (game.settings.get("pf2e", "staminaVariant")) spHPvalue.value = this.actor.system.attributes.hp.sp.value;
+					if (game.settings.get("pf2e", "staminaVariant") && this.actor.system.attributes.hp.sp) spHPvalue.value = this.actor.system.attributes.hp.sp.value;
 					currentHPvalue.value = this.actor.system.attributes.hp.value;
 					
 					currentHPvalue.onchange();
@@ -722,7 +722,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (tempHPvalue.value != this.actor.system.attributes.hp.temp || currentHPvalue.value != this.actor.system.attributes.hp.value || (game.settings.get("pf2e", "staminaVariant") && spHPvalue.value != this.actor.system.attributes.hp.sp.value)) {
 						let update = {system : {attributes : {hp : {temp : tempHPvalue.value, value : currentHPvalue.value}}}};
 						
-						if (game.settings.get("pf2e", "staminaVariant")) {
+						if (game.settings.get("pf2e", "staminaVariant") && this.actor.system.attributes.hp.sp) {
 							update.system.attributes.hp.sp = {value : spHPvalue.value};
 						}
 						
