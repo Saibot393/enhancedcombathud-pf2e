@@ -1,3 +1,6 @@
+## v1.11.7
+- Update for compatibility with pf2e-dailies v3.0.0
+
 ## v1.11.6
 - Addendum for previous fix
 
