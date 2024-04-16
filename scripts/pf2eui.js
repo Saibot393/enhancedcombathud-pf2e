@@ -3250,7 +3250,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				let spelllevel = spell.system.level?.value;
 				
-				if (!isisgnature && spell.system.location.hasOwnProperty("heightenedLevel")) {
+				if (!isisgnature && spell.system.location.hasOwnProperty("heightenedLevel") && !spell.isCantrip) {
 					spelllevel = spell.system.location.heightenedLevel;
 				}
 				
