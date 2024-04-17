@@ -532,7 +532,7 @@ function itemfromRule(rule) {
 					rule.actor.toggleRollOption(rule.domain, rule.option, connectedItem.id, !connectedItem.rules[ruleIndex].value);
 				}},
 				active : () => {return connectedItem.rules[ruleIndex].value},
-				toggleoptions : rule.suboptions.map((option) => {return {value : option.value, name : game.i18n.localize(option.label)}}),
+				toggleoptions : rule.suboptions?.map((option) => {return {value : option.value, name : game.i18n.localize(option.label)}}),
 				onchange : (value) => {if (connectedItem) {
 					rule.actor.toggleRollOption(rule.domain, rule.option, connectedItem.id, connectedItem.rules[ruleIndex].value, value)
 				}},
