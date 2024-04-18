@@ -1,3 +1,6 @@
+## v1.11.9
+- Small bug fix for rule toggles
+
 ## v1.11.8
 - Fixed bug regarding cantrips added via patchmuncher
 
