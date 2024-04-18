@@ -1060,7 +1060,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			const saves = this.actor.saves;
 			const skills = {perception : this.actor.perception, ...this.actor.skills};
-			const skillactions = /*Array.from(game.pf2e.actions).concat(*/Array.from(game.pf2e.actions.entries()).map(entry => entry[1]);
+			const addSkillActions = [["treatWounds", {
+				name : fromUuidSync("Compendium.pf2e.actionspf2e.Item.1kGNdIIhuglAjIp9").name,
+				slug : "treat-wounds",
+				section : "skill",
+				statistic : "medicine",
+				trait : ["exploration", "healing", "manipulate"],
+				use : () => {game.pf2e.actions.treatWounds({actors : this.actor})}
+			}]];
+			const skillactions = /*Array.from(game.pf2e.actions).concat(*/Array.from(game.pf2e.actions.entries()).concat(addSkillActions).map(entry => entry[1]);
 			
 			const savesButtons = Object.keys(saves).map(saveKey => {
 				const save = saves[saveKey];

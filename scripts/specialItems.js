@@ -82,7 +82,7 @@ const settingActionIMGs = {
 	}
 }
 
-const trainedactions = ["maneuver-in-flight", "squeeze", "decipher-writing", "identify-magic", "learn-a-spell", "disarm", "identify-alchemy", "feint", "treat-disease", "treat-poison", "create-forgery", "track", "disable-device", "pick-a-lock"]
+const trainedactions = ["maneuver-in-flight", "squeeze", "decipher-writing", "identify-magic", "learn-a-spell", "disarm", "identify-alchemy", "feint", "treat-disease", "treat-poison", "treat-wounds", "create-forgery", "track", "disable-device", "pick-a-lock"]
 
 var defaultActions = {};
 
