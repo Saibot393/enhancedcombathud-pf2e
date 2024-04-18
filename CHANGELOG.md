@@ -1,3 +1,6 @@
+## v1.11.10
+- Added missing action "Treat wounds" to skill actions
+
 ## v1.11.9
 - Small bug fix for rule toggles
 
