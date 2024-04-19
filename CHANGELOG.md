@@ -1,3 +1,6 @@
+## v1.11.11
+- Bug fix for elemental blasts
+
 ## v1.11.10
 - Added missing action "Treat wounds" to skill actions
 
