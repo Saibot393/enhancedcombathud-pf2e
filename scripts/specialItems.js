@@ -427,6 +427,9 @@ async function registerPF2EECHSItems () {
 									case "administerFirstAid":
 										options = ["stabilize", "stop-bleeding"];
 										break;
+									case "createADiversion":
+										options = ["distracting-words", "gesture", "trick"];
+										break;
 								}
 								
 								if (options) {

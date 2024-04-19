@@ -1226,6 +1226,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								case "administer-first-aid":
 									options = ["stabilize", "stop-bleeding"];
 									break;
+								case "create-a-diversion":
+									options = ["distracting-words", "gesture", "trick"];
+									break;
 							}
 									
 							if (options) {
