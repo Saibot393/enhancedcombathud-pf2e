@@ -1,3 +1,6 @@
+## v1.11.12
+- Bug fix for create a diversion action
+
 ## v1.11.11
 - Bug fix for elemental blasts
 
