@@ -154,8 +154,8 @@ Hooks.on("updateItem", (item) => {
 				}
 			}
 		}
-		/*
 		if (item.type == "spellcastingEntry") {
+			/*
 			let staffid;
 			
 			if (game.modules.get(PF2EDailies)?.active) {	
@@ -163,15 +163,13 @@ Hooks.on("updateItem", (item) => {
 			}
 			
 			if (staffid) {
-				for (const itemButton of ui.ARGON.itemButtons) {
-					if (itemButton.item?.id == staffid || item.spells?.get(itemButton.item?.id)) {
-						console.log(itemButton);
-						itemButton.render();
-					}
+			*/
+			for (const itemButton of ui.ARGON.itemButtons) {
+				if (item.spells?.get(itemButton.item?.id)) {
+					itemButton.render();
 				}
 			}
 		}
-		*/
 		if (item.rules?.length) {
 			for (const itemButton of ui.ARGON.itemButtons) {
 				if (itemButton.item?.system?.updateID == item.id) {
@@ -1121,7 +1119,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					let valueLabel = `<span style="margin: 0 1rem">${skill.mod >= 0 ? "+" : ""}${skill.mod}</span>`;
 					
 					let rankicon = "";
-					if (!this.actor.type == "npc" && game.settings.get(ModuleName, "showtrainedrankletter")) {
+					if (!(this.actor.type == "npc") && game.settings.get(ModuleName, "showtrainedrankletter")) {
 						rankicon = `<i class="fa-solid fa-${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank).toLowerCase()[0]}" data-tooltip="${game.i18n.localize("PF2E.ProficiencyLevel" + skill.rank)}" style="font-size:${game.settings.get(ModuleName, "skillrankiconscale")}rem"></i> `;
 					}
 					
