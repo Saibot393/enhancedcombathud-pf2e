@@ -2046,8 +2046,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					if (game.modules.get(PF2EDailies)?.active) {
 						let staffData = this.actor.flags[PF2EDailies]?.extra?.staffData;
 						
-						if (staffData?.staffId == this.item.id) {
-							return staffData.charges?.value;
+						if (staffData) {
+							if (staffData?.staffId == this.item.id) {
+								return staffData.charges?.value;
+							}
 						}
 					}
 					
