@@ -1678,7 +1678,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			this.__defineGetter__("_currentActions", () => {
-				return CoreHUD._actionSave[this.actionType][this.actor.id]._currentActions;
+				return CoreHUD._actionSave[this.actionType][this.actor.id]?._currentActions;
 			});
 			
 			this.__defineSetter__("_currentActions", (value) => {
@@ -1813,8 +1813,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						}
 					}
 				
-					
-					availableActions = this.currentActions;
 					for (let i = 0;i < childrenArray.length; i++) {
 						childrenArray[i].style.color = i < this.currentActions ? "var(--ech-mainAction-base-color)" : "#788291"
 					}
