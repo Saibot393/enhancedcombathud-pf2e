@@ -1,3 +1,6 @@
+## v1.11.14
+- Small bug fix
+
 ## v1.11.13
 - Fixed bug that prevented the rank letters for not lore skills to show up
 - Fixed bug that prevented spell buttons from updating when used
