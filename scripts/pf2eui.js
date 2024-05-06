@@ -2128,6 +2128,16 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 		}
 		
+		get disabled() {
+			if (this.isWeaponSet) {
+				if (this.item) {
+					return !(this.item.system?.equipped?.handsHeld > 0);
+				}
+			}
+			
+			return false;
+		}
+		
 		async getTooltipData() {
 			if (this.panel?.visible) return null;
 			const tooltipData = await getTooltipDetails(this.item);
@@ -2355,6 +2365,28 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			await super._renderInner();
 			
+			if (this.isWeaponSet) {
+				let isGrey = false;
+				
+				const quantity = this.quantity;
+				const quantitySecondary = this.quantitySecondary;
+				const isBothZero = (( quantity ?? 0) + (quantitySecondary ?? 0)) === 0;
+				
+				if (this.item?.name == "+1 Longbow") console.log(isGrey);
+				
+				if (Number.isNumeric(quantity) || Number.isNumeric(quantitySecondary)) {
+					isGrey = isGrey || isBothZero;
+				}
+				
+				if (this.item?.name == "+1 Longbow") console.log(isGrey);
+				
+				isGrey = isGrey || this.disabled;
+				
+				if (this.item?.name == "+1 Longbow") console.log(isGrey);
+				
+				this.element.style.filter = isGrey ? "grayscale(1)" : null;
+			}
+			
 			if (this.isWeaponSet && this.isPrimary) {
 				if (this.panel) {
 					this.panel.element.remove();
@@ -2472,7 +2504,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 				
-				if (this.item?.requiresAmmo) {
+				if (this.item?.requiresAmmo || this.item?.ammoRequired > 0) {
 					if (game.modules.get("pf2e-ranged-combat")?.active && game.settings.get(ModuleName, "rangedammoswapmacro")) {
 						let toggleData = {
 							iconclass : ["fa-solid", "fa-repeat"],
@@ -2656,6 +2688,39 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 					toggles.push(toggleData);
 				}
+				
+				if (this.actionType == "action") {
+					let sheathedrawaction = connectedsettingAction(this.item)?.auxiliaryActions?.find(action => action.annotation == "sheathe" || action.annotation == "draw");
+					
+					if (sheathedrawaction) {
+						let sdicon = "";
+						
+						switch (sheathedrawaction.annotation) {
+							case "sheathe":
+								sdicon = "fa-hand-back-fist";
+								break;
+							case "draw":
+								sdicon = "fa-tshirt";
+								break;
+						}
+						
+						let toggleData = {
+							iconclass : ["fa-solid", `${sdicon}`],
+							onclick : async () => {
+								useAction(this.actionType, sheathedrawaction.actions);
+								
+								await sheathedrawaction?.execute();
+								
+								this.updatePartnerButton();
+							},
+							tooltip : sheathedrawaction?.label || ""
+						};	
+
+						toggles.push(toggleData);
+					}
+				}
+				
+				//add shield 0, 1, 2 toggle
 			}
 			
 			if (this.item?.system.frequency?.max > this.item?.system.frequency?.value) {
