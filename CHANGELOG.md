@@ -1,3 +1,8 @@
+## v1.11.15
+- Fixed bug with ammo select
+- Unequipped weapons in the weapon set buttons are now greyscaled
+- Added draw/sheathe button to weapon set buttons
+
 ## v1.11.14
 - Small bug fix
 
