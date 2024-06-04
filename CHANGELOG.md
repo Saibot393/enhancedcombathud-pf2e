@@ -1,3 +1,6 @@
+## v2.0.0
+- v12 compatibility
+
 ## v1.11.15
 - Fixed bug with ammo select
 - Unequipped weapons in the weapon set buttons are now greyscaled
