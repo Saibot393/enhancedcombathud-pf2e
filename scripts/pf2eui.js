@@ -2803,7 +2803,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			this.element.appendChild(createToggleIcons(toggles, {iconsize : iconsize, rightoffset : 0, topoffset : topoffset}));
 			
 			if (game.settings.get(ModuleName, "showconnectedpassives")) {
-				if (["weapon", "shield", "action", "melee"].includes(this.item.type)) {
+				if (["weapon", "shield", "action", "melee"].includes(this.item?.type)) {
 					let passives = connectedPassives(this.item);
 					
 					let passiveToggles = passives.map(passive => {
