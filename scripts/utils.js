@@ -529,7 +529,7 @@ function spelluseAction(spell, level, heightenlevel = 0) {
 					castoptions[i] = {label : `${i}${ordinal} ${game.i18n.localize("PF2E.Item.Spell.Rank.Label")} [${spellgroup.system.slots["slot" + i].value}/${spellgroup.system.slots["slot" + i].max}]`};
 				}
 				
-				let heightenedto = await openNewInput("choice", game.i18n.localize("PF2E.CastLabel"), game.i18n.localize("PF2E.SpellLevelLabel.CastingItemCreateDialog"), {defaultValue : level,options : castoptions});
+				let heightenedto = await openNewInput("choice", game.i18n.localize("PF2E.CastLabel"), game.i18n.localize("PF2E.SpellLevelLabel"), {defaultValue : level,options : castoptions});
 				
 				spell.spellcasting.cast(spell, {consume : true, rank : Number(heightenedto)});
 			}
