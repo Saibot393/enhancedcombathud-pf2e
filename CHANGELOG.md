@@ -1,3 +1,6 @@
+## v2.0.2
+- Small bug fix for versatile weapons
+
 ## v2.0.1
 - Small bug fix
 
