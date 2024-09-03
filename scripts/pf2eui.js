@@ -2579,7 +2579,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						if (toggle.options.length) {
 							let options = [null, ...toggle.options];
 							
-							let current = toggle.selection;
+							let current = toggle.selected;
 							let currentid = options.indexOf(current);
 							let next = options[(currentid + 1)%options.length];
 							
@@ -2591,7 +2591,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								iconclass : damageIcon(current),
 								onclick : () => {
 									if (togglekey == "modular") useAction("action");
-									this.item.update({system : {traits : {toggles : {[togglekey] : {selection : next}}}}})
+									this.item.update({system : {traits : {toggles : {[togglekey] : {selected : next}}}}})
 								},
 								tooltip : game.i18n.localize("PF2E.Trait" + firstUpper(togglekey))
 							};
@@ -3493,6 +3493,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _getPanel() {
 			switch (this.type) {
 				case "spell":
+					console.log("test");
 					return new PF2EAccordionPanel({id: this.id, accordionPanelCategories: this.sortedSpells().map(data => new PF2EAccordionPanelCategory(data)) });
 					break;
 				default:
