@@ -3493,7 +3493,6 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _getPanel() {
 			switch (this.type) {
 				case "spell":
-					console.log("test");
 					return new PF2EAccordionPanel({id: this.id, accordionPanelCategories: this.sortedSpells().map(data => new PF2EAccordionPanelCategory(data)) });
 					break;
 				default:

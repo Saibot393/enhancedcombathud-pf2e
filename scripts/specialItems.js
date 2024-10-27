@@ -583,7 +583,7 @@ function skillactionkeys(skill) {
 function systemfromaction(action) {
 	if (!action) return {};
 	
-	return {
+	let data = {
 		description : {value : game.i18n.localize(action.description)},
 		traits : {value : action.traits},
 		slug : action.slug,
@@ -591,6 +591,15 @@ function systemfromaction(action) {
 		actionType : {value : Number.isNumeric(action.glyph) ? "action" : action.glyph},
 		actions : {value : Number.isNumeric(action.glyph) ? Number(action.glyph) : ""}
 	};
+	
+	switch (data.actionType?.value) {
+		case "R" :
+			data.actionType.value = "reaction";
+			data.actions.value = 1;
+			break;
+	}
+	
+	return data;
 }
 
 export {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule, getSettingActionOptions, getSettingActionTitles}
