@@ -17,6 +17,8 @@ const hporange = "rgb(255 127 0)";
 const hpyellow = "rgb(255 255 0)";
 const hpgreen = "rgb(0 255 100)";
 
+var Pf2eEffectClass;
+
 /* EXPERIMENTAL code to add custom colors
 Hooks.once("argonDefaultColor", (defaultColors) => {
 	defaultColors.colors.movement.test123 = { background: "#c85f5aFF", boxShadow: "#dc736eCC" };
@@ -139,6 +141,25 @@ Hooks.once("ready", async () => {
 	if (!game.user.getFlag(ModuleName, "lockedmacros")) {
 		game.user.setFlag(ModuleName, "lockedmacros", {});
 	}
+	
+	class EffectClass extends CONFIG.ARGON.PORTRAIT.Effect {
+		async _onLeftClick(event) {
+			if (this.effect.isValued) {
+				this.actor.increaseCondition(this.effect.slug);
+			}
+		}
+
+		async _onRightClick(event) {
+			if (this.effect.isValued) {
+				this.actor.decreaseCondition(this.effect.slug);
+			}
+			else {
+				this.actor.toggleCondition(this.effect.slug);
+			}
+		}
+	}
+	
+	Pf2eEffectClass = EffectClass;
 });
 
 Hooks.on("updateItem", (item) => {
@@ -285,6 +306,23 @@ Hooks.on("argonInit", async (CoreHUD) => {
     class PF2EPortraitPanel extends ARGON.PORTRAIT.PortraitPanel {
 		constructor(...args) {
 			super(...args);
+		}
+		
+		get effectClass() {
+			return Pf2eEffectClass;
+		}
+		
+		async getEffects() {
+			const effects = [];
+			for(const effect of this.actor.items.filter(item => item.type == "condition")) {
+				effects.push({	img: effect.img, 
+								name: effect.name, 
+								tooltip: await TextEditor.enrichHTML(effect.description),
+								slug : effect.system.slug,
+								isValued : effect.system.value?.isValued
+							});
+			}
+			return effects;
 		}
 		
 		get description() {
