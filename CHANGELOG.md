@@ -1,3 +1,6 @@
+## v2.0.4
+- Added compatibility with new CORE temporary effect feature
+
 ## v2.0.3
 - Small bug fix
 
