@@ -3252,7 +3252,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			switch (this.type) {
-				case "feat": return "PF2E.Item.Action.Plural";
+				case "feat": return "PF2E.Item.ABC.Features";
 				case "toggle": return "PF2E.TogglesLabel";
 				default : return "PF2E.Item." + firstUpper(this.type) + ".Plural";
 			}
