@@ -1,3 +1,6 @@
+## v2.0.5
+- Fix for translation error
+
 ## v2.0.4
 - Added compatibility with new CORE temporary effect feature
 
