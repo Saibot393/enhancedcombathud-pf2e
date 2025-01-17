@@ -1000,11 +1000,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					const height = 23;
 					let traitbox = document.createElement("div");
 					traitbox.style.position = "absolute";
-					traitbox.style.top = 0;
+					traitbox.style.top = "1px";
 					traitbox.style.left = 0;
 					traitbox.style.width = "100%";
 					traitbox.style.height = `${height}px`;
-					traitbox.style.background = "rgba(65, 75, 85, 0.9)";
+					traitbox.style.background = "var(--ech-mainAction-base-background)";
 					traitbox.style.zIndex = "1";
 					traitbox.style.overflowX = "auto";
 					traitbox.style.overflowY = "hidden";
@@ -1408,6 +1408,10 @@ Hooks.on("argonInit", async (CoreHUD) => {
 
 		get title() {
 			return `${game.i18n.localize("PF2E.SavesHeader")}, ${game.i18n.localize("PF2E.CoreSkillsHeader")} & ${game.i18n.localize("PF2E.LoreSkillsHeader")}`;
+		}
+		
+		get template() {
+			return `/modules/${ModuleName}/templates/DrawerPanel.hbs`;
 		}
 		
 		_expandPanel(index) {
@@ -3254,6 +3258,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			switch (this.type) {
 				case "feat": return "PF2E.Item.ABC.Features";
 				case "toggle": return "PF2E.TogglesLabel";
+				case "action": return "PF2E.TabActionsLabel";
 				default : return "PF2E.Item." + firstUpper(this.type) + ".Plural";
 			}
 		}
