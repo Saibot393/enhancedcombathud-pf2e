@@ -1,5 +1,5 @@
 ## v2.0.6
-- Small ui improvements
+- Small ui fixes & improvements
 
 ## v2.0.5
 - Fix for translation error
