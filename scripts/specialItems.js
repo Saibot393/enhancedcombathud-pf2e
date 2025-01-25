@@ -539,7 +539,8 @@ function itemfromRule(rule) {
 				onchange : (value) => {if (connectedItem) {
 					rule.actor.toggleRollOption(rule.domain, rule.option, connectedItem.id, connectedItem.rules[ruleIndex].value, value)
 				}},
-				selectvalue : () => {return rule.suboptions?.find(option => option.selected).value}
+				//selectvalue : () => {return rule.suboptions?.find(option => option.selected).value}
+				selectvalue : () => {return connectedItem.rules[ruleIndex].selection}
 			}
 		}
 	}

@@ -2414,17 +2414,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				const quantitySecondary = this.quantitySecondary;
 				const isBothZero = (( quantity ?? 0) + (quantitySecondary ?? 0)) === 0;
 				
-				if (this.item?.name == "+1 Longbow") console.log(isGrey);
-				
 				if (Number.isNumeric(quantity) || Number.isNumeric(quantitySecondary)) {
 					isGrey = isGrey || isBothZero;
 				}
 				
-				if (this.item?.name == "+1 Longbow") console.log(isGrey);
-				
 				isGrey = isGrey || this.disabled;
-				
-				if (this.item?.name == "+1 Longbow") console.log(isGrey);
 				
 				this.element.style.filter = isGrey ? "grayscale(1)" : null;
 			}
@@ -2466,7 +2460,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						option.style.height = "20px";
 						option.style.backgroundColor = "grey";
 						option.style.fontSize = "12px";
-						option.selected = ruleoption.value == this.item.flags[ModuleName].selectvalue;
+						option.selected = ruleoption.value == this.item.flags[ModuleName].selectvalue();
 						
 						optionselect.appendChild(option);
 					}
