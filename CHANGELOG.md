@@ -1,3 +1,6 @@
+## v2.0.7
+- Fix for rule toggles
+
 ## v2.0.6
 - Small ui fixes & improvements
 
