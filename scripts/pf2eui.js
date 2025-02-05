@@ -499,7 +499,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				]
 			];
 			
-			const spellDC = Math.max(...(await Promise.all(this.actor.items.filter(item => item.type == 'spellcastingEntry').map(group => group.getSpellData()))).map(info => info.statistic.dc.value));
+			const spellDC = Math.max(...(await Promise.all(this.actor.items.filter(item => item.type == 'spellcastingEntry').map(group => group.getSheetData()))).map(info => info.statistic.dc.value));
 			
 			/*
 			for (let spellgroup of this.actor.items.filter(item => item.type == 'spellcastingEntry')) {
@@ -797,7 +797,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			const spellDCElement = this.element.querySelector("#SpellDCvalue");
 			
 			if (spellDCElement) {//spell DC
-				let description = (await Promise.all(this.actor.items.filter(item => item.type == 'spellcastingEntry').map(group => group.getSpellData()))).find(info => info.statistic.dc.value == spellDCElement.innerHTML)?.statistic.dc.breakdown;
+				let description = (await Promise.all(this.actor.items.filter(item => item.type == 'spellcastingEntry').map(group => group.getSheetData()))).find(info => info.statistic.dc.value == spellDCElement.innerHTML)?.statistic.dc.breakdown;
 				
 				let spellicon = document.createElement("i");
 				spellicon.classList.add("fa-solid", "fa-book");
@@ -2278,7 +2278,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			else {
 				if (this.item) {
 					if (this.item.flags.hasOwnProperty(ModuleName) && this.item.flags[ModuleName].onclick) {//custom on clicks
-						used = await this.item.flags[ModuleName].onclick(options);
+						used = await this.item.flags[ModuleName].onclick({event, ...options});
 					}
 					else {
 						if (this.panel && game.settings.get(ModuleName, "directStaffuse")) {//panel action
@@ -2311,11 +2311,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							else {
 								if (this.item.consume) {//consume actions
 									if (game.settings.get(ModuleName, "consumableuse").includes("consume")) {
-										this.item.consume();
+										this.item.consume(event);
 									}
 									
 									if (game.settings.get(ModuleName, "consumableuse").includes("chat")) {
-										this.item.toChat();
+										this.item.toChat(event);
 									}
 						
 									used = true;
@@ -2326,7 +2326,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 										used = true;
 									}
 									else {//give up and let PF2E handle it
-										this.item.toChat();
+										this.item.toChat(event);
 										used = true;
 									}
 									
@@ -2846,7 +2846,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						return {
 							iconsource : passive.img,
 							tooltip : passive.name,
-							onclick : () => (passive.toChat()),
+							onclick : (event) => (passive.toChat(event)),
 							onrclick : () => (passive.sheet?.render(true))
 						}
 					});

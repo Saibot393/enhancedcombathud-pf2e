@@ -187,6 +187,7 @@ async function registerPF2EECHSItems () {
 						
 							if (actor) {
 								game.pf2e.actions.get("step").toActionVariant({actors : actor}).toMessage();
+								//game.pf2e.actions.get("step").toChat(options.event);
 							}
 							
 							ui.ARGON?.components?.movement.addstep();
@@ -212,6 +213,7 @@ async function registerPF2EECHSItems () {
 							}
 							else {
 								game.pf2e.actions.get("take-cover").toActionVariant({actors : actor}).toMessage()
+								//game.pf2e.actions.get("take-cover").toChat(options.event);
 							}
 							return true;
 						}

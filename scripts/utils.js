@@ -91,7 +91,7 @@ async function getTooltipDetails(item) {
 			
 			details.push({
 				label: game.i18n.localize("PF2E.Category"),
-				value: game.i18n.localize("PF2E.Item.Action.Category." + firstUpper(system.category)) + (actionicon.length ? ` <i class="${actionicon.join(" ")}"></i>` : "")
+				value: game.i18n.localize("PF2E.Item.Ability.Category." + firstUpper(system.category)) + (actionicon.length ? ` <i class="${actionicon.join(" ")}"></i>` : "")
 			});
 		}
 		
@@ -127,8 +127,8 @@ async function getTooltipDetails(item) {
 		
 		if (system.area) {
 			details.push({
-				label: game.i18n.localize("PF2E.AreaLabel"),
-				value: replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : system.area.value}) + " " + game.i18n.localize("PF2E.AreaType" + firstUpper(system.area.type))
+				label: game.i18n.localize("PF2E.Area.Label"),
+				value: replacewords(game.i18n.localize("PF2E.WeaponRangeN"), {range : system.area.value}) + " " + game.i18n.localize("PF2E.Area.Shape." + system.area.type)
 			});
 		}
 		
