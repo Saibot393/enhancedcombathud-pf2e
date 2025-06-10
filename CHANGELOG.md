@@ -1,3 +1,6 @@
+## v3.0.1
+- Improved support for [Starfinder 2e Playtest](https://foundryvtt.com/packages/starfinder-field-test-for-pf2e)
+
 ## v3.0.0
 - v13 compatibility
 
