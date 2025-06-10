@@ -1265,6 +1265,12 @@ Hooks.on("argonInit", async (CoreHUD) => {
 								case "create-a-diversion":
 									options = ["distracting-words", "gesture", "trick"];
 									break;
+								case "drive": //for Starfinder2e
+									options = ["drive1", "drive2", "drive3"];
+									break;
+								case "stunt": //for Starfinder2e
+									options = ["back-off", "evade", "flip-and-burn", "barrel-roll", "flyby", "drift", "turn-in-place"];
+									break;
 							}
 									
 							if (options) {
@@ -4406,6 +4412,11 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			inactiveItems.forEach((item) => {
 				if (this.actor.items.get(item.id)) {
+					/*
+					if (item.parentItem) {
+						item = item.parentItem;
+					}
+					*/
 					updates.push({ _id: item.id, system : {equipped : {carryType : "worn"}} });
 				}
 			});
@@ -4414,8 +4425,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (activeItems[0] == activeItems[1]) {
 				handsHeld = 2;
 			}
+
 			activeItems.forEach((item) => {
 				if (this.actor.items.get(item.id)) {
+					/*
+					if (item.parentItem) {
+						item = item.parentItem;
+					}
+					*/
+					
 					updates.push({ _id: item.id, system : {equipped : {carryType : "held", handsHeld : handsHeld}} });
 				}
 			});
