@@ -601,12 +601,15 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				
 				let heroSpan = document.createElement("span");
 				heroSpan.classList.add("adjust-hero-points");
+				/*
 				if (value == 1) {
 					heroSpan.setAttribute("data-tooltip", replacewords(game.i18n.localize("PF2E.HeroPointRatio.One"), {value : value, max : max}));
 				}
 				else {
 					heroSpan.setAttribute("data-tooltip", replacewords(game.i18n.localize("PF2E.HeroPointRatio.Many"), {value : value, max : max}));
 				}
+				*/
+				heroSpan.setAttribute("data-tooltip", replacewords(game.i18n.localize("PF2E.Actor.ResourceRatio"), {resource : game.i18n.localize("PF2E.Actor.Resource.HeroPoints"), value : value, max : max}));
 				heroSpan.style.fontSize = "20px";
 				
 				for (let i = 1; i <= max; i++) {
@@ -2177,6 +2180,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get disabled() {
+			if (this.actor.type == "npc") return false;
+			
 			if (this.isWeaponSet) {
 				if (this.item) {
 					return !(this.item.system?.equipped?.handsHeld > 0);
