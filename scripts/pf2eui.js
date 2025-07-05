@@ -164,6 +164,7 @@ Hooks.once("ready", async () => {
 
 Hooks.on("updateItem", (item) => {
 	const PF2EDailies = "pf2e-dailies";
+	
 	if (ui.ARGON && item.parent == ui.ARGON?.components.portrait?.actor) {
 		if (item.type == "condition") {
 			ui.ARGON.components.portrait.render();
@@ -274,6 +275,69 @@ Hooks.once("init", async () => {
 	}
 	
 	CONFIG.ARGON.CORE.CoreHUD.prototype.bind = newBind;
+	
+	CONFIG.ARGON.CORE.Tooltip.prototype._hovered = false;
+	CONFIG.ARGON.CORE.ArgonComponent.prototype._hovered = false;
+	
+	async function newToolTipListener() {
+        if (!game.settings.get("enhancedcombathud", "showTooltips")) return;
+        const html = this.element;
+        html.onmouseenter = () => {}//this._onTooltipMouseEnter.bind(this);
+        html.onmouseleave = this._onTooltipMouseLeave.bind(this);
+        //add listener for middle mouse click
+        html.addEventListener("mouseup", (event) => {
+            const isWheelClick = event.button === 1;
+            if(isWheelClick) this._onTooltipMouseEnter(event, true);
+        });
+    }
+	
+	async function NEWonTooltipMouseEnter(event, locked = false) {
+		this._mouseOver = true;
+		
+        if(locked && this._tooltip) this._tooltip._destroy();
+        const tooltipData = await this.getTooltipData();
+        if (!tooltipData) return;
+        const tooltipCls = this.tooltipCls;
+        this._tooltip = new tooltipCls(tooltipData, this.element, this.tooltipOrientation, locked);
+        this._tooltip.render();
+    }
+
+    async function NEWonTooltipMouseLeave(event) {
+		this._mouseOver = false;
+		
+		const timeout = async ms => new Promise(res => setTimeout(res, ms));
+	
+		await timeout(50); //give tooltip time to register mouse over
+		
+        if (!this._tooltip || this._tooltip._locked) return;
+		if (this._tooltip._mouseOver) return;
+        this._tooltip._destroy();
+		this._tooltip = null;
+    }
+	
+	CONFIG.ARGON.CORE.ArgonComponent.prototype._onTooltipMouseEnter = NEWonTooltipMouseEnter;
+	CONFIG.ARGON.CORE.ArgonComponent.prototype._onTooltipMouseLeave = NEWonTooltipMouseLeave;
+	
+	let OLDTooltipRender = CONFIG.ARGON.CORE.Tooltip.prototype.render
+	
+	async function NEWTooltipRender(...args) {
+		let BoundRender = OLDTooltipRender.bind(this);
+		
+		BoundRender(...args);
+		
+		this.element.addEventListener("mouseleave", () => {
+			this._mouseOver = false;
+			
+			//if (this._tooltip._mouseOver || this._locked) return;
+			this._destroy();
+		});
+		
+		this.element.addEventListener("mouseenter", () => {
+			this._mouseOver = true;
+		});
+	}
+	
+	CONFIG.ARGON.CORE.Tooltip.prototype.render = NEWTooltipRender;
 });
 
 Hooks.on("argonInit", async (CoreHUD) => {
