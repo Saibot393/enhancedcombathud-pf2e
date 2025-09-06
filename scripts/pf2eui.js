@@ -2615,7 +2615,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 				
-				if (this.item?.requiresAmmo || this.item?.ammoRequired > 0) {
+				if (this.item?.requiresAmmo || this.item?.ammoRequired > 0 || this.item.system.reload) {
 					if (game.modules.get("pf2e-ranged-combat")?.active && game.settings.get(ModuleName, "rangedammoswapmacro")) {
 						let toggleData = {
 							iconclass : ["fa-solid", "fa-repeat"],
