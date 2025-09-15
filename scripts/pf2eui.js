@@ -2334,7 +2334,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				let staffSpells = await this.staffSpells();
 				
 				if (staffSpells?.length) {
-					return new PF2EAccordionPanel({accordionPanelCategories: staffSpells.map(data => new PF2EAccordionPanelCategory(data)) });
+					return new PF2EAccordionPanel({id : "staffSpells", accordionPanelCategories: staffSpells.map(data => new PF2EAccordionPanelCategory(data))});
 				}
 			}
 			return null;
@@ -3482,7 +3482,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					uses: () => {return {
 						max : this.actor.system.resources.focus.max,
 						value : this.actor.system.resources.focus.value
-					}}
+					}},
+					level : "F"
 				});
 			}
 			
@@ -3605,7 +3606,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		async _getPanel() {
 			switch (this.type) {
 				case "spell":
-					return new PF2EAccordionPanel({id: this.id, accordionPanelCategories: this.sortedSpells().map(data => new PF2EAccordionPanelCategory(data)) });
+					return new PF2EAccordionPanel({id: "spell", accordionPanelCategories: this.sortedSpells().map(data => new PF2EAccordionPanelCategory(data)) });
 					break;
 				default:
 					return new PF2EButtonPanel({id: this.id, buttons: this.validitems.map(item => new PF2EItemButton({item}))});
@@ -3743,6 +3744,17 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			openpanels.forEach(panel => panel.toggle(false, noTransition));
 		}
+		
+		restoreState() {
+			if (this.id) {
+				for (let i = 0; i < this._subPanels.length; i++) {
+					this._subPanels[i]?.synchToggletoFlag();
+				}
+			}
+			else {
+				super.restoreState();
+			}
+		}
 	}
 	
 	class PF2EAccordionPanelCategory extends ARGON.MAIN.BUTTON_PANELS.ACCORDION.AccordionPanelCategory {
@@ -3760,6 +3772,24 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			super.toggle(toggle, noTransition);
+			
+			if (this.actor?.isOwner && this.id) {
+				this.actor.setFlag(ModuleName, `toggleState.${this.id}.${game.userId}.${this.level}`, this.visible)
+			}
+		}
+		
+		synchToggletoFlag() {
+			let targetState = this.actor?.getFlag(ModuleName, `toggleState.${this.id}.${game.userId}.${this.level}`);
+			
+			if (targetState != undefined) {
+				if (this.visible != targetState) {
+					this.toggle();
+				}
+			}
+		}
+		
+		get id() {
+			return this.parent?.id;
 		}
 		
 		get buttonMultipliers() {
