@@ -1,3 +1,6 @@
+## v3.0.3
+- Fixed bug that prevented the ammo choice to show up for certain weapons
+
 ## v3.0.2
 - Fixed bug that sometimes caused tooltips to flicker
 
