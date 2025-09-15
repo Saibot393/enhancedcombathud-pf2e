@@ -1,3 +1,6 @@
+## v3.1.0
+- Spell accordion panels will now remember the toggle state per character and per user
+
 ## v3.0.3
 - Fixed bug that prevented the ammo choice to show up for certain weapons
 
