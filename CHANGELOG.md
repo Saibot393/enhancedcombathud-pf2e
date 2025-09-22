@@ -1,3 +1,6 @@
+## v3.1.1
+- Bug fix for new Pf2e System version
+
 ## v3.1.0
 - Spell accordion panels will now remember the toggle state per character and per user
 
