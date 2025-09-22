@@ -4265,7 +4265,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				this.speedtype = value.srcElement.value;
 			}
 			
-			let movementtypes = [this.actor.system.attributes.speed.type];
+			let movementtypes = ["land"];
 			
 			movementtypes = movementtypes.concat(this.actor.system.attributes.speed.otherSpeeds.map(speed => speed.type));
 			
