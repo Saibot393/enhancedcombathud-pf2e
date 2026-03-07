@@ -1,3 +1,6 @@
+## v3.1.2
+- Change to adjust to new pf2e weapon data structure for special traits
+
 ## v3.1.1
 - Bug fix for new Pf2e System version
 
