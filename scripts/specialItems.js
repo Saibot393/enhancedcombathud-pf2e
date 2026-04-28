@@ -1,4 +1,4 @@
-import { ModuleName, settingActionSpace, firstUpper } from "./utils.js";
+import { ModuleName, settingActionSpace, firstUpper, hasFlySpeed } from "./utils.js";
 import {openNewInput} from "./popupInput.js";
 
 const ItemReplacementID = "_argonUI_";
@@ -301,7 +301,7 @@ async function registerPF2EECHSItems () {
 							let actor = options.actor;
 							
 							if (actor) {
-								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+								if (hasFlySpeed(actor)) {
 									return `icons/svg/angel.svg`;
 								}
 								else {
@@ -313,7 +313,7 @@ async function registerPF2EECHSItems () {
 							let actor = options.actor;
 							
 							if (actor) {
-								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+								if (hasFlySpeed(actor)) {
 									return game.i18n.localize(game.pf2e.actions.get("arrest-a-fall").name);
 								}
 								else {
@@ -326,7 +326,7 @@ async function registerPF2EECHSItems () {
 							let action;
 							
 							if (actor) {
-								if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+								if (hasFlySpeed(actor)) {
 									action = game.pf2e.actions.get("arrest-a-fall");
 								}
 								else {
@@ -341,7 +341,7 @@ async function registerPF2EECHSItems () {
 						let actor = options.actor;
 						
 						if (actor) {
-							if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+							if (hasFlySpeed(actor)) {
 								//game.pf2e.actions.get("arrest-a-fall").toMessage();
 								game.pf2e.actions.get("arrest-a-fall").toActionVariant().use({event : options.event})
 								return true;
@@ -357,7 +357,7 @@ async function registerPF2EECHSItems () {
 						let actor = options.actor;
 						
 						if (actor) {
-							if (actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")) {
+							if (hasFlySpeed(actor)) {
 								return (await fromUuid("Compendium.pf2e.actionspf2e.Item.qm7xptMSozAinnPS")).sheet.render(true);
 							}
 							else {

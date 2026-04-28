@@ -7,10 +7,10 @@
     "name": "saibot"
     }
   ],
-  "version": "3.1.2",
+  "version": "4.0.0",
   "compatibility": {
-    "minimum": "12",
-    "verified": "13"
+    "minimum": "13",
+    "verified": "14"
   },
   "socket": "true",
   "languages": [
@@ -60,7 +60,7 @@
 	]
   },
   "url": "https://github.com/Saibot393/enhancedcombathud-pf2e",
-  "download": "https://github.com/Saibot393/enhancedcombathud-pf2e/archive/refs/tags/v3.1.2.zip",
+  "download": "https://github.com/Saibot393/enhancedcombathud-pf2e/archive/refs/tags/v4.0.0.zip",
   "manifest": "https://github.com/Saibot393/enhancedcombathud-pf2e/releases/latest/download/module.json",
   "readme": "https://github.com/Saibot393/enhancedcombathud-pf2e/blob/main/README.md",
   "changelog": "https://github.com/Saibot393/enhancedcombathud-pf2e/blob/main/CHANGELOG.md",

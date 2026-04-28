@@ -1,5 +1,5 @@
 import {registerPF2EECHSItems, PF2EECHActionItems, PF2EECHFreeActionItems, PF2EECHReActionItems, trainedactions, itemfromRule} from "./specialItems.js";
-import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasFeats, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction, connectedPassives, toggleFavourite, isFavourite} from "./utils.js";
+import {replacewords, ModuleName, sorttypes, sortdirections, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, hasFeats, MAPtext, actionGlyphs, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, tabnames, sheettabbutton, itemfilter, actionfilter, sortfunction, connectedPassives, toggleFavourite, isFavourite, reloadWeapon, loadedAmmo, ammoCompatible} from "./utils.js";
 import {openNewInput} from "./popupInput.js";                                                                                                                                                                                    
 import {elementalBlastProxy} from "./proxyfake.js";  
 import {createItemMacro} from "./macro.js";
@@ -264,7 +264,7 @@ Hooks.once("init", async () => {
 		useAction
 	}
 	
-	let oldBind = CONFIG.ARGON.CORE.CoreHUD.prototype.bind;
+	let oldBind = (CONFIG.ARGON.CORE.CoreHUD || CONFIG.ARGON.CORE.CoreHud).prototype.bind;
 	
 	async function newBind (target) {
 		if (target && !target.isOwner) return;
@@ -274,7 +274,7 @@ Hooks.once("init", async () => {
 		return await call(target);
 	}
 	
-	CONFIG.ARGON.CORE.CoreHUD.prototype.bind = newBind;
+	(CONFIG.ARGON.CORE.CoreHUD || CONFIG.ARGON.CORE.CoreHud).prototype.bind = newBind;
 	
 	CONFIG.ARGON.CORE.Tooltip.prototype._hovered = false;
 	CONFIG.ARGON.CORE.ArgonComponent.prototype._hovered = false;
@@ -2442,7 +2442,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _onTooltipMouseEnter(event, locked = false) {
+			this._isMouseOver = true;
 			await super._onTooltipMouseEnter(event, locked);
+			await this.customMouseEnter();
+		}
+		
+		async _onMouseEnter(event, locked = false) {
+			this._isMouseOver = true;
+			await super._onMouseEnter(event, locked);
+			await this.customMouseEnter();
+		}
+		
+		async customMouseEnter() {
 			if (this.element.querySelector(".specialAction")) {
 				if (this.element.querySelector(".titleoverride")) {
 					let element = this.element.querySelector("span.action-element-title") || this.element.querySelector("span.feature-element-title");
@@ -2457,8 +2468,18 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		async _onTooltipMouseLeave(event) {
+			this._isMouseOver = false;
 			await super._onTooltipMouseLeave(event);
-			
+			await this.customMouseLeave();
+		}
+		
+		async _onMouseLeave(event) {
+			this._isMouseOver = false;
+			await super._onMouseLeave(event);
+			await this.customMouseLeave();
+		}
+		
+		async customMouseLeave() {
 			if (this.element.querySelector(".specialAction")) {
 				if (this.element.querySelector(".titleoverride")) {
 					let element = this.element.querySelector("span.action-element-title") || this.element.querySelector("span.feature-element-title");
@@ -2615,7 +2636,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					}
 				}
 				
-				if (this.item?.requiresAmmo || this.item?.ammoRequired > 0 || (this.item.system.reload && ![null, "-"].includes(this.item.system.reload.value))) {
+				if (this.item?.requiresAmmo || this.item?.ammoRequired > 0 || (this.item?.system.reload && ![null, "-"].includes(this.item?.system.reload.value))) {
 					if (game.modules.get("pf2e-ranged-combat")?.active && game.settings.get(ModuleName, "rangedammoswapmacro")) {
 						let toggleData = {
 							iconclass : ["fa-solid", "fa-repeat"],
@@ -2632,7 +2653,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						//ammoSelect.classList.add("action-element-title");
 						ammoSelect.classList.add("specialAction");
 						
-						for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => item.isAmmo)]) {
+						let loadedItems = loadedAmmo(this.item);
+						
+						for (let ammo of [{name : "", id : ""},...this.actor.items.filter(item => (item.isAmmo || item.type == "ammo") && ammoCompatible(this.item, item.id))]) {
 							let option = document.createElement("option");
 							option.text = ammo.name;
 							option.value = ammo.id;
@@ -2642,7 +2665,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 							option.style.height = "20px";
 							option.style.backgroundColor = "grey";
 							option.style.fontSize = "12px";
-							option.selected = this.item.system.selectedAmmoId == ammo.id;
+							option.selected = this.item.system.selectedAmmoId == ammo.id || loadedItems.find(item => item.id == ammo.id) || (ammo.id == "" && !this.item.system.selectedAmmoId && !loadedItems.length);
 							
 							ammoSelect.appendChild(option);
 						}
@@ -2661,7 +2684,22 @@ Hooks.on("argonInit", async (CoreHUD) => {
 						//ammoSelect.style.visibility = "hidden";
 						ammoSelect.style.display = "none";
 						
-						ammoSelect.onchange = () => {this.item.update({system : {selectedAmmoId : ammoSelect.value}})};
+						ammoSelect.onchange = async () => {
+							if (this.item.attach) {
+								if (loadedItems.length) {
+									for (let ammo of loadedItems) {
+										await ammo.detach({skipConfirm : true});
+									}
+								}
+								
+								if (reloadWeapon(this.item, ammoSelect.value)) {
+									useAction("action");
+								}
+							}
+							else {
+								this.item.update({system : {selectedAmmoId : ammoSelect.value}})
+							}
+						};
 						
 						this.element.appendChild(ammoSelect);
 					}
@@ -2929,6 +2967,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 					this.element.appendChild(createToggleIcons(passiveToggles, {iconsize : iconsize, leftoffset : 0, align : "center"}));
 				}
 			}
+			
+			if (this._isMouseOver) this._onMouseEnter();
 		}
 	}
 	
@@ -3189,6 +3229,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _onMouseEnter(event, locked = false) {
+			this._isMouseOver = true;
 			await super._onTooltipMouseEnter(event, locked);
 			
 			if (this.element.querySelector(".specialAction")) {
@@ -3205,6 +3246,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		async _onMouseLeave(event) {
+			this._isMouseOver = false;
+			
 			await super._onTooltipMouseLeave(event);
 			
 			if (this.element.querySelector(".specialAction")) {
@@ -3300,6 +3343,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			toggles.push(toggleData);
 			
 			this.element.appendChild(createToggleIcons(toggles, {iconsize : iconsize, rightoffset : 0, topoffset : 0}));
+			
+			if (this._isMouseOver) this._onMouseEnter();
 		}
 	}
   
@@ -3622,6 +3667,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _onMouseEnter(event, locked = false) {
+			this._isMouseOver = true;
 			if (this.element.querySelector(".specialAction")) {
 				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
 					//specialelement.style.visibility = "";
@@ -3631,6 +3677,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 
 		async _onMouseLeave(event) {
+			this._isMouseOver = false;
 			if (this.element.querySelector(".specialAction")) {
 				for (const specialelement of this.element.querySelectorAll(".specialAction")) {
 					//specialelement.style.visibility = "hidden";
@@ -3696,6 +3743,8 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			}
 			
 			this.element.appendChild(createToggleIcons(toggles, {iconsize : iconsize, rightoffset : 0, topoffset : 0}));
+			
+			if (this._isMouseOver) this._onMouseEnter();
 		}
 		
 		async increaseSortType() {
@@ -3985,20 +4034,20 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		get typemaxspeed() {
-			let typeinfo = this.actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == this.speedtype);
-			
+			let typeinfo = this.actor.system.attributes.speed?.otherSpeeds.find(speed => speed.type == this.speedtype) || this.actor.system.movement.speeds[this.speedtype];
+
 			if (this.speedtype == "land") {
 				if (this.actor.hasCondition("prone")) {
 					return 5;
 				}
-				typeinfo = this.actor.system.attributes.speed;
+				typeinfo = this.actor.system.attributes.speed || typeinfo;
 			}
-			
+
 			if (!typeinfo) {//fallback to default land
 				return 0;
 			}
 			else {
-				return typeinfo.total;
+				return typeinfo.total || typeinfo.value;
 			}
 		}
 		
@@ -4190,9 +4239,9 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			const movementColor = this.movementColor;
 
-			const disabledBars = Math.min(Math.max((this.movementUsedthisAction) || 0, 0), max);
+			const disabledBars = Math.round(Math.min(Math.max((this.movementUsedthisAction) || 0, 0), max));
 
-			const barsNumber = Math.min(Math.max(this.movementMax - disabledBars, 0), max);
+			const barsNumber = Math.round(Math.min(Math.max(this.movementMax - disabledBars, 0), max));
 
 			const barsContainer = this.element.querySelector(".movement-spaces");
 
@@ -4203,19 +4252,23 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			for (let i = 0; i < disabledBars; i++) {
 			  newHtml += `<div class="movement-space"></div>`;
 			}
-			this.element.querySelector(".movement-current").innerText = barsNumber;
-			this.element.querySelector(".movement-max").innerText = (this._prevUsepoint + this.movementMax);
+			this.element.querySelector(".movement-current").innerText = Math.round(barsNumber);
+			this.element.querySelector(".movement-max").innerText = Math.round((this._prevUsepoint + this.movementMax));
 			barsContainer.innerHTML = newHtml;
 		}
 		
 		onTokenUpdate(updates, context) {
 			if (updates.x === undefined && updates.y === undefined) return;
-			const ray = new Ray({ x: this.token.x, y: this.token.y }, { x: updates.x ?? this.token.x, y: updates.y ?? this.token.y });
+			const startPoint = { x: this.token.x, y: this.token.y, elevation : this.token.elevation};
+			const targetPoint = { x: updates.x ?? this.token.x, y: updates.y ?? this.token.y, elevation : updates.elevation ?? this.token.elevation };
+			const ray = new Ray(startPoint, targetPoint);
 			const segments = [{ ray }];
-			const distance = Math.floor(
-				canvas.grid.measureDistances(segments, { gridSpaces: true }) /
+			let distance = 
+				(canvas.grid.measureDistances ? canvas.grid.measureDistances(segments, { gridSpaces: true }) : canvas.grid.measurePath([startPoint, targetPoint]).cost) /
 				canvas.dimensions.distance
-			);
+			;
+			
+			
 			if (context?.isUndo) {
 				this.movementUsed -= distance;
 			}
@@ -4267,7 +4320,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			
 			let movementtypes = ["land"];
 			
-			movementtypes = movementtypes.concat(this.actor.system.attributes.speed.otherSpeeds.map(speed => speed.type));
+			movementtypes = this.actor.system.movement ? Object.keys(this.actor.system.movement.speeds).filter(key => this.actor.system.movement.speeds[key]).filter(key => key != "travel") : movementtypes.concat(this.actor.system.attributes.speed.otherSpeeds.map(speed => speed.type));
 			
 			let rollmovements = [];
 			
@@ -4427,7 +4480,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 		}
 		
 		async _getSets() {
-			const sets = mergeObject(await this.getDefaultSets(), deepClone(this.actor.getFlag("enhancedcombathud", "weaponSets") || {}));
+			const sets = foundry.utils.mergeObject(await this.getDefaultSets(), foundry.utils.deepClone(this.actor.getFlag("enhancedcombathud", "weaponSets") || {}));
 
 			for (const [set, slots] of Object.entries(sets)) {
 				for (let key of ["primary", "secondary"]) {

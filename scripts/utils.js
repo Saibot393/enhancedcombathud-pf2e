@@ -787,4 +787,41 @@ function isFavourite(item, classbydefault = true) {
 	return false;
 }
 
-export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction, connectedPassives, toggleFavourite, isFavourite}
+function hasFlySpeed(actor) {
+	if (actor.system.attributes.speed) {
+		return actor.system.attributes.speed.otherSpeeds.find(speed => speed.type == "fly")
+	}
+	if (actor.system.movement) {
+		return actor.system.movement.speeds.fly
+	}
+}
+
+function getLoadedAmmo(weapon) {
+	if (!weapon.system.ammo?.capacity) return [];
+	return weapon.subitems.filter((i) => i.isOfType("ammo") || i.isOfType("weapon") && i.isAmmoFor(weapon));
+}
+
+async function reloadWeapon(weapon, ammoId, all = !1) {
+	if (!weapon.actor.inventory.has(ammoId)) return false;
+	const ammo = weapon.actor.inventory.get(ammoId, { strict: !0 }), capacity = weapon.system.ammo?.capacity ?? 0, numLoaded = getLoadedAmmo(weapon).filter((a) => !(a.isOfType("ammo") && a.isMagazine && a.system.uses.value === 0)).reduce((total, n) => total + n, 0), remainingSpace = Math.max(0, capacity - numLoaded), quantity = all ? Math.min(remainingSpace, ammo.quantity) : 1;
+
+	remainingSpace > 0 && (await weapon.attach(ammo, {
+		quantity,
+		stack: !0
+	}));
+	const weaponAmmo = weapon.system.ammo;
+	return weaponAmmo?.capacity && numLoaded + quantity >= weaponAmmo.capacity;
+}
+
+function loadedAmmo(weapon) {
+	if (!weapon.subitems) return [];
+	return Array.from(weapon.subitems).filter(ammo => ammo.type == "ammo");
+}
+
+function ammoCompatible(weapon, ammoId) {
+	let ammo = weapon?.parent?.items.get(ammoId);
+	if (!ammo || !weapon) return false;
+	return weapon.system?.ammo?.baseType == ammo.system?.baseItem;
+}
+
+export { ModuleName, settingActionSpace, sorttypes, sortdirections, tabnames, replacewords, getTooltipDetails, actionGlyphofItem, damageIcon, firstUpper, actioninfo, actionGlyphs, sheettabbutton, hasFeats, MAPtext, spelluseAction, itemconnectedAction, isClassFeature, connectedItem, connectedsettingAction, itemcanbetwoHanded, itemfilter, actionfilter, sortfunction, connectedPassives, toggleFavourite, isFavourite, hasFlySpeed, reloadWeapon, loadedAmmo, ammoCompatible}
