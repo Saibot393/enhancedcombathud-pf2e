@@ -1,3 +1,6 @@
+## v4.0.0
+- v14 compatibility
+
 ## v3.1.2
 - Change to adjust to new pf2e weapon data structure for special traits
 
