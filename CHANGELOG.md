@@ -1,3 +1,6 @@
+## v4.0.1
+- Fixed dailies staff compatibility
+
 ## v4.0.0
 - v14 compatibility
 
