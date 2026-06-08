@@ -207,11 +207,11 @@ Hooks.on("updateItem", (item) => {
 
 Hooks.on("updateActor", (actor, change) => {
 	const PF2EDailies = "pf2e-dailies";
-	if (change?.flags && change?.flags[PF2EDailies]?.extra?.staffData) {
+	if (change?.flags && (change?.flags[PF2EDailies]?.extra?.staffData || change?.flags[PF2EDailies]?.extra?.dailies?.staves)) {
 		let staffid;
 		
 		if (game.modules.get(PF2EDailies)?.active) {	
-			staffid = actor?.flags[PF2EDailies]?.extra?.staffData?.staffId;
+			staffid = actor?.flags[PF2EDailies]?.extra?.staffData?.staffId || actor.flags[PF2EDailies]?.extra?.dailies?.staves?.staffId;
 		}
 		
 		if (staffid) {
@@ -2158,7 +2158,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 				case "weapon":
 					const PF2EDailies = "pf2e-dailies";
 					if (game.modules.get(PF2EDailies)?.active) {
-						let staffData = this.actor.flags[PF2EDailies]?.extra?.staffData;
+						let staffData = this.actor.flags[PF2EDailies]?.extra?.staffData || this.actor.flags[PF2EDailies]?.extra?.dailies?.staves;
 						
 						if (staffData) {
 							if (staffData?.staffId == this.item.id) {
@@ -2297,7 +2297,7 @@ Hooks.on("argonInit", async (CoreHUD) => {
 			if (this.item?.system.traits?.value.includes("staff")) {
 				if (game.modules.get(PF2EDailies)?.active) {
 					//let spellgroup = this.actor.items.filter(item => item.type == "spellcastingEntry").find(item => item.getFlag(PF2EDailies, "staff")?.staveID == this.item.id);
-					let spellgroup = this.actor.flags[PF2EDailies]?.extra?.staffData;
+					let spellgroup = this.actor.flags[PF2EDailies]?.extra?.staffData || this.actor.flags[PF2EDailies]?.extra?.dailies?.staves;
 						
 					if (spellgroup?.staffId == this.item.id) {
 						let spellCategorie = {};
